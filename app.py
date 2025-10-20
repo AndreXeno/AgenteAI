@@ -10,6 +10,52 @@ import tempfile
 # ==============================
 st.set_page_config(page_title="Mind&Body Coach AI", page_icon="🧘‍♂️", layout="centered")
 
+# ==============================
+# 🔐 LOGIN / REGISTRAZIONE UTENTE
+# ==============================
+st.sidebar.title("🔑 Accesso")
+auth_mode = st.sidebar.radio("Seleziona modalità:", ["Login", "Registrati"])
+
+users_file = "data/users.csv"
+import pandas as pd, os
+os.makedirs("data", exist_ok=True)
+
+# Carica o crea file utenti
+if os.path.exists(users_file):
+    users_df = pd.read_csv(users_file)
+else:
+    users_df = pd.DataFrame(columns=["username", "password"])
+    users_df.to_csv(users_file, index=False)
+
+if auth_mode == "Registrati":
+    new_user = st.sidebar.text_input("Crea username")
+    new_pass = st.sidebar.text_input("Crea password", type="password")
+    if st.sidebar.button("Registrati"):
+        if new_user and new_pass:
+            if new_user in users_df["username"].values:
+                st.sidebar.error("⚠️ Nome utente già esistente.")
+            else:
+                users_df.loc[len(users_df)] = [new_user, new_pass]
+                users_df.to_csv(users_file, index=False)
+                st.sidebar.success("✅ Registrazione completata! Ora effettua il login.")
+        else:
+            st.sidebar.warning("Compila entrambi i campi.")
+else:
+    login_user = st.sidebar.text_input("Username")
+    login_pass = st.sidebar.text_input("Password", type="password")
+    if st.sidebar.button("Accedi"):
+        if ((users_df["username"] == login_user) & (users_df["password"] == login_pass)).any():
+            st.session_state["logged_in"] = True
+            st.session_state["username"] = login_user
+            st.sidebar.success(f"👋 Bentornato, {login_user}!")
+        else:
+            st.sidebar.error("❌ Credenziali errate.")
+
+# Blocca l’accesso se non autenticato
+if "logged_in" not in st.session_state or not st.session_state["logged_in"]:
+    st.warning("🔒 Effettua l’accesso o registrati per continuare.")
+    st.stop()
+
 st.sidebar.header("👤 Profilo Utente")
 if st.sidebar.button("Modifica Profilo"):
     st.switch_page("pages/Profilo_Utente.py")
@@ -93,14 +139,15 @@ if send_btn and user_input:
     user_text = user_input.strip()
 elif audio:
     st.info("🎧 Elaboro la tua voce con Gemini...")
-    from google import genai
-    import base64
-    client = genai.Client()
-    # Codifica audio in base64 per l'invio
+    import google.generativeai as genai
+    from config.settings import GEMINI_API_KEY
+    genai.configure(api_key=GEMINI_API_KEY)
+
     encoded_audio = base64.b64encode(audio["bytes"]).decode("utf-8")
-    response = client.models.generate_content(
-        model="gemini-2.5-flash",
-        contents=[
+
+    model = genai.GenerativeModel("gemini-2.5-flash")
+    response = model.generate_content(
+        [
             {
                 "inline_data": {
                     "mime_type": "audio/webm",
@@ -116,8 +163,9 @@ else:
 if user_text:
     st.session_state.messages.append({"role": "user", "content": user_text})
 
+    username = st.session_state.get("username", "anonimo")
     with st.spinner("🤖 Il coach sta riflettendo..."):
-        response = st.session_state.agent.run(user_text)
+        response = st.session_state.agent.run(user_text, username=username)
         reply_text = response.text
 
 
