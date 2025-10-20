@@ -12,15 +12,17 @@ genai.configure(api_key=GEMINI_API_KEY)
 
 DATA_DIR = "data"
 
-def handle_weekly_analysis():
+def handle_weekly_analysis(username: str = "anonimo"):
     """
     Combina i dati mentali e fisici e genera un report motivante settimanale.
     Non si blocca mai se i nomi delle colonne non corrispondono perfettamente.
     Chiede conferma all’utente in caso di ambiguità.
     """
-
-    mental_path = os.path.join(DATA_DIR, "log_mentale.csv")
-    train_path = os.path.join(DATA_DIR, "allenamenti_manual.csv")
+    # Crea la cartella utente e i percorsi dei file personali
+    user_dir = os.path.join("data", "users", username)
+    os.makedirs(user_dir, exist_ok=True)
+    mental_path = os.path.join(user_dir, "mind_state.csv")
+    train_path = os.path.join(user_dir, "allenamenti.csv")
 
     if not os.path.exists(mental_path) and not os.path.exists(train_path):
         return "Non ho ancora abbastanza dati per analizzare la tua settimana 😅"
@@ -29,14 +31,16 @@ def handle_weekly_analysis():
     summary = {"allenamenti": 0, "durata_tot": 0, "stress_medio": None}
 
     # ⚙️ Allenamenti
-    if os.path.exists(train_path):
+    try:
         df_train = pd.read_csv(train_path)
-        df_train["data"] = pd.to_datetime(df_train["data"], errors="coerce")
-        df_train = df_train[df_train["data"].dt.date >= week_ago]
-
+    except Exception:
+        df_train = pd.DataFrame()
+    if not df_train.empty:
+        if "data" in df_train.columns:
+            df_train["data"] = pd.to_datetime(df_train["data"], errors="coerce")
+            df_train = df_train[df_train["data"].dt.date >= week_ago]
         if not df_train.empty:
             summary["allenamenti"] = len(df_train)
-
             # Controlla colonne possibili
             possible_dur_cols = [c for c in df_train.columns if "durata" in c.lower()]
             if possible_dur_cols:
@@ -51,11 +55,14 @@ def handle_weekly_analysis():
                 )
 
     # 🧠 Mente
-    if os.path.exists(mental_path):
+    try:
         df_mind = pd.read_csv(mental_path)
-        df_mind["data"] = pd.to_datetime(df_mind["data"], errors="coerce")
-        df_mind = df_mind[df_mind["data"].dt.date >= week_ago]
-
+    except Exception:
+        df_mind = pd.DataFrame()
+    if not df_mind.empty:
+        if "data" in df_mind.columns:
+            df_mind["data"] = pd.to_datetime(df_mind["data"], errors="coerce")
+            df_mind = df_mind[df_mind["data"].dt.date >= week_ago]
         if not df_mind.empty:
             possible_stress_cols = [c for c in df_mind.columns if "stress" in c.lower()]
             if possible_stress_cols:
@@ -87,4 +94,4 @@ def handle_weekly_analysis():
     response = model.generate_content(analysis_prompt)
 
     # ✅ Restituisci il report finale
-    return f"📅 Report settimanale corpo-mente ️\n\n{response.text}"
+    return f"📅 Report settimanale corpo-mente per **{username}** 🧘‍♂️\n\n{response.text}"

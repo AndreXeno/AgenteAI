@@ -89,7 +89,7 @@ class MindBodyAgent:
         print(f"🧩 Contesto generato ({len(context)} caratteri).")
         return context
 
-    def run(self, user_input: str):
+    def run(self, user_input: str, username: str = "anonimo"):
         text = user_input.lower().strip()
         print("\n==============================")
         print(f"💬 Nuovo input utente: {user_input}")
@@ -99,7 +99,7 @@ class MindBodyAgent:
         if text.startswith("/allenamento") or text.startswith("/aggiungi allenamento"):
             print("🏋️ Attivo modulo: TRAINING (aggiunta manuale).")
             clean_input = user_input.replace("/allenamento", "").replace("/aggiungi allenamento", "").strip()
-            response = handle_training(clean_input)
+            response = handle_training(clean_input, username)
             self.update_memory("coach", response)
             print("✅ Allenamento processato e registrato.")
             return type("Response", (), {"text": response})()
@@ -110,7 +110,7 @@ class MindBodyAgent:
             context = f"{BASE_PROMPT}\n\n📚 Conoscenze disponibili:\n{GLOBAL_KNOWLEDGE[:3000]}\n\n" + self.get_context()
             print("🧠 Context inviato a Gemini (anteprima):")
             print(context[:500] + "...")
-            response = handle_training_reflection(f"Contesto conversazione:\n{context}\n\nNuovo messaggio:\n{user_input}")
+            response = handle_training_reflection(f"Contesto conversazione:\n{context}\n\nNuovo messaggio:\n{user_input}", username)
             self.update_memory("coach", response)
             print("✅ Risposta generata da modulo TRAINING_REFLECTION.")
             return type("Response", (), {"text": response})()
@@ -121,7 +121,7 @@ class MindBodyAgent:
             context = f"{BASE_PROMPT}\n\n📚 Conoscenze disponibili:\n{GLOBAL_KNOWLEDGE[:3000]}\n\n" + self.get_context()
             print("🧠 Context inviato a Gemini (anteprima):")
             print(context[:500] + "...")
-            response = handle_mind_state(f"Contesto conversazione:\n{context}\n\nNuovo messaggio:\n{user_input}")
+            response = handle_mind_state(f"Contesto conversazione:\n{context}\n\nNuovo messaggio:\n{user_input}", username)
             self.update_memory("coach", response)
             print("✅ Risposta generata da modulo MIND_STATE.")
             return type("Response", (), {"text": response})()
@@ -129,7 +129,7 @@ class MindBodyAgent:
         # 📊 Caso 4 — Richiesta di analisi settimanale
         if any(word in text for word in ["settimana", "report", "analisi", "riepilogo"]):
             print("📊 Attivo modulo: WEEKLY_ANALYSIS.")
-            response = handle_weekly_analysis()
+            response = handle_weekly_analysis(username)
             self.update_memory("coach", response)
             print("✅ Report settimanale generato.")
             return type("Response", (), {"text": response})()

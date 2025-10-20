@@ -116,7 +116,7 @@ st.subheader("💬 Invia un messaggio o parla")
 col1, col2, col3 = st.columns([8, 1, 1])
 
 with col1:
-    user_input = st.text_input("Scrivi qui...", key="input", placeholder="Come ti senti oggi?")
+    user_input = st.text_input("", key="input", placeholder="Come ti senti oggi?")
 with col2:
     send_btn = st.button("📤")
 with col3:

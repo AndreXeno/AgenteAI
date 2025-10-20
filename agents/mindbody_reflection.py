@@ -12,33 +12,40 @@ genai.configure(api_key=GEMINI_API_KEY)
 DATA_DIR = "data"
 
 
-def handle_training_reflection(user_input: str):
+def handle_training_reflection(user_input: str, username: str = "anonimo"):
     """
     Analizza una riflessione sull'allenamento o sulla giornata e risponde in modo empatico,
     usando i dati già registrati (senza analisi tecniche).
     """
 
     # 1️⃣ Recupera contesto recente dagli allenamenti
-    train_path = os.path.join(DATA_DIR, "allenamenti_manual.csv")
+    user_dir = os.path.join("data", "users", username)
+    os.makedirs(user_dir, exist_ok=True)
+    train_path = os.path.join(user_dir, "allenamenti.csv")
+
+    # train_path = os.path.join(DATA_DIR, "allenamenti_manual.csv")
 
     summary = ""
     if os.path.exists(train_path):
         df = pd.read_csv(train_path)
-        df["data"] = pd.to_datetime(df["data"])
-        last_week = datetime.date.today() - datetime.timedelta(days=7)
-        recent = df[df["data"].dt.date >= last_week]
-
-        if not recent.empty:
-            tot = len(recent)
-            media = recent["durata_min"].mean() if "durata_min" in recent.columns else 0
-            ultima = df.iloc[-1]
-            summary = (
-                f"Negli ultimi 7 giorni hai fatto {tot} allenamenti "
-                f"con una durata media di {media:.0f} minuti. "
-                f"L'ultimo è stato il {ultima['data']} ({ultima['tipo']}, {ultima['durata_min']} min)."
-            )
+        if df.empty or "durata_min" not in df.columns:
+            summary = "Non ho trovato dati sufficienti per analizzare i tuoi allenamenti recenti."
         else:
-            summary = "Negli ultimi giorni non ci sono stati allenamenti registrati."
+            df["data"] = pd.to_datetime(df["data"])
+            last_week = datetime.date.today() - datetime.timedelta(days=7)
+            recent = df[df["data"].dt.date >= last_week]
+
+            if not recent.empty:
+                tot = len(recent)
+                media = recent["durata_min"].mean() if "durata_min" in recent.columns else 0
+                ultima = df.iloc[-1]
+                summary = (
+                    f"Negli ultimi 7 giorni hai fatto {tot} allenamenti "
+                    f"con una durata media di {media:.0f} minuti. "
+                    f"L'ultimo è stato il {ultima['data']} ({ultima['tipo']}, {ultima['durata_min']} min)."
+                )
+            else:
+                summary = "Negli ultimi giorni non ci sono stati allenamenti registrati."
     else:
         summary = "Non ho ancora dati sui tuoi allenamenti."
 

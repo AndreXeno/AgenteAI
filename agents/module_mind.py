@@ -15,11 +15,14 @@ genai.configure(api_key=GEMINI_API_KEY)
 
 DATA_DIR = "data"
 
-def handle_mind_state(user_input: str):
+def handle_mind_state(user_input: str, username: str = "anonimo"):
     """
     Risponde direttamente al messaggio dell'utente in modo empatico e naturale,
     senza fare analisi JSON o sintesi. Usa Gemini come coach emotivo diretto.
     """
+    user_dir = os.path.join("data", "users", username)
+    os.makedirs(user_dir, exist_ok=True)
+    mind_path = os.path.join(user_dir, "mind_state.csv")
     # Cerca automaticamente nei documenti pertinenti
     relevant_docs = query_knowledge(user_input)
     num_docs = len(relevant_docs) if relevant_docs else 0
@@ -73,6 +76,13 @@ def handle_mind_state(user_input: str):
     """
     model = genai.GenerativeModel("gemini-2.5-flash")
     response = model.generate_content(prompt)
-    # Log base...
-    ...
+    # Salva lo stato mentale dell'utente in CSV personale
+    today = datetime.date.today().strftime("%Y-%m-%d")
+    entry = pd.DataFrame([[today, username, user_input, response.text]],
+                         columns=["data", "username", "input", "risposta"])
+    if os.path.exists(mind_path):
+        entry.to_csv(mind_path, mode="a", header=False, index=False)
+    else:
+        entry.to_csv(mind_path, index=False)
+    print(f"[LOG] Stato mentale salvato in {mind_path}")
     return f"🧠 {response.text}"

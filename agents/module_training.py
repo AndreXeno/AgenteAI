@@ -37,7 +37,7 @@ def parse_training_data(user_input: str):
     return data
 
 
-def handle_training(user_input: str):
+def handle_training(user_input: str, username: str = "anonimo"):
     """
     Analizza un allenamento manuale, lo registra in CSV,
     confronta con gli allenamenti passati e genera feedback tecnico + motivazione.
@@ -45,6 +45,10 @@ def handle_training(user_input: str):
     - Fai notare se c'é stato un miglioramento o peggioramento, dai consigli e spiega il motivo di questo andamento
     - Dai consigli pratici su come migliorare sull'allenamento in questione.
     """
+    user_dir = os.path.join("data", "users", username)
+    os.makedirs(user_dir, exist_ok=True)
+    file_path = os.path.join(user_dir, "allenamenti.csv")
+
     text = user_input.lower()
 
     emotional_words = ["triste", "felice", "solo", "stress", "ansia", "agitato", "demotivato", "arrabbiato", "rassegnato", "stanco", "isolato", "paura", "insicuro", "invidioso", "geloso"]
@@ -57,12 +61,10 @@ def handle_training(user_input: str):
         slope = parsed.get("pendenza_%", None)
         notes = user_input
 
-        os.makedirs(DATA_DIR, exist_ok=True)
-        file_path = os.path.join(DATA_DIR, "allenamenti_manual.csv")
         today = datetime.date.today().strftime("%Y-%m-%d")
 
-        df = pd.DataFrame([[today, "non specificato", duration, distance, bpm, slope, notes]],
-                          columns=["data", "tipo", "durata_min", "distanza_km", "bpm", "pendenza", "note"])
+        df = pd.DataFrame([[username, today, "non specificato", duration, distance, bpm, slope, notes]],
+                          columns=["username", "data", "tipo", "durata_min", "distanza_km", "bpm", "pendenza", "note"])
         df.to_csv(file_path, mode="a", header=not os.path.exists(file_path), index=False)
 
         return "🏋️ Ho registrato il tuo allenamento. Sembra che oggi ci sia anche molto di cui parlare... vuoi raccontarmi come ti senti?"
@@ -82,17 +84,16 @@ def handle_training(user_input: str):
     notes = user_input
 
     # 🔹 Salvataggio CSV con colonne aggiuntive
-    os.makedirs(DATA_DIR, exist_ok=True)
-    file_path = os.path.join(DATA_DIR, "allenamenti_manual.csv")
     today = datetime.date.today().strftime("%Y-%m-%d")
 
-    df = pd.DataFrame([[today, activity, duration, distance, bpm, slope, notes]],
-                      columns=["data", "tipo", "durata_min", "distanza_km", "bpm", "pendenza", "note"])
+    df = pd.DataFrame([[username, today, activity, duration, distance, bpm, slope, notes]],
+                      columns=["username", "data", "tipo", "durata_min", "distanza_km", "bpm", "pendenza", "note"])
     df.to_csv(file_path, mode="a", header=not os.path.exists(file_path), index=False)
 
     # 🔹 Analisi statistica (solo su durata per ora)
     prev_df = pd.read_csv(file_path)
-    same_type = prev_df[prev_df["tipo"] == activity]
+    same_user = prev_df[prev_df["username"] == username]
+    same_type = same_user[same_user["tipo"] == activity]
     avg_duration = same_type["durata_min"].mean() if not same_type.empty else duration
     diff = duration - avg_duration
     trend = "🔺" if diff > 0 else "🔻" if diff < 0 else "➖"
