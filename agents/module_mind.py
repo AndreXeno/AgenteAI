@@ -5,13 +5,13 @@
 import os
 import datetime
 import pandas as pd
-import google.generativeai as genai  # ✅ libreria corretta di Gemini# ✅ usa il modulo corretto
+import google.generativeai as genai # ✅ libreria corretta di Gemini# ✅ usa il modulo corretto
 
 from config.settings import GEMINI_API_KEY
 from agents.knowledge_loader import query_knowledge
 
 # Inizializza correttamente il client Gemini
-client = genai.Client(api_key=GEMINI_API_KEY)
+genai.configure(api_key=GEMINI_API_KEY)
 
 DATA_DIR = "data"
 
@@ -71,10 +71,8 @@ def handle_mind_state(user_input: str):
     💬 RISPOSTA
     Messaggio utente: "{user_input}"
     """
-    response = client.models.generate_content(
-        model="gemini-2.5-flash",
-        contents=prompt
-    )
+    model = genai.GenerativeModel("gemini-2.5-flash")
+    response = model.generate_content(prompt)
     # Log base...
     ...
     return f"🧠 {response.text}"
