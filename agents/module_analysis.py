@@ -5,11 +5,9 @@
 import os
 import pandas as pd
 import datetime
-from google import genai
-
-# Inizializza il client Gemini (usa GEMINI_API_KEY se impostata)
+import google.generativeai as genai
 from config.settings import GEMINI_API_KEY
-client = genai.Client(api_key=GEMINI_API_KEY)
+genai.configure(api_key=GEMINI_API_KEY)
 
 
 DATA_DIR = "data"
@@ -85,10 +83,8 @@ def handle_weekly_analysis():
     3. Una frase motivante finale
     """
 
-    response = client.models.generate_content(
-        model="gemini-2.5-flash",
-        contents=analysis_prompt
-    )
+    model = genai.GenerativeModel("gemini-2.5-flash")
+    response = model.generate_content(analysis_prompt)
 
     # ✅ Restituisci il report finale
     return f"📅 Report settimanale corpo-mente ️\n\n{response.text}"
