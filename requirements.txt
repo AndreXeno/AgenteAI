@@ -1,3 +1,13 @@
-google-generativeai
+streamlit
 pandas
-rich
+google-generativeai
+openpyxl
+PyPDF2
+python-docx
+langchain
+langchain-community
+langchain-google-genai
+faiss-cpu
+gtts
+streamlit-mic-recorder
+python-dotenv
