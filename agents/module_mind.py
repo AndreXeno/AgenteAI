@@ -5,7 +5,7 @@
 import os
 import datetime
 import pandas as pd
-import google.genai as genai  # ✅ usa il modulo corretto
+import google.generativeai as genai  # ✅ libreria corretta di Gemini# ✅ usa il modulo corretto
 
 from config.settings import GEMINI_API_KEY
 from agents.knowledge_loader import query_knowledge
