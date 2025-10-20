@@ -5,8 +5,9 @@
 import os
 import pandas as pd
 import datetime
-from google import genai
+import google.generativeai as genai
 from config.settings import GEMINI_API_KEY
+genai.configure(api_key=GEMINI_API_KEY)
 
 DATA_DIR = "data"
 
@@ -42,8 +43,7 @@ def handle_training_reflection(user_input: str):
         summary = "Non ho ancora dati sui tuoi allenamenti."
 
     # 2️⃣ Genera risposta empatica con Gemini
-    client = genai.Client(api_key=GEMINI_API_KEY)
-
+    model = genai.GenerativeModel("gemini-2.5-flash")
     prompt = f"""
     L'utente ha detto: "{user_input}"
 
@@ -57,9 +57,6 @@ def handle_training_reflection(user_input: str):
     - Evita schemi o elenchi, scrivi come se parlassi direttamente con lui.
     """
 
-    response = client.models.generate_content(
-        model="gemini-2.5-flash",
-        contents=prompt
-    )
+    response = model.generate_content(prompt)
 
     return response.text
