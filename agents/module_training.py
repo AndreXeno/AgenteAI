@@ -6,11 +6,9 @@ import os
 import re
 import datetime
 import pandas as pd
-from google import genai
-
-# Inizializza il client Gemini (usa GEMINI_API_KEY se impostata)
+import google.generativeai as genai
 from config.settings import GEMINI_API_KEY
-client = genai.Client(api_key=GEMINI_API_KEY)
+genai.configure(api_key=GEMINI_API_KEY)
 
 DATA_DIR = "data"
 
@@ -121,10 +119,8 @@ def handle_training(user_input: str):
     """
 
     # ✅ Nuova chiamata corretta a Gemini
-    response = client.models.generate_content(
-        model="gemini-2.5-flash",
-        contents=analysis_prompt
-    )
+    model = genai.GenerativeModel("gemini-2.5-flash")
+    response = model.generate_content(analysis_prompt)
 
     # 🔹 Messaggio finale
     info_parts = [
