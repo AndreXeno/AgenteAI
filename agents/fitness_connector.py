@@ -1,9 +1,14 @@
 import os
 import json
 import requests
-from dotenv import load_dotenv
+import streamlit as st
 import pandas as pd
 from pandas.errors import EmptyDataError
+
+# Lettura configurazione Strava da st.secrets
+STRAVA_CLIENT_ID = st.secrets["STRAVA_CLIENT_ID"]
+STRAVA_CLIENT_SECRET = st.secrets["STRAVA_CLIENT_SECRET"]
+STRAVA_REDIRECT_URI = st.secrets["STRAVA_REDIRECT_URI"]
 
 # ======================================
 # 🌐 FITNESS CONNECTOR
@@ -36,17 +41,24 @@ STRAVA_AUTH_URL = "https://www.strava.com/oauth/authorize"
 STRAVA_TOKEN_URL = "https://www.strava.com/oauth/token"
 STRAVA_API_BASE = "https://www.strava.com/api/v3"
 
-def connect_strava(client_id, redirect_uri):
-    return f"{STRAVA_AUTH_URL}?client_id={client_id}&response_type=code&redirect_uri={redirect_uri}&approval_prompt=auto&scope=activity:read_all"
+def connect_strava():
+    return (
+        f"{STRAVA_AUTH_URL}?client_id={STRAVA_CLIENT_ID}"
+        f"&response_type=code"
+        f"&redirect_uri={STRAVA_REDIRECT_URI}"
+        f"&approval_prompt=auto"
+        f"&scope=activity:read_all"
+    )
 
-def exchange_strava_token(client_id, client_secret, code):
+def exchange_strava_token(code):
     payload = {
-        "client_id": client_id,
-        "client_secret": client_secret,
+        "client_id": STRAVA_CLIENT_ID,
+        "client_secret": STRAVA_CLIENT_SECRET,
         "code": code,
         "grant_type": "authorization_code"
     }
-    return requests.post(STRAVA_TOKEN_URL, data=payload).json()
+    response = requests.post(STRAVA_TOKEN_URL, data=payload)
+    return response.json()
 
 def get_strava_activities(access_token, per_page=10):
     headers = {"Authorization": f"Bearer {access_token}"}
