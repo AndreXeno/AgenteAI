@@ -147,16 +147,16 @@ col1, col2 = st.columns(2)
 
 with col1:
     if st.button("Connetti Strava"):
-        st.markdown(f"[Apri Strava Login]({connect_strava('TUO_CLIENT_ID', 'http://localhost:8501')})")
+        st.markdown(f"[Apri Strava Login]({connect_strava()})")
 
     if st.button("Connetti Fitbit"):
-        st.markdown(f"[Apri Fitbit Login]({connect_fitbit('TUO_CLIENT_ID', 'http://localhost:8501')})")
+        st.markdown(f"[Apri Fitbit Login]({connect_fitbit()})")
 
     if st.button("Connetti MapMyRun"):
-        st.markdown(f"[Apri MapMyRun Login]({connect_mapmyrun('TUO_CLIENT_ID', 'http://localhost:8501')})")
+        st.markdown(f"[Apri MapMyRun Login]({connect_mapmyrun()})")
 
     if st.button("Connetti Google Fit"):
-        st.markdown(f"[Apri Google Fit Login]({connect_google_fit('TUO_CLIENT_ID', 'http://localhost:8501')})")
+        st.markdown(f"[Apri Google Fit Login]({connect_google_fit()})")
 
     st.write(" ")
 
