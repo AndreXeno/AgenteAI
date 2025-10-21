@@ -28,6 +28,7 @@ def save_token(username: str, provider: str, token_data: dict):
     tokens[provider] = token_data
     with open(token_path, "w") as f:
         json.dump(tokens, f, indent=2)
+    auto_sync_user_data(username, provider, token_data)
 
 # =========================
 # 🔗 STRAVA
@@ -163,6 +164,92 @@ def get_mapmyrun_workouts(access_token, limit=10):
 # 📂 GPX IMPORT & UNIVERSAL DATA HANDLER
 # =========================
 
+def auto_sync_user_data(username, provider, token_data):
+    user_dir = ensure_user_dir(username)
+    profile_path = os.path.join(user_dir, "profilo_utente.csv")
+    fitness_data_path = os.path.join(user_dir, "dati_fitness.csv")
+
+    if provider == "strava":
+        access_token = token_data.get("access_token")
+        if not access_token:
+            print("[LOG] ⚠️ Access token Strava mancante, impossibile sincronizzare.")
+            return
+        # Get athlete profile
+        headers = {"Authorization": f"Bearer {access_token}"}
+        res_profile = requests.get(f"{STRAVA_API_BASE}/athlete", headers=headers)
+        if res_profile.status_code == 200:
+            profile = res_profile.json()
+            df_profile = pd.DataFrame([{
+                "id": profile.get("id"),
+                "username": username,
+                "firstname": profile.get("firstname"),
+                "lastname": profile.get("lastname"),
+                "city": profile.get("city"),
+                "state": profile.get("state"),
+                "country": profile.get("country"),
+                "sex": profile.get("sex"),
+                "profile": profile.get("profile"),
+                "created_at": profile.get("created_at"),
+                "updated_at": profile.get("updated_at")
+            }])
+            if os.path.exists(profile_path):
+                try:
+                    df_existing = pd.read_csv(profile_path)
+                except EmptyDataError:
+                    df_existing = pd.DataFrame()
+            else:
+                df_existing = pd.DataFrame()
+            df_existing = df_existing[df_existing["id"] != profile.get("id")]
+            df_final = pd.concat([df_existing, df_profile], ignore_index=True)
+            df_final.to_csv(profile_path, index=False)
+            print(f"[LOG] ✅ Profilo Strava sincronizzato per {username}")
+        else:
+            print(f"[LOG] ⚠️ Errore nel recupero profilo Strava: {res_profile.status_code}")
+
+        # Get activities
+        activities = get_strava_activities(access_token, per_page=50)
+        if isinstance(activities, list):
+            data_list = []
+            for act in activities:
+                data_list.append({
+                    "activity_id": act.get("id"),
+                    "name": act.get("name"),
+                    "distance": act.get("distance"),
+                    "moving_time": act.get("moving_time"),
+                    "elapsed_time": act.get("elapsed_time"),
+                    "total_elevation_gain": act.get("total_elevation_gain"),
+                    "type": act.get("type"),
+                    "start_date": act.get("start_date"),
+                    "average_speed": act.get("average_speed"),
+                    "max_speed": act.get("max_speed"),
+                    "calories": act.get("calories"),
+                })
+            append_fitness_data(username, provider, data_list)
+        else:
+            print(f"[LOG] ⚠️ Errore nel recupero attività Strava: {activities}")
+
+    elif provider == "google_fit":
+        # Google Fit sync requires more complex API calls; here we just log the event.
+        print(f"[LOG] ℹ️ Sincronizzazione Google Fit non ancora implementata per {username}")
+
+    elif provider == "fitbit":
+        # Fitbit sync placeholder
+        print(f"[LOG] ℹ️ Sincronizzazione Fitbit non ancora implementata per {username}")
+
+    elif provider == "myfitnesspal":
+        # For MyFitnessPal, token_data should contain username and password for simplicity
+        mfp_username = token_data.get("username")
+        mfp_password = token_data.get("password")
+        if not mfp_username or not mfp_password:
+            print("[LOG] ⚠️ Credenziali MyFitnessPal mancanti, impossibile sincronizzare.")
+            return
+        data = get_myfitnesspal_data(mfp_username, mfp_password)
+        if "error" not in data:
+            df_data = pd.DataFrame([data])
+            append_fitness_data(username, provider, [data])
+            print(f"[LOG] ✅ Dati MyFitnessPal sincronizzati per {username}")
+        else:
+            print(f"[LOG] ⚠️ Errore sincronizzazione MyFitnessPal: {data['error']}")
 
 # =========================
 # 💾 SAVE MERGE SYSTEM (AUTOCREATE COLUMNS)
