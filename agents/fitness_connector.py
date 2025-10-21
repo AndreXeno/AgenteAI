@@ -1,8 +1,9 @@
-
-
 import os
 import json
 import requests
+from dotenv import load_dotenv
+import pandas as pd
+from pandas.errors import EmptyDataError
 
 # ======================================
 # 🌐 FITNESS CONNECTOR
@@ -150,10 +151,79 @@ def get_mapmyrun_workouts(access_token, limit=10):
     return res.json()
 
 # =========================
-# 📂 UNIVERSAL GPX IMPORT
+# 🔗 NIKE RUN CLUB (Placeholder)
+# =========================
+def connect_nike_run_club(client_id, redirect_uri):
+    # Placeholder for future Nike Run Club OAuth implementation
+    return f"https://api.nike.com/oauth2/authorize?client_id={client_id}&response_type=code&redirect_uri={redirect_uri}&scope=activity"
+
+def exchange_nike_run_club_token(client_id, client_secret, code, redirect_uri):
+    # Placeholder for token exchange
+    pass
+
+def get_nike_run_club_activities(access_token, per_page=10):
+    # Placeholder for fetching activities
+    pass
+
+# =========================
+# 🔗 ADIDAS RUNNING (Placeholder)
+# =========================
+def connect_adidas_running(client_id, redirect_uri):
+    # Placeholder for Adidas Running OAuth implementation
+    return f"https://api.adidas.com/oauth2/authorize?client_id={client_id}&response_type=code&redirect_uri={redirect_uri}&scope=activity"
+
+def exchange_adidas_running_token(client_id, client_secret, code, redirect_uri):
+    # Placeholder for token exchange
+    pass
+
+def get_adidas_running_activities(access_token, per_page=10):
+    # Placeholder for fetching activities
+    pass
+
+# =========================
+# 🔗 DECATHLON COACH (Placeholder)
+# =========================
+def connect_decathlon_coach(client_id, redirect_uri):
+    # Placeholder for Decathlon Coach OAuth implementation
+    return f"https://api.decathlon.com/oauth2/authorize?client_id={client_id}&response_type=code&redirect_uri={redirect_uri}&scope=activity"
+
+def exchange_decathlon_coach_token(client_id, client_secret, code, redirect_uri):
+    # Placeholder for token exchange
+    pass
+
+def get_decathlon_coach_activities(access_token, per_page=10):
+    # Placeholder for fetching activities
+    pass
+
+# =========================
+# 📂 UNIVERSAL GPX IMPORT (Extended)
 # =========================
 import xml.etree.ElementTree as ET
-import pandas as pd
+
+def detect_gpx_source(root, ns):
+    """
+    Tenta di rilevare la sorgente del file GPX (Nike Run Club, Adidas Running, Decathlon, Strava, etc.)
+    basandosi su metadati o struttura.
+    """
+    # Controlla metadata specifici o namespace particolari
+    metadata = root.find('default:metadata', ns)
+    if metadata is not None:
+        desc = metadata.find('default:desc', ns)
+        if desc is not None and 'Nike' in desc.text:
+            print("[LOG] Fonte GPX rilevata: Nike Run Club")
+            return "Nike Run Club"
+        if desc is not None and 'Adidas' in desc.text:
+            print("[LOG] Fonte GPX rilevata: Adidas Running")
+            return "Adidas Running"
+        if desc is not None and 'Decathlon' in desc.text:
+            print("[LOG] Fonte GPX rilevata: Decathlon Coach")
+            return "Decathlon Coach"
+        if desc is not None and 'Strava' in desc.text:
+            print("[LOG] Fonte GPX rilevata: Strava")
+            return "Strava"
+    # Fallback generico
+    print("[LOG] Fonte GPX non rilevata, impostata come 'Generico'")
+    return "Generico"
 
 def import_gpx_file(username, gpx_path):
     """
@@ -168,6 +238,8 @@ def import_gpx_file(username, gpx_path):
         root = tree.getroot()
         ns = {'default': 'http://www.topografix.com/GPX/1/1'}
 
+        source = detect_gpx_source(root, ns)
+
         points = []
         for trkpt in root.findall(".//default:trkpt", ns):
             lat = trkpt.attrib.get('lat')
@@ -178,15 +250,41 @@ def import_gpx_file(username, gpx_path):
                 "lat": float(lat),
                 "lon": float(lon),
                 "elevazione": float(ele.text) if ele is not None else None,
-                "tempo": time.text if time is not None else None
+                "tempo": time.text if time is not None else None,
+                "source": source
             })
 
         df = pd.DataFrame(points)
         df.to_csv(csv_path, mode="a", index=False, header=not os.path.exists(csv_path))
-        return {"status": "ok", "rows": len(df), "file": csv_path}
+        return {"status": "ok", "rows": len(df), "file": csv_path, "source": source}
 
     except Exception as e:
         return {"error": str(e)}
+
+# =========================
+# ⚙️ IMPORTAZIONE AUTOMATICA PER DIVERSI FORMATI
+# =========================
+def auto_detect_and_import(username, file_path):
+    """
+    Rileva automaticamente il tipo di file (.gpx, .tcx, .fit) e chiama il parser corretto.
+    """
+    ext = os.path.splitext(file_path)[1].lower()
+    print(f"[LOG] File da importare: {file_path}, estensione rilevata: {ext}")
+
+    if ext == ".gpx":
+        print("[LOG] Inizio importazione GPX")
+        return import_gpx_file(username, file_path)
+    elif ext == ".tcx":
+        print("[LOG] Importazione TCX non ancora implementata")
+        # Placeholder: implementare import_tcx_file(username, file_path)
+        return {"error": "Importazione TCX non ancora implementata"}
+    elif ext == ".fit":
+        print("[LOG] Importazione FIT non ancora implementata")
+        # Placeholder: implementare import_fit_file(username, file_path)
+        return {"error": "Importazione FIT non ancora implementata"}
+    else:
+        print("[LOG] Tipo di file non supportato")
+        return {"error": "Tipo di file non supportato"}
 
 # =========================
 # 🔁 Importazione unificata
@@ -206,26 +304,44 @@ def import_from_provider(username, provider, token_data):
         return {"error": "Provider non supportato."}
 
 # =========================
-# 💾 SALVATAGGIO DATI FLESSIBILE
+# 💾 SALVATAGGIO DATI FLESSIBILE (con gestione duplicati)
 # =========================
-import pandas as pd
-
 def append_fitness_data(username: str, provider: str, data_list: list):
     """
     Aggiunge dinamicamente nuovi dati fitness al CSV dell'utente.
     Se arrivano campi nuovi, aggiunge automaticamente nuove colonne.
+    Gestisce duplicati basandosi su timestamp 'data_importazione' o campi simili.
     """
     user_dir = ensure_user_dir(username)
     csv_path = os.path.join(user_dir, "dati_fitness.csv")
 
     # Se il file esiste, leggilo. Altrimenti crea un DataFrame vuoto
     if os.path.exists(csv_path):
-        df_existing = pd.read_csv(csv_path)
+        try:
+            df_existing = pd.read_csv(csv_path)
+        except EmptyDataError:
+            df_existing = pd.DataFrame()
     else:
         df_existing = pd.DataFrame()
 
     # Normalizza i dati nuovi in DataFrame
     df_new = pd.DataFrame(data_list)
+
+    # Gestione duplicati: se esiste una colonna 'tempo' o 'timestamp' o 'data_importazione' usala per controllo
+    timestamp_col_candidates = ["tempo", "timestamp", "data_importazione", "time", "date"]
+    timestamp_col = None
+    for col in timestamp_col_candidates:
+        if col in df_new.columns and col in df_existing.columns:
+            timestamp_col = col
+            break
+
+    if timestamp_col is not None and not df_existing.empty:
+        # Rimuove da df_new le righe che hanno timestamp già presenti in df_existing
+        existing_timestamps = set(df_existing[timestamp_col].dropna().astype(str).unique())
+        before_count = len(df_new)
+        df_new = df_new[~df_new[timestamp_col].astype(str).isin(existing_timestamps)]
+        after_count = len(df_new)
+        print(f"[LOG] Duplicati rimossi: {before_count - after_count}")
 
     # Se serve, aggiungi colonne mancanti
     for col in df_new.columns:
@@ -237,9 +353,10 @@ def append_fitness_data(username: str, provider: str, data_list: list):
         if col not in df_new.columns:
             df_new[col] = None
 
-    # Aggiungi colonna "provider" e "data_importazione"
+    # Aggiungi colonna "provider" e "data_importazione" se non presente
     df_new["provider"] = provider
-    df_new["data_importazione"] = pd.Timestamp.now().strftime("%Y-%m-%d %H:%M:%S")
+    if "data_importazione" not in df_new.columns:
+        df_new["data_importazione"] = pd.Timestamp.now().strftime("%Y-%m-%d %H:%M:%S")
 
     # Combina tutto e salva
     df_final = pd.concat([df_existing, df_new], ignore_index=True)
