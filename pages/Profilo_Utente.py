@@ -9,10 +9,11 @@ st.title("👤 Profilo Utente")
 st.caption("Gestisci i tuoi dati personali, fisici e sportivi. Ogni modifica viene salvata e archiviata nel tempo per tracciare i tuoi progressi.")
 
 st.subheader("🔑 Identità utente")
-username = st.text_input("Inserisci il tuo nome utente (usalo sempre uguale)", key="username")
-if not username:
-    st.warning("Inserisci un nome utente per continuare.")
+# Prendi il nome utente dalla sessione autenticata
+if "username" not in st.session_state or not st.session_state["username"]:
+    st.warning("Effettua il login per accedere al profilo utente.")
     st.stop()
+username = st.session_state["username"]
 
 # Percorso CSV personale per utente
 BASE_DIR = "data/users"
@@ -136,8 +137,12 @@ else:
 
 # --- Integrazione con connettore fitness ---
 from agents.fitness_connector import (
-    connect_strava, connect_fitbit, connect_mapmyrun, connect_google_fit,
-    import_gpx_file, import_and_save
+    connect_strava,
+    is_strava_connected,
+    disconnect_strava,
+    is_myfitnesspal_connected,
+    disconnect_myfitnesspal,
+    auto_sync_user_data
 )
 
 st.divider()
@@ -146,38 +151,37 @@ st.subheader("🔗 Connessioni Fitness")
 col1, col2 = st.columns(2)
 
 with col1:
-    if st.button("Connetti Strava"):
-        st.markdown(f"[Apri Strava Login]({connect_strava()})")
-
-    if st.button("Connetti Fitbit"):
-        st.markdown(f"[Apri Fitbit Login]({connect_fitbit()})")
-
-    if st.button("Connetti MapMyRun"):
-        st.markdown(f"[Apri MapMyRun Login]({connect_mapmyrun()})")
-
-    if st.button("Connetti Google Fit"):
-        st.markdown(f"[Apri Google Fit Login]({connect_google_fit()})")
-
+    if is_strava_connected(username):
+        st.success("✅ Strava connesso")
+        if st.button("Disconnetti Strava"):
+            disconnect_strava(username)
+            st.experimental_rerun()
+    else:
+        if st.button("Connetti Strava"):
+            st.markdown(f"[Apri Strava Login]({connect_strava()})")
     st.write(" ")
 
 with col2:
-    st.write("📂 Importazione file GPX (Nike, Adidas, Decathlon...)")
-    uploaded_file = st.file_uploader("Carica GPX", type=["gpx"])
-    if uploaded_file is not None:
-        file_path = os.path.join(USER_DIR, "upload.gpx")
-        with open(file_path, "wb") as f:
-            f.write(uploaded_file.read())
-        result = import_gpx_file(username, file_path)
-        st.success(f"✅ {result.get('rows', 0)} punti GPX importati con successo!")
+    pass
 
-# Importazione MyFitnessPal
-st.subheader("🍎 Sincronizza MyFitnessPal")
-myfit_user = st.text_input("Username MyFitnessPal")
-myfit_pass = st.text_input("Password MyFitnessPal", type="password")
-if st.button("Importa dati MyFitnessPal"):
-    creds = {"username": myfit_user, "password": myfit_pass}
-    result = import_and_save(username, "myfitnesspal", creds)
-    st.success(f"✅ Importati {result.get('rows_added', 0)} record da MyFitnessPal!")
+
+# Gestione connessione MyFitnessPal
+st.subheader("🍎 Connessione MyFitnessPal")
+
+if is_myfitnesspal_connected(username):
+    st.success("✅ MyFitnessPal connesso")
+    if st.button("Disconnetti MyFitnessPal"):
+        disconnect_myfitnesspal(username)
+        st.success("🔌 Disconnesso con successo da MyFitnessPal")
+        st.experimental_rerun()
+else:
+    myfit_user = st.text_input("Username MyFitnessPal")
+    myfit_pass = st.text_input("Password MyFitnessPal", type="password")
+    if st.button("Connetti a MyFitnessPal"):
+        creds = {"username": myfit_user, "password": myfit_pass}
+        result = auto_sync_user_data(username, "myfitnesspal", creds)
+        st.success(f"✅ Collegato e importati {result.get('rows_added', 0)} record da MyFitnessPal!")
+        st.experimental_rerun()
 
 # Anteprima dati fitness
 st.divider()

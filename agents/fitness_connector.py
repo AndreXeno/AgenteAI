@@ -50,6 +50,15 @@ def is_strava_connected(username: str):
         tokens = json.load(f)
     return "strava" in tokens and "access_token" in tokens["strava"]
 
+def is_myfitnesspal_connected(username: str):
+    user_dir = ensure_user_dir(username)
+    token_path = os.path.join(user_dir, "tokens.json")
+    if not os.path.exists(token_path):
+        return False
+    with open(token_path, "r") as f:
+        tokens = json.load(f)
+    return "myfitnesspal" in tokens and "username" in tokens["myfitnesspal"] and "password" in tokens["myfitnesspal"]
+
 def disconnect_strava(username: str):
     user_dir = ensure_user_dir(username)
     token_path = os.path.join(user_dir, "tokens.json")
@@ -62,6 +71,21 @@ def disconnect_strava(username: str):
         with open(token_path, "w") as f:
             json.dump(tokens, f, indent=2)
         print(f"[LOG] 🔌 Strava disconnesso per {username}")
+        return True
+    return False
+
+def disconnect_myfitnesspal(username: str):
+    user_dir = ensure_user_dir(username)
+    token_path = os.path.join(user_dir, "tokens.json")
+    if not os.path.exists(token_path):
+        return False
+    with open(token_path, "r") as f:
+        tokens = json.load(f)
+    if "myfitnesspal" in tokens:
+        del tokens["myfitnesspal"]
+        with open(token_path, "w") as f:
+            json.dump(tokens, f, indent=2)
+        print(f"[LOG] 🔌 MyFitnessPal disconnesso per {username}")
         return True
     return False
 
@@ -227,14 +251,6 @@ def auto_sync_user_data(username, provider, token_data):
             append_fitness_data(username, provider, data_list)
         else:
             print(f"[LOG] ⚠️ Errore nel recupero attività Strava: {activities}")
-
-    elif provider == "google_fit":
-        # Google Fit sync requires more complex API calls; here we just log the event.
-        print(f"[LOG] ℹ️ Sincronizzazione Google Fit non ancora implementata per {username}")
-
-    elif provider == "fitbit":
-        # Fitbit sync placeholder
-        print(f"[LOG] ℹ️ Sincronizzazione Fitbit non ancora implementata per {username}")
 
     elif provider == "myfitnesspal":
         # For MyFitnessPal, token_data should contain username and password for simplicity
