@@ -5,6 +5,16 @@ from agents.fitness_connector.strava import connect_strava, is_strava_connected,
 from agents.fitness_connector.myfitnesspal import is_myfitnesspal_connected, disconnect_myfitnesspal
 from agents.fitness_connector.sync_manager import auto_sync_user_data
 
+from agents.session_manager import load_session, save_session
+
+if "username" not in st.session_state or not st.session_state["username"]:
+    username = load_session()
+    if username:
+        st.session_state["username"] = username
+
+# Quando l’utente fa login:
+save_session(st.session_state["username"])
+
 st.set_page_config(page_title="Profilo Utente", page_icon="👤", layout="centered")
 st.title("👤 Profilo Utente")
 

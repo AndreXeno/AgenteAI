@@ -12,6 +12,18 @@ if not username:
 
 # --- CALLBACK STRAVA (dopo autorizzazione) ---
 params = st.experimental_get_query_params()
+
+# Se la sessione è vuota ma arriva un parametro 'user', ricreala
+if "username" not in st.session_state or not st.session_state["username"]:
+    if "user" in params:
+        st.session_state["username"] = params["user"][0]
+        print(f"[SESSION RESTORE] Username ripristinato da URL: {st.session_state['username']}")
+
+username = st.session_state.get("username", None)
+if not username:
+    st.warning("Effettua il login prima di gestire le connessioni.")
+    st.stop()
+    
 if "code" in params:
     code = params["code"][0]
     st.info("⏳ Autorizzazione Strava in corso...")

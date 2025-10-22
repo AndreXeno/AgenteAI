@@ -5,6 +5,15 @@ from gtts import gTTS
 import base64
 import tempfile
 
+from agents.session_manager import load_session, save_session
+
+if "username" not in st.session_state or not st.session_state["username"]:
+    username = load_session()
+    if username:
+        st.session_state["username"] = username
+
+# Quando l’utente fa login:
+save_session(st.session_state["username"])
 # ==============================
 # 🎨 CONFIGURAZIONE BASE
 # ==============================
@@ -19,6 +28,8 @@ st.set_page_config(page_title="Mind&Body Coach AI", page_icon="🧘‍♂️", l
 import pandas as pd, os
 users_file = "data/users.csv"
 os.makedirs("data", exist_ok=True)
+
+
 
 # Carica o crea file utenti
 if os.path.exists(users_file):

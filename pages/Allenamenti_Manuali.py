@@ -5,6 +5,16 @@ import os
 import pandas as pd
 from datetime import datetime
 
+from agents.session_manager import load_session, save_session
+
+if "username" not in st.session_state or not st.session_state["username"]:
+    username = load_session()
+    if username:
+        st.session_state["username"] = username
+
+# Quando l’utente fa login:
+save_session(st.session_state["username"])
+
 st.set_page_config(page_title="Allenamenti Manuali", page_icon="🏋️", layout="centered")
 
 st.title("🏋️ Aggiungi Allenamento Manuale")

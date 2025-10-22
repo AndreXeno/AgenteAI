@@ -21,14 +21,14 @@ DATA_DIR = "data/users"
 # =====================================
 # 🔗 CONNESSIONE E AUTORIZZAZIONE
 # =====================================
-def connect_strava(username: str = None):
-    """Genera l'URL per connettere l'account Strava"""
+def connect_strava(username=None):
+    redirect_uri = f"{STRAVA_REDIRECT_URI}?user={username}" if username else STRAVA_REDIRECT_URI
     return (
         f"{STRAVA_AUTH_URL}?client_id={STRAVA_CLIENT_ID}"
         f"&response_type=code"
-        f"&redirect_uri={STRAVA_REDIRECT_URI}"
+        f"&redirect_uri={redirect_uri}"
         f"&approval_prompt=auto"
-        f"&scope=read,activity:read_all"
+        f"&scope=activity:read_all"
     )
 
 
