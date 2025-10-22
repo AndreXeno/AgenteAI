@@ -1,7 +1,6 @@
-import streamlit as st, os, pandas as pd, json
+import streamlit as st
+import os, json, pandas as pd
 from datetime import datetime
-
-# Import aggiornati con percorso esplicito
 from agents.fitness_connector.strava import connect_strava, is_strava_connected, disconnect_strava
 from agents.fitness_connector.myfitnesspal import is_myfitnesspal_connected, disconnect_myfitnesspal
 from agents.fitness_connector.sync_manager import auto_sync_user_data
@@ -51,10 +50,9 @@ if st.button("💾 Salva Profilo"):
         "sesso": sesso,
         "obiettivi": obiettivi
     }
-
     df = pd.concat([df, pd.DataFrame([row])], ignore_index=True)
     df.to_csv(PROFILE_PATH, index=False)
-    st.success("✅ Profilo aggiornato!")
+    st.success("✅ Profilo aggiornato con successo!")
 
     # ==========================
     # 🔄 Sincronizzazione automatica
@@ -65,7 +63,7 @@ if st.button("💾 Salva Profilo"):
             with open(token_path, "r") as f:
                 tokens = json.load(f)
             for provider, token_data in tokens.items():
-                st.info(f"🔁 Sincronizzazione in corso con {provider.capitalize()}...")
+                st.info(f"🔁 Sincronizzazione automatica con {provider.capitalize()} in corso...")
                 result = auto_sync_user_data(username, provider, token_data)
                 if isinstance(result, dict) and "error" not in result:
                     st.success(f"✅ Dati da {provider.capitalize()} sincronizzati automaticamente!")
@@ -75,7 +73,7 @@ if st.button("💾 Salva Profilo"):
             st.error(f"Errore durante la sincronizzazione automatica: {e}")
 
 # ==========================
-# 🔗 Gestione connessioni
+# 🔗 Gestione connessioni fitness
 # ==========================
 st.divider()
 st.subheader("🔗 Connessioni Fitness")
@@ -113,8 +111,11 @@ with col2:
                     st.success("✅ Connessione completata e dati importati!")
                     st.rerun()
                 else:
-                    st.error(f"Errore: {result.get('error', 'Connessione fallita')}")
+                    st.error(f"❌ Errore: {result.get('error', 'Connessione fallita')}")
 
+# ==========================
+# 📄 Link alle altre sezioni
+# ==========================
 st.divider()
 st.page_link("pages/Connessioni_Fitness.py", label="🔗 Gestisci Connessioni Fitness")
 st.page_link("pages/Allenamenti_Manuali.py", label="🏋️ Gestisci Allenamenti")
