@@ -1,54 +1,61 @@
 import streamlit as st
+import json
 from agents.fitness_connector import strava, myfitnesspal, sync_manager
 
 st.set_page_config(page_title="Connessioni Fitness", page_icon="🔗", layout="centered")
 st.title("🔗 Connessioni Fitness")
 
-# ✅ Recupera nome utente dalla sessione
 username = st.session_state.get("username", None)
 if not username:
     st.warning("Effettua il login prima di gestire le connessioni.")
     st.stop()
 
-# --- Gestione callback Strava ---
-params = st.query_params
+# --- CALLBACK STRAVA (dopo autorizzazione) ---
+params = st.experimental_get_query_params()
 if "code" in params:
     code = params["code"][0]
+    st.info("⏳ Autorizzazione Strava in corso...")
     token_data = strava.exchange_strava_token(code)
     if "access_token" in token_data:
         strava.save_token(username, "strava", token_data)
         st.success("✅ Strava collegato con successo!")
+        # Sincronizzazione automatica immediata
         sync_manager.auto_sync_user_data(username, "strava", token_data)
-        st.query_params.clear()
+        st.experimental_set_query_params()
         st.rerun()
     else:
-        st.error("❌ Errore nel collegamento a Strava.")
+        st.error(f"❌ Errore nel collegamento a Strava: {token_data}")
 
-# --- Sezione STRAVA ---
-st.subheader("🚴 Strava")
+# --- Sezione Strava ---
+st.subheader("🚴 Connessione a Strava")
 
-if strava.is_strava_connected(username):
-    st.success("✅ Connesso a Strava")
+if strava.is_connected(username):
+    st.success("✅ Strava attualmente connesso")
     if st.button("Disconnetti Strava"):
-        strava.disconnect_strava(username)
-        st.rerun()
+        strava.disconnect(username)
+        st.experimental_rerun()
 else:
-    st.link_button("Connetti Strava", url=strava.connect_strava())
+    st.info("⚙️ Strava non ancora connesso")
+    st.link_button("🔗 Collega Strava", url=strava.connect_strava(username))
 
-# --- Sezione MYFITNESSPAL ---
-st.subheader("🍎 MyFitnessPal")
+st.divider()
 
-if myfitnesspal.is_myfitnesspal_connected(username):
+# --- Sezione MyFitnessPal ---
+st.subheader("🍎 Connessione a MyFitnessPal")
+
+if myfitnesspal.is_connected(username):
     st.success("✅ MyFitnessPal connesso")
     if st.button("Disconnetti MyFitnessPal"):
-        myfitnesspal.disconnect_myfitnesspal(username)
-        st.rerun()
+        myfitnesspal.disconnect(username)
+        st.experimental_rerun()
 else:
     myfit_user = st.text_input("Username MyFitnessPal")
     myfit_pass = st.text_input("Password MyFitnessPal", type="password")
-    if st.button("Connetti MyFitnessPal"):
+    if st.button("Connetti a MyFitnessPal"):
         creds = {"username": myfit_user, "password": myfit_pass}
-        myfitnesspal.save_token(username, "myfitnesspal", creds)
-        sync_manager.auto_sync_user_data(username, "myfitnesspal", creds)
-        st.success("✅ MyFitnessPal collegato e sincronizzato con successo!")
-        st.rerun()
+        result = sync_manager.auto_sync_user_data(username, "myfitnesspal", creds)
+        if "error" not in result:
+            st.success("✅ Collegato e dati importati da MyFitnessPal!")
+            st.experimental_rerun()
+        else:
+            st.error(f"❌ Errore: {result['error']}")
