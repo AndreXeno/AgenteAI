@@ -22,14 +22,22 @@ DATA_DIR = "data/users"
 # 🔗 CONNESSIONE E AUTORIZZAZIONE
 # =====================================
 def connect_strava(username=None):
+    """
+    Genera l'URL di autorizzazione Strava, includendo sia il parametro 'state' (standard OAuth)
+    sia il parametro '?user=<username>' nel redirect URI per permettere il ripristino della sessione.
+    """
     redirect_uri = f"{STRAVA_REDIRECT_URI}?user={username}" if username else STRAVA_REDIRECT_URI
-    return (
+    state_param = f"&state={username}" if username else ""
+    auth_url = (
         f"{STRAVA_AUTH_URL}?client_id={STRAVA_CLIENT_ID}"
         f"&response_type=code"
         f"&redirect_uri={redirect_uri}"
         f"&approval_prompt=auto"
         f"&scope=activity:read_all"
+        f"{state_param}"
     )
+    print(f"[DEBUG] 🔗 URL autorizzazione Strava generato per {username}: {auth_url}")
+    return auth_url
 
 
 def exchange_strava_token(code):

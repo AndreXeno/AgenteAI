@@ -32,7 +32,7 @@ if st.session_state.get("username"):
         save_session(st.session_state["username"])
         print(f"[SESSION SAVE] 💾 Sessione salvata per {st.session_state['username']}")
     except Exception as e:
-        print(f"[SESSION ERROR] ⚠️ Errore durante il salvataggio: {e}")
+        print(f"[SESSION ERROR] ⚠️ Errore durante il salvataggio della sessione: {e}")
 else:
     print("[SESSION INFO] Nessun utente loggato al momento.")
 # ==============================
