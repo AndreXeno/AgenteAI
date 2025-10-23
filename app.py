@@ -7,25 +7,34 @@ import tempfile
 
 from agents.session_manager import load_session, save_session
 
-# Inizializza chiavi di sessione
+# ==============================
+# 🔐 GESTIONE SESSIONE UTENTE (robusta)
+# ==============================
+# Inizializza chiavi principali di sessione
 if "username" not in st.session_state:
     st.session_state["username"] = None
 if "logged_in" not in st.session_state:
     st.session_state["logged_in"] = False
 
-# ==============================
-# 🔐 GESTIONE SESSIONE UTENTE
-# ==============================
-saved_user = load_session()
-if saved_user and not st.session_state["username"]:
-    st.session_state["username"] = saved_user
-    print(f"[SESSION RESTORE] Ripristinato utente: {saved_user}")
+# Tenta di ripristinare la sessione salvata localmente
+try:
+    saved_user = load_session()
+    if saved_user and not st.session_state["username"]:
+        st.session_state["username"] = saved_user
+        st.session_state["logged_in"] = True
+        print(f"[SESSION RESTORE] ✅ Utente ripristinato da sessione salvata: {saved_user}")
+except Exception as e:
+    print(f"[SESSION ERROR] ❌ Errore nel ripristino sessione: {e}")
 
+# Salva la sessione solo se un utente è loggato
 if st.session_state.get("username"):
-    save_session(st.session_state["username"])
-    print(f"[SESSION SAVE] Sessione salvata per {st.session_state['username']}")
+    try:
+        save_session(st.session_state["username"])
+        print(f"[SESSION SAVE] 💾 Sessione salvata per {st.session_state['username']}")
+    except Exception as e:
+        print(f"[SESSION ERROR] ⚠️ Errore durante il salvataggio: {e}")
 else:
-    print("[SESSION] Nessun utente loggato al momento.")
+    print("[SESSION INFO] Nessun utente loggato al momento.")
 # ==============================
 # 🎨 CONFIGURAZIONE BASE
 # ==============================

@@ -7,14 +7,25 @@ from datetime import datetime
 
 from agents.session_manager import load_session, save_session
 
-if "username" not in st.session_state or not st.session_state["username"]:
-    username = load_session()
-    if username:
-        st.session_state["username"] = username
+# ==============================
+# 🔐 GESTIONE SESSIONE UTENTE
+# ==============================
+# Assicura che la chiave esista sempre
+if "username" not in st.session_state:
+    st.session_state["username"] = None
 
-# Quando l’utente fa login:
-save_session(st.session_state["username"])
+# Carica la sessione precedente se esiste
+saved_user = load_session()
+if saved_user and not st.session_state["username"]:
+    st.session_state["username"] = saved_user
+    print(f"[SESSION RESTORE] Ripristinato utente: {saved_user}")
 
+# Salva la sessione solo se l'utente è loggato
+if st.session_state.get("username"):
+    save_session(st.session_state["username"])
+    print(f"[SESSION SAVE] Sessione salvata per {st.session_state['username']}")
+else:
+    print("[SESSION] Nessun utente loggato al momento")
 st.set_page_config(page_title="Allenamenti Manuali", page_icon="🏋️", layout="centered")
 
 st.title("🏋️ Aggiungi Allenamento Manuale")
