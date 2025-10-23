@@ -7,13 +7,25 @@ import tempfile
 
 from agents.session_manager import load_session, save_session
 
-if "username" not in st.session_state or not st.session_state["username"]:
-    username = load_session()
-    if username:
-        st.session_state["username"] = username
+# Inizializza chiavi di sessione
+if "username" not in st.session_state:
+    st.session_state["username"] = None
+if "logged_in" not in st.session_state:
+    st.session_state["logged_in"] = False
 
-# Quando l’utente fa login:
-save_session(st.session_state["username"])
+# ==============================
+# 🔐 GESTIONE SESSIONE UTENTE
+# ==============================
+saved_user = load_session()
+if saved_user and not st.session_state["username"]:
+    st.session_state["username"] = saved_user
+    print(f"[SESSION RESTORE] Ripristinato utente: {saved_user}")
+
+if st.session_state.get("username"):
+    save_session(st.session_state["username"])
+    print(f"[SESSION SAVE] Sessione salvata per {st.session_state['username']}")
+else:
+    print("[SESSION] Nessun utente loggato al momento.")
 # ==============================
 # 🎨 CONFIGURAZIONE BASE
 # ==============================
