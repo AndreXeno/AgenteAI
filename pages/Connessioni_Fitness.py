@@ -68,7 +68,7 @@ if "code" in params:
 # ==============================
 st.subheader("🚴 Connessione a Strava")
 
-if strava.is_connected(username):
+if strava.is_strava_connected(username):
     st.success("✅ Strava attualmente connesso")
     if st.button("Disconnetti Strava"):
         strava.disconnect(username)
