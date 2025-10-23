@@ -52,6 +52,12 @@ if "code" in params:
     if "access_token" in token_data:
         strava.save_token(username, "strava", token_data)
         st.success("✅ Strava collegato con successo!")
+
+        # 🔄 Sincronizzazione immediata dei dati
+        from agents.fitness_connector.sync_manager import auto_sync_user_data
+        auto_sync_user_data(username, "strava", token_data)
+
+        # Pulisce l'URL e ricarica
         st.experimental_set_query_params()
         st.rerun()
     else:
@@ -70,8 +76,7 @@ if strava.is_strava_connected(username):
 else:
     st.info("⚙️ Strava non ancora connesso")
     connect_url = strava.connect_strava(username)
-    st.link_button("🔗 Collega Strava", url=f"{connect_url}&state={username}")
-
+    st.link_button("🔗 Collega Strava", url=connect_url)
 st.divider()
 
 # ==============================
