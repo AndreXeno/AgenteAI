@@ -15,28 +15,38 @@ st.title("🔗 Connessioni Fitness")
 # Assicura che la chiave esista sempre
 if "username" not in st.session_state:
     st.session_state["username"] = None
+if "logged_in" not in st.session_state:
+    st.session_state["logged_in"] = False
 
 # Prova a ripristinare la sessione da file
 saved_user = load_session()
 if saved_user and not st.session_state["username"]:
     st.session_state["username"] = saved_user
+    st.session_state["logged_in"] = True
     print(f"[SESSION RESTORE] Ripristinato utente: {saved_user}")
-
-username = st.session_state.get("username", None)
-if not username:
-    st.warning("Effettua il login prima di gestire le connessioni.")
-    st.stop()
 
 # ==============================
 # 🔁 CALLBACK STRAVA (dopo autorizzazione)
 # ==============================
 params = st.experimental_get_query_params()
 
-# Se la sessione è vuota ma arriva un parametro 'user', ricreala
-if not st.session_state["username"] and "user" in params:
-    st.session_state["username"] = params["user"][0]
-    save_session(st.session_state["username"])
-    print(f"[SESSION RESTORE] Username ripristinato da URL: {st.session_state['username']}")
+# Se la sessione è vuota ma arriva un parametro 'user' o 'state', ricreala
+if not st.session_state["username"]:
+    if "user" in params:
+        st.session_state["username"] = params["user"][0]
+        st.session_state["logged_in"] = True
+        save_session(st.session_state["username"])
+        print(f"[SESSION RESTORE] Username ripristinato da URL (user): {st.session_state['username']}")
+    elif "state" in params:
+        st.session_state["username"] = params["state"][0]
+        st.session_state["logged_in"] = True
+        save_session(st.session_state["username"])
+        print(f"[SESSION RESTORE] Username ripristinato da URL (state): {st.session_state['username']}")
+
+username = st.session_state.get("username", None)
+if not username:
+    st.warning("Effettua il login prima di gestire le connessioni.")
+    st.stop()
 
 # Dopo il redirect da Strava, gestisci il token di accesso
 if "code" in params:
