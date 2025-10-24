@@ -9,6 +9,35 @@ from agents.mindbody_reflection import handle_training_reflection
 from agents.knowledge_loader import load_all_knowledge
 import json
 import os
+import pandas as pd
+
+def load_user_data(username):
+    user_data = {}
+    base_path = os.path.join("data", "users", username)
+    if os.path.exists(base_path):
+        allenamenti_path = os.path.join(base_path, "allenamenti.csv")
+        profilo_path = os.path.join(base_path, "profilo_utente.csv")
+        fitness_path = os.path.join(base_path, "dati_fitness.csv")
+
+        if os.path.exists(allenamenti_path):
+            try:
+                df_allenamenti = pd.read_csv(allenamenti_path)
+                user_data["allenamenti"] = df_allenamenti.to_dict(orient="records")
+            except Exception as e:
+                user_data["allenamenti"] = f"Errore caricamento allenamenti: {e}"
+        if os.path.exists(profilo_path):
+            try:
+                df_profilo = pd.read_csv(profilo_path)
+                user_data["profilo_utente"] = df_profilo.to_dict(orient="records")
+            except Exception as e:
+                user_data["profilo_utente"] = f"Errore caricamento profilo: {e}"
+        if os.path.exists(fitness_path):
+            try:
+                df_fitness = pd.read_csv(fitness_path)
+                user_data["dati_fitness"] = df_fitness.to_dict(orient="records")
+            except Exception as e:
+                user_data["dati_fitness"] = f"Errore caricamento dati fitness: {e}"
+    return user_data
 
 # ======================================
 # ⚙️ CONFIGURAZIONE E LOG AVVIO
@@ -93,6 +122,10 @@ class MindBodyAgent:
         text = user_input.lower().strip()
         print("\n==============================")
         print(f"💬 Nuovo input utente: {user_input}")
+
+        user_data = load_user_data(username)
+        print(f"📂 Dati utente caricati per contesto: {list(user_data.keys())}")
+
         self.update_memory("utente", user_input)
 
         # 🏋️ Caso 1 — Comando esplicito per aggiungere allenamento
@@ -108,6 +141,7 @@ class MindBodyAgent:
         if any(word in text for word in ["corsa", "palestra", "allenamento", "allenato", "fatica", "giornata", "gara", "workout", "stanco", "demotivato", "solo", "svuotato", "stressato", "ansioso", "rassegnato", "felice"]):
             print("💭 Attivo modulo: TRAINING_REFLECTION.")
             context = f"{BASE_PROMPT}\n\n📚 Conoscenze disponibili:\n{GLOBAL_KNOWLEDGE[:3000]}\n\n" + self.get_context()
+            context = f"📊 Dati aggiornati dell'utente:\n{json.dumps(user_data, indent=2, ensure_ascii=False)}\n\n" + context
             print("🧠 Context inviato a Gemini (anteprima):")
             print(context[:500] + "...")
             response = handle_training_reflection(f"Contesto conversazione:\n{context}\n\nNuovo messaggio:\n{user_input}", username)
@@ -119,6 +153,7 @@ class MindBodyAgent:
         if any(word in text for word in ["stress", "ansia", "rilassat", "felice", "motivato", "triste", "agitato", "scarico", "rassegnato", "isolato", "invidioso", "geloso"]):
             print("🧘 Attivo modulo: MIND_STATE.")
             context = f"{BASE_PROMPT}\n\n📚 Conoscenze disponibili:\n{GLOBAL_KNOWLEDGE[:3000]}\n\n" + self.get_context()
+            context = f"📊 Dati aggiornati dell'utente:\n{json.dumps(user_data, indent=2, ensure_ascii=False)}\n\n" + context
             print("🧠 Context inviato a Gemini (anteprima):")
             print(context[:500] + "...")
             response = handle_mind_state(f"Contesto conversazione:\n{context}\n\nNuovo messaggio:\n{user_input}", username)
@@ -129,6 +164,9 @@ class MindBodyAgent:
         # 📊 Caso 4 — Richiesta di analisi settimanale
         if any(word in text for word in ["settimana", "report", "analisi", "riepilogo"]):
             print("📊 Attivo modulo: WEEKLY_ANALYSIS.")
+            # In questo caso non c'è un context testuale, ma possiamo comunque fornire i dati utente se necessario
+            # Per coerenza, passiamo i dati utente in qualche modo se il modulo lo supporta, altrimenti solo response
+            # Qui si assume che handle_weekly_analysis accetti solo username
             response = handle_weekly_analysis(username)
             self.update_memory("coach", response)
             print("✅ Report settimanale generato.")

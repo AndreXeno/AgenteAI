@@ -14,11 +14,23 @@ from agents.session_manager import load_session, save_session
 if "username" not in st.session_state:
     st.session_state["username"] = None
 
-# Carica la sessione precedente se esiste
-saved_user = load_session()
-if saved_user and not st.session_state["username"]:
-    st.session_state["username"] = saved_user
-    print(f"[SESSION RESTORE] Ripristinato utente: {saved_user}")
+# Carica la sessione precedente se esiste, in modo sicuro
+try:
+    saved_user = load_session()
+    if (
+        saved_user
+        and isinstance(saved_user, str)
+        and saved_user.strip()
+        and not st.session_state.get("username")
+    ):
+        st.session_state["username"] = saved_user.strip()
+        print(f"[SESSION RESTORE] Ripristinato utente: {saved_user.strip()}")
+    else:
+        print(f"[SESSION RESTORE] Nessun utente valido da ripristinare (saved_user={repr(saved_user)})")
+except Exception as e:
+    print(f"[SESSION RESTORE] Errore durante il ripristino della sessione: {e}")
+    if "username" not in st.session_state:
+        st.session_state["username"] = None
 
 # Salva la sessione solo se l'utente è loggato
 if st.session_state.get("username"):
@@ -52,11 +64,19 @@ else:
     latest = {}
 
 st.subheader("📋 Dati fisici e personali")
-peso = st.number_input("Peso (kg)", min_value=30.0, value=float(latest.get("peso", 70)))
-altezza = st.number_input("Altezza (cm)", min_value=100.0, value=float(latest.get("altezza", 170)))
-eta = st.number_input("Età", min_value=10, value=int(latest.get("eta", 25)))
-sesso = st.selectbox("Sesso", ["M", "F", "Altro"], index=["M", "F", "Altro"].index(latest.get("sesso", "M")))
-obiettivi = st.text_input("Obiettivi di allenamento", latest.get("obiettivi", ""))
+try:
+    peso = st.number_input("Peso (kg)", min_value=30.0, value=float(latest.get("peso", 70)))
+    altezza = st.number_input("Altezza (cm)", min_value=100.0, value=float(latest.get("altezza", 170)))
+    eta = st.number_input("Età", min_value=10, value=int(latest.get("eta", 25)))
+    sesso = st.selectbox("Sesso", ["M", "F", "Altro"], index=["M", "F", "Altro"].index(latest.get("sesso", "M")))
+    obiettivi = st.text_input("Obiettivi di allenamento", latest.get("obiettivi", ""))
+except (ValueError, TypeError):
+    st.warning("⚠️ Alcuni dati salvati non sono validi. Controlla e correggi i campi evidenziati.")
+    peso = st.number_input("Peso (kg)", min_value=30.0, value=70.0)
+    altezza = st.number_input("Altezza (cm)", min_value=100.0, value=170.0)
+    eta = st.number_input("Età", min_value=10, value=25)
+    sesso = st.selectbox("Sesso", ["M", "F", "Altro"], index=0)
+    obiettivi = st.text_input("Obiettivi di allenamento", "mantenimento")
 
 # ==========================
 # 💾 Salvataggio profilo

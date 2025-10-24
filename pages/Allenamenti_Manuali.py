@@ -41,6 +41,7 @@ sports = [
     "Basket",
     "Yoga",
     "Pilates"
+
 ]
 
 sport = st.selectbox("Scegli lo sport", sports)
@@ -83,8 +84,10 @@ elif sport in ["Yoga", "Pilates"]:
 
 # Pulsante di salvataggio
 if st.button("💾 Salva Allenamento"):
-    os.makedirs("data", exist_ok=True)
-    csv_path = os.path.join("data", "allenamenti_manual.csv")
+    # Percorso personalizzato per ogni utente
+    user_dir = os.path.join("data", "users", st.session_state["username"])
+    os.makedirs(user_dir, exist_ok=True)
+    csv_path = os.path.join(user_dir, "allenamenti.csv")
 
     now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 

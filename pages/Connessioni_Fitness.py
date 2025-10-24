@@ -24,21 +24,16 @@ if saved_user and not st.session_state["username"]:
     st.session_state["logged_in"] = True
     print(f"[SESSION RESTORE] Ripristinato utente: {saved_user}")
 
-params = st.query_params
-# Normalize params (Streamlit returns Mapping[str, str] in recent versions)
-if isinstance(params, dict):
-    qp = {k: ([v] if isinstance(v, str) else v) for k, v in params.items()}
-else:
-    qp = {}
+qp = st.query_params
 
 if not st.session_state["username"]:
     if "user" in qp and qp["user"]:
-        st.session_state["username"] = qp["user"][0]
+        st.session_state["username"] = qp["user"]
         st.session_state["logged_in"] = True
         save_session(st.session_state["username"])
         print(f"[SESSION RESTORE] Username ripristinato da URL (user): {st.session_state['username']}")
     elif "state" in qp and qp["state"]:
-        st.session_state["username"] = qp["state"][0]
+        st.session_state["username"] = qp["state"]
         st.session_state["logged_in"] = True
         save_session(st.session_state["username"])
         print(f"[SESSION RESTORE] Username ripristinato da URL (state): {st.session_state['username']}")
@@ -51,7 +46,7 @@ if not username:
 # 🔁 CALLBACK STRAVA
 # ==============================
 if "code" in qp and qp["code"]:
-    code = qp["code"][0]
+    code = qp["code"]
     st.info("⏳ Autorizzazione Strava in corso...")
     token_data = strava.exchange_strava_token(code)
 

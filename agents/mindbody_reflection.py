@@ -23,7 +23,7 @@ def handle_training_reflection(user_input: str, username: str = "anonimo"):
     os.makedirs(user_dir, exist_ok=True)
     train_path = os.path.join(user_dir, "allenamenti.csv")
 
-    # train_path = os.path.join(DATA_DIR, "allenamenti_manual.csv")
+    # train_path = os.path.join(DATA_DIR, "allenamenti.csv")
 
     summary = ""
     if os.path.exists(train_path):
