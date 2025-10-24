@@ -41,7 +41,6 @@ username = st.session_state.get("username", None)
 if not username:
     st.warning("Effettua il login prima di gestire le connessioni.")
     st.stop()
-
 # ==============================
 # 🔁 CALLBACK STRAVA
 # ==============================
@@ -49,17 +48,23 @@ if "code" in params:
     code = params["code"][0]
     st.info("⏳ Autorizzazione Strava in corso...")
     token_data = strava.exchange_strava_token(code)
+
     if "access_token" in token_data:
         strava.save_token(username, "strava", token_data)
-        st.success("✅ Strava collegato con successo!")
 
-        # 🔄 Sincronizzazione immediata dei dati
         from agents.fitness_connector.sync_manager import auto_sync_user_data
         auto_sync_user_data(username, "strava", token_data)
 
-        # Pulisce l'URL e ricarica
-        st.experimental_set_query_params()
-        st.rerun()
+        st.success("✅ Strava collegato con successo! Sincronizzazione completata.")
+        st.markdown("""
+            <meta http-equiv="refresh" content="3; url=/Connessioni_Fitness" />
+            <p>🔄 Reindirizzamento automatico in corso... Se non vieni reindirizzato entro 3 secondi,
+            <a href="/Connessioni_Fitness">clicca qui per tornare alla pagina.</a></p>
+        """, unsafe_allow_html=True)
+
+        # 👉 Importante: fermare dopo il rendering dell’HTML
+        st.stop()
+
     else:
         st.error(f"❌ Errore nel collegamento a Strava: {token_data}")
 
