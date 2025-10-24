@@ -49,18 +49,28 @@ if "username" not in st.session_state or not st.session_state["username"]:
     st.stop()
 
 username = st.session_state["username"]
-USER_DIR = f"data/users/{username}"
-PROFILE_PATH = f"{USER_DIR}/profilo_utente.csv"
+USER_DIR = os.path.join("data", "users", username)
+PROFILE_PATH = os.path.join(USER_DIR, "profilo_utente.csv")
 os.makedirs(USER_DIR, exist_ok=True)
 
 # ==========================
 # 📄 Caricamento ultimo profilo
 # ==========================
 if os.path.exists(PROFILE_PATH):
-    df = pd.read_csv(PROFILE_PATH)
-    latest = df.iloc[-1].to_dict() if not df.empty else {}
+    try:
+        if os.path.getsize(PROFILE_PATH) == 0:
+            st.warning("Il file del profilo utente è vuoto. Viene creato un nuovo profilo vuoto.")
+            df = pd.DataFrame(columns=["username", "data", "peso", "altezza", "eta", "sesso", "obiettivi"])
+            latest = {}
+        else:
+            df = pd.read_csv(PROFILE_PATH)
+            latest = df.iloc[-1].to_dict() if not df.empty else {}
+    except Exception as e:
+        st.warning(f"Errore nel caricamento del profilo utente: {e}. Viene creato un nuovo profilo vuoto.")
+        df = pd.DataFrame(columns=["username", "data", "peso", "altezza", "eta", "sesso", "obiettivi"])
+        latest = {}
 else:
-    df = pd.DataFrame()
+    df = pd.DataFrame(columns=["username", "data", "peso", "altezza", "eta", "sesso", "obiettivi"])
     latest = {}
 
 st.subheader("📋 Dati fisici e personali")

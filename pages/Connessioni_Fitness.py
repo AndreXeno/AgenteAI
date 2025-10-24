@@ -86,8 +86,12 @@ st.subheader("🍎 Connessione a MyFitnessPal")
 if myfitnesspal.is_myfitnesspal_connected(username):
     st.success("✅ MyFitnessPal connesso")
     if st.button("Disconnetti MyFitnessPal"):
-        myfitnesspal.disconnect_myfitnesspal(username)
-        st.experimental_rerun()
+        result = myfitnesspal.disconnect_myfitnesspal(username)
+        if result:
+            st.success("🔌 Disconnesso con successo da MyFitnessPal")
+        else:
+            st.warning("⚠️ Nessuna connessione trovata da disconnettere.")
+        st.rerun()
 else:
     st.info("⚙️ MyFitnessPal non ancora connesso")
     with st.expander("Connetti a MyFitnessPal"):
@@ -99,6 +103,6 @@ else:
             result = myfitnesspal.auto_sync(username, creds)
             if "error" not in result:
                 st.success("✅ Connessione completata e dati importati da MyFitnessPal!")
-                st.experimental_rerun()
+                st.rerun()
             else:
                 st.error(f"❌ Errore: {result['error']}")
