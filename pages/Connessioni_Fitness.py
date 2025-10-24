@@ -2,6 +2,7 @@ import streamlit as st
 import json
 from agents.fitness_connector import strava, myfitnesspal
 from agents.session_manager import load_session, save_session
+from agents.fitness_connector.sync_manager import auto_sync_user_data
 
 # ==============================
 # ⚙️ CONFIGURAZIONE BASE
@@ -23,16 +24,21 @@ if saved_user and not st.session_state["username"]:
     st.session_state["logged_in"] = True
     print(f"[SESSION RESTORE] Ripristinato utente: {saved_user}")
 
-params = st.experimental_get_query_params()
+params = st.query_params
+# Normalize params (Streamlit returns Mapping[str, str] in recent versions)
+if isinstance(params, dict):
+    qp = {k: ([v] if isinstance(v, str) else v) for k, v in params.items()}
+else:
+    qp = {}
 
 if not st.session_state["username"]:
-    if "user" in params:
-        st.session_state["username"] = params["user"][0]
+    if "user" in qp and qp["user"]:
+        st.session_state["username"] = qp["user"][0]
         st.session_state["logged_in"] = True
         save_session(st.session_state["username"])
         print(f"[SESSION RESTORE] Username ripristinato da URL (user): {st.session_state['username']}")
-    elif "state" in params:
-        st.session_state["username"] = params["state"][0]
+    elif "state" in qp and qp["state"]:
+        st.session_state["username"] = qp["state"][0]
         st.session_state["logged_in"] = True
         save_session(st.session_state["username"])
         print(f"[SESSION RESTORE] Username ripristinato da URL (state): {st.session_state['username']}")
@@ -44,27 +50,20 @@ if not username:
 # ==============================
 # 🔁 CALLBACK STRAVA
 # ==============================
-if "code" in params:
-    code = params["code"][0]
+if "code" in qp and qp["code"]:
+    code = qp["code"][0]
     st.info("⏳ Autorizzazione Strava in corso...")
     token_data = strava.exchange_strava_token(code)
 
-    if "access_token" in token_data:
+    if token_data and "access_token" in token_data:
+        # Salva token e sincronizza subito i dati
         strava.save_token(username, "strava", token_data)
-
-        from agents.fitness_connector.sync_manager import auto_sync_user_data
         auto_sync_user_data(username, "strava", token_data)
+        st.success("✅ Strava collegato! Dati sincronizzati.")
 
-        st.success("✅ Strava collegato con successo! Sincronizzazione completata.")
-        st.markdown("""
-            <meta http-equiv="refresh" content="3; url=/Connessioni_Fitness" />
-            <p>🔄 Reindirizzamento automatico in corso... Se non vieni reindirizzato entro 3 secondi,
-            <a href="/Connessioni_Fitness">clicca qui per tornare alla pagina.</a></p>
-        """, unsafe_allow_html=True)
-
-        # 👉 Importante: fermare dopo il rendering dell’HTML
-        st.stop()
-
+        # Pulisci i parametri di query e ricarica la pagina
+        st.query_params.clear()
+        st.rerun()
     else:
         st.error(f"❌ Errore nel collegamento a Strava: {token_data}")
 
