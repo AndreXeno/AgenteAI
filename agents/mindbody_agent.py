@@ -10,14 +10,42 @@ from agents.knowledge_loader import load_all_knowledge
 import json
 import os
 import pandas as pd
+# Fitness sync helper: try to fetch fresh data if Strava is connected
+from agents.fitness_connector.sync_manager import auto_sync_user_data
 
 def load_user_data(username):
     user_data = {}
+    user_data["username"] = username
     base_path = os.path.join("data", "users", username)
     if os.path.exists(base_path):
         allenamenti_path = os.path.join(base_path, "allenamenti.csv")
         profilo_path = os.path.join(base_path, "profilo_utente.csv")
-        fitness_path = os.path.join(base_path, "dati_fitness.csv")
+        # fitness_path = os.path.join(base_path, "dati_fitness.csv")
+
+        # --- Carica token e (se necessario) sincronizza Strava automaticamente ---
+        tokens_path = os.path.join(base_path, "tokens.json")
+        user_data["tokens"] = {}
+        if os.path.exists(tokens_path):
+            try:
+                with open(tokens_path, "r", encoding="utf-8") as tf:
+                    tokens = json.load(tf)
+                    user_data["tokens"] = tokens
+            except Exception as e:
+                print(f"[WARN] Impossibile leggere tokens.json per {username}: {e}")
+
+            # Se è presente un token Strava e non esistono dati allenamenti, proviamo una sincronizzazione rapida
+            try:
+                if "strava" in user_data["tokens"]:
+                    token_info = user_data["tokens"]["strava"]
+                    if (not os.path.exists(allenamenti_path)) or (os.path.exists(allenamenti_path) and os.stat(allenamenti_path).st_size == 0):
+                        print(f"[SYNC] Dati allenamenti mancanti per {username}, avvio sync Strava...")
+                        try:
+                            auto_sync_user_data(username, "strava", token_info)
+                            print(f"[SYNC] Sync Strava completata per {username}.")
+                        except Exception as sync_e:
+                            print(f"[SYNC] Errore durante auto_sync Strava per {username}: {sync_e}")
+            except Exception as e:
+                print(f"[WARN] Errore controllo sync Strava per {username}: {e}")
 
         if os.path.exists(allenamenti_path):
             try:
@@ -31,12 +59,13 @@ def load_user_data(username):
                 user_data["profilo_utente"] = df_profilo.to_dict(orient="records")
             except Exception as e:
                 user_data["profilo_utente"] = f"Errore caricamento profilo: {e}"
-        if os.path.exists(fitness_path):
-            try:
-                df_fitness = pd.read_csv(fitness_path)
-                user_data["dati_fitness"] = df_fitness.to_dict(orient="records")
-            except Exception as e:
-                user_data["dati_fitness"] = f"Errore caricamento dati fitness: {e}"
+        # if os.path.exists(fitness_path):
+        #     try:
+        #         df_fitness = pd.read_csv(fitness_path)
+        #         user_data["dati_fitness"] = df_fitness.to_dict(orient="records")
+        #     except Exception as e:
+        #         user_data["dati_fitness"] = f"Errore caricamento dati fitness: {e}"
+    print(f"[LOAD] user_data keys for {username}: {list(user_data.keys())}")
     return user_data
 
 # ======================================
@@ -119,16 +148,33 @@ class MindBodyAgent:
         return context
 
     def run(self, user_input: str, username: str = "anonimo"):
-        text = user_input.lower().strip()
         print("\n==============================")
         print(f"💬 Nuovo input utente: {user_input}")
 
+        # Normalizza testo
+        text = user_input.lower().strip()
+
+        # Carica i dati dell’utente (profilo, allenamenti, token, ecc.)
         user_data = load_user_data(username)
         print(f"📂 Dati utente caricati per contesto: {list(user_data.keys())}")
 
+        # Costruisci un riassunto sintetico del profilo
+        if isinstance(user_data.get("profilo_utente"), list) and len(user_data["profilo_utente"]) > 0:
+            prof = user_data["profilo_utente"][-1]
+            profile_summary = (
+                f"L'utente si chiama {username}, ha {prof.get('eta', 'un’età non specificata')} anni, "
+                f"pesa {prof.get('peso', 'un peso non indicato')} kg, è alto {prof.get('altezza', 'un’altezza non indicata')} cm "
+                f"e il suo obiettivo è {prof.get('obiettivi', 'non specificato')}."
+            )
+        else:
+            profile_summary = f"L'utente si chiama {username}, ma non ha ancora completato il profilo personale."
+
+        print(f"🧠 Profilo utente sintetizzato: {profile_summary}")
+
+        # Aggiorna la memoria conversazionale
         self.update_memory("utente", user_input)
 
-        # 🏋️ Caso 1 — Comando esplicito per aggiungere allenamento
+        # 🏋️ Caso 1 — Aggiunta manuale di un allenamento
         if text.startswith("/allenamento") or text.startswith("/aggiungi allenamento"):
             print("🏋️ Attivo modulo: TRAINING (aggiunta manuale).")
             clean_input = user_input.replace("/allenamento", "").replace("/aggiungi allenamento", "").strip()
@@ -137,11 +183,16 @@ class MindBodyAgent:
             print("✅ Allenamento processato e registrato.")
             return type("Response", (), {"text": response})()
 
-        # 💬 Caso 2 — Riflessioni o emozioni legate a giornata o allenamento
-        if any(word in text for word in ["corsa", "palestra", "allenamento", "allenato", "fatica", "giornata", "gara", "workout", "stanco", "demotivato", "solo", "svuotato", "stressato", "ansioso", "rassegnato", "felice"]):
+        # 💭 Caso 2 — Riflessioni o emozioni legate all’allenamento o alla giornata
+        if any(word in text for word in ["corsa", "palestra", "allenamento", "allenato", "fatica", "giornata", "gara", "workout", "stanco", "demotivato", "solo", "stressato", "felice"]):
             print("💭 Attivo modulo: TRAINING_REFLECTION.")
-            context = f"{BASE_PROMPT}\n\n📚 Conoscenze disponibili:\n{GLOBAL_KNOWLEDGE[:3000]}\n\n" + self.get_context()
-            context = f"📊 Dati aggiornati dell'utente:\n{json.dumps(user_data, indent=2, ensure_ascii=False)}\n\n" + context
+            context = (
+                f"👤 Identità utente:\n{profile_summary}\n\n"
+                f"📊 Dati aggiornati dell'utente:\n{json.dumps(user_data, indent=2, ensure_ascii=False)}\n\n"
+                f"{BASE_PROMPT}\n\n"
+                f"📚 Conoscenze disponibili:\n{GLOBAL_KNOWLEDGE[:3000]}\n\n"
+                f"{self.get_context()}"
+            )
             print("🧠 Context inviato a Gemini (anteprima):")
             print(context[:500] + "...")
             response = handle_training_reflection(f"Contesto conversazione:\n{context}\n\nNuovo messaggio:\n{user_input}", username)
@@ -149,11 +200,16 @@ class MindBodyAgent:
             print("✅ Risposta generata da modulo TRAINING_REFLECTION.")
             return type("Response", (), {"text": response})()
 
-        # 🧘 Caso 3 — Stato mentale puro
-        if any(word in text for word in ["stress", "ansia", "rilassat", "felice", "motivato", "triste", "agitato", "scarico", "rassegnato", "isolato", "invidioso", "geloso"]):
+        # 🧘 Caso 3 — Stato mentale o emozioni
+        if any(word in text for word in ["stress", "ansia", "rilassat", "motivato", "triste", "agitato", "scarico", "felice", "rassegnato"]):
             print("🧘 Attivo modulo: MIND_STATE.")
-            context = f"{BASE_PROMPT}\n\n📚 Conoscenze disponibili:\n{GLOBAL_KNOWLEDGE[:3000]}\n\n" + self.get_context()
-            context = f"📊 Dati aggiornati dell'utente:\n{json.dumps(user_data, indent=2, ensure_ascii=False)}\n\n" + context
+            context = (
+                f"👤 Identità utente:\n{profile_summary}\n\n"
+                f"📊 Dati aggiornati dell'utente:\n{json.dumps(user_data, indent=2, ensure_ascii=False)}\n\n"
+                f"{BASE_PROMPT}\n\n"
+                f"📚 Conoscenze disponibili:\n{GLOBAL_KNOWLEDGE[:3000]}\n\n"
+                f"{self.get_context()}"
+            )
             print("🧠 Context inviato a Gemini (anteprima):")
             print(context[:500] + "...")
             response = handle_mind_state(f"Contesto conversazione:\n{context}\n\nNuovo messaggio:\n{user_input}", username)
@@ -161,18 +217,15 @@ class MindBodyAgent:
             print("✅ Risposta generata da modulo MIND_STATE.")
             return type("Response", (), {"text": response})()
 
-        # 📊 Caso 4 — Richiesta di analisi settimanale
+        # 📊 Caso 4 — Analisi settimanale
         if any(word in text for word in ["settimana", "report", "analisi", "riepilogo"]):
             print("📊 Attivo modulo: WEEKLY_ANALYSIS.")
-            # In questo caso non c'è un context testuale, ma possiamo comunque fornire i dati utente se necessario
-            # Per coerenza, passiamo i dati utente in qualche modo se il modulo lo supporta, altrimenti solo response
-            # Qui si assume che handle_weekly_analysis accetti solo username
             response = handle_weekly_analysis(username)
             self.update_memory("coach", response)
             print("✅ Report settimanale generato.")
             return type("Response", (), {"text": response})()
 
-        # ❓ Default — Non classificato
+        # ❓ Default — Fallback
         print("❓ Input non riconosciuto, rispondo in fallback.")
         response = "Non ho capito bene, puoi spiegarmi meglio o dirmi come ti senti?"
         self.update_memory("coach", response)

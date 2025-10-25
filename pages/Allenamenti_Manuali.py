@@ -1,5 +1,3 @@
-
-
 import streamlit as st
 import os
 import pandas as pd
@@ -27,6 +25,10 @@ if st.session_state.get("username"):
 else:
     print("[SESSION] Nessun utente loggato al momento")
 st.set_page_config(page_title="Allenamenti Manuali", page_icon="🏋️", layout="centered")
+
+if not st.session_state.get("username"):
+    st.warning("⚠️ Effettua prima il login per salvare un allenamento.")
+    st.stop()
 
 st.title("🏋️ Aggiungi Allenamento Manuale")
 st.caption("Inserisci i dati del tuo allenamento per registrarlo e monitorare i progressi.")
@@ -115,7 +117,10 @@ if st.button("💾 Salva Allenamento"):
 
     # Salvataggio nel CSV
     if os.path.exists(csv_path):
-        df = pd.read_csv(csv_path)
+        try:
+            df = pd.read_csv(csv_path)
+        except pd.errors.EmptyDataError:
+            df = pd.DataFrame()
         df = pd.concat([df, pd.DataFrame([row])], ignore_index=True)
     else:
         df = pd.DataFrame([row])

@@ -199,17 +199,41 @@ elif audio:
 else:
     user_text = None
 
-if user_text:
-    st.session_state.messages.append({"role": "user", "content": user_text})
+    # ==============================
+    # 🔄 ELABORAZIONE INPUT UTENTE
+    # ==============================
+    if user_text:
+        st.session_state.messages.append({"role": "user", "content": user_text})
 
-    username = st.session_state.get("username", "anonimo")
-    with st.spinner("🤖 Il coach sta riflettendo..."):
-        response = st.session_state.agent.run(user_text, username=username)
-        reply_text = response.text
+        # Carica dati utente aggiornati da CSV
+        username = st.session_state.get("username", "anonimo")
+        user_dir = f"data/users/{username}"
+        profilo_path = f"{user_dir}/profilo_utente.csv"
+        allenamenti_path = f"{user_dir}/allenamenti.csv"
+        fitness_path = f"{user_dir}/dati_fitness.csv"
 
+        user_data = {}
+        import pandas as pd, os
+        try:
+            if os.path.exists(profilo_path):
+                df = pd.read_csv(profilo_path)
+                user_data["profilo"] = df.iloc[-1].to_dict() if not df.empty else {}
+            if os.path.exists(allenamenti_path):
+                df = pd.read_csv(allenamenti_path)
+                user_data["allenamenti"] = df.to_dict("records")[-5:]  # ultimi 5
+            if os.path.exists(fitness_path):
+                df = pd.read_csv(fitness_path)
+                user_data["fitness"] = df.to_dict("records")[-5:]
+        except Exception as e:
+            st.warning(f"⚠️ Dati non accessibili: {e}")
 
-    st.session_state.messages.append({
-        "role": "bot",
-        "content": reply_text
-    })
-    st.rerun()
+        # Passa i dati a MindBodyAgent per migliorare le risposte
+        with st.spinner("🤖 Il coach sta riflettendo sui tuoi dati..."):
+            response = st.session_state.agent.run(user_text, username=username, user_data=user_data)
+            reply_text = getattr(response, "text", str(response))
+
+        st.session_state.messages.append({
+            "role": "bot",
+            "content": reply_text
+        })
+        st.rerun()

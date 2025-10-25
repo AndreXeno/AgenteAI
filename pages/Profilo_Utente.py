@@ -13,6 +13,10 @@ from agents.session_manager import load_session, save_session
 # Assicura che la chiave esista sempre
 if "username" not in st.session_state:
     st.session_state["username"] = None
+if "strava_connected" not in st.session_state:
+    st.session_state["strava_connected"] = False
+if "myfitnesspal_connected" not in st.session_state:
+    st.session_state["myfitnesspal_connected"] = False
 
 # Carica la sessione precedente se esiste, in modo sicuro
 try:
@@ -31,6 +35,25 @@ except Exception as e:
     print(f"[SESSION RESTORE] Errore durante il ripristino della sessione: {e}")
     if "username" not in st.session_state:
         st.session_state["username"] = None
+
+# Carica eventuali token salvati e aggiorna stato connessioni
+if st.session_state.get("username"):
+    USER_DIR = os.path.join("data", "users", st.session_state["username"])
+    token_path = os.path.join(USER_DIR, "tokens.json")
+    if os.path.exists(token_path):
+        try:
+            with open(token_path, "r") as f:
+                tokens = json.load(f)
+            if "strava" in tokens:
+                st.session_state["strava_connected"] = True
+            else:
+                st.session_state["strava_connected"] = False
+            if "myfitnesspal" in tokens:
+                st.session_state["myfitnesspal_connected"] = True
+            else:
+                st.session_state["myfitnesspal_connected"] = False
+        except Exception as e:
+            print(f"[SESSION RESTORE] Errore nel caricamento dei token: {e}")
 
 # Salva la sessione solo se l'utente è loggato
 if st.session_state.get("username"):
@@ -61,16 +84,20 @@ os.makedirs(USER_DIR, exist_ok=True)
 if os.path.exists(PROFILE_PATH):
     try:
         if os.path.getsize(PROFILE_PATH) == 0:
-            st.warning("Il file del profilo utente è vuoto. Viene creato un nuovo profilo vuoto.")
-            df = pd.DataFrame(columns=["username", "data", "peso", "altezza", "eta", "sesso", "obiettivi"])
-            latest = {}
+            st.warning("Il file del profilo utente è vuoto. Viene usato l'ultimo profilo salvato se disponibile.")
+            df = pd.read_csv(PROFILE_PATH)
+            latest = df.iloc[-1].to_dict() if not df.empty else {}
         else:
             df = pd.read_csv(PROFILE_PATH)
             latest = df.iloc[-1].to_dict() if not df.empty else {}
     except Exception as e:
-        st.warning(f"Errore nel caricamento del profilo utente: {e}. Viene creato un nuovo profilo vuoto.")
-        df = pd.DataFrame(columns=["username", "data", "peso", "altezza", "eta", "sesso", "obiettivi"])
-        latest = {}
+        st.warning(f"Errore nel caricamento del profilo utente: {e}. Viene mantenuto il profilo precedente se presente.")
+        try:
+            df = pd.read_csv(PROFILE_PATH)
+            latest = df.iloc[-1].to_dict() if not df.empty else {}
+        except Exception:
+            df = pd.DataFrame(columns=["username", "data", "peso", "altezza", "eta", "sesso", "obiettivi"])
+            latest = {}
 else:
     df = pd.DataFrame(columns=["username", "data", "peso", "altezza", "eta", "sesso", "obiettivi"])
     latest = {}
@@ -103,7 +130,16 @@ if st.button("💾 Salva Profilo"):
         "sesso": sesso,
         "obiettivi": obiettivi
     }
-    df = pd.concat([df, pd.DataFrame([row])], ignore_index=True)
+    # Carica dati esistenti se presenti, aggiungi nuova riga e salva
+    if os.path.exists(PROFILE_PATH):
+        try:
+            existing_df = pd.read_csv(PROFILE_PATH)
+            df = pd.concat([existing_df, pd.DataFrame([row])], ignore_index=True)
+        except Exception as e:
+            st.warning(f"Errore nel caricamento del profilo esistente: {e}. Viene creato un nuovo profilo.")
+            df = pd.DataFrame([row])
+    else:
+        df = pd.DataFrame([row])
     df.to_csv(PROFILE_PATH, index=False)
     st.success("✅ Profilo aggiornato con successo!")
 
@@ -135,11 +171,12 @@ col1, col2 = st.columns(2)
 
 # --- STRAVA ---
 with col1:
-    if is_strava_connected(username):
+    if is_strava_connected(username) or st.session_state.get("strava_connected", False):
         st.success("✅ Strava connesso")
         if st.button("Disconnetti Strava"):
             disconnect_strava(username)
-            st.rerun()
+            st.session_state["strava_connected"] = False
+            st.experimental_rerun()
     else:
         st.info("⚙️ Strava non connesso")
         if st.button("Connetti Strava"):
@@ -147,11 +184,12 @@ with col1:
 
 # --- MYFITNESSPAL ---
 with col2:
-    if is_myfitnesspal_connected(username):
+    if is_myfitnesspal_connected(username) or st.session_state.get("myfitnesspal_connected", False):
         st.success("✅ MyFitnessPal connesso")
         if st.button("Disconnetti MyFitnessPal"):
             disconnect_myfitnesspal(username)
-            st.rerun()
+            st.session_state["myfitnesspal_connected"] = False
+            st.experimental_rerun()
     else:
         st.info("⚙️ MyFitnessPal non connesso")
         with st.expander("Connetti a MyFitnessPal"):
@@ -162,7 +200,7 @@ with col2:
                 result = auto_sync_user_data(username, "myfitnesspal", creds)
                 if isinstance(result, dict) and "error" not in result:
                     st.success("✅ Connessione completata e dati importati!")
-                    st.rerun()
+                    st.experimental_rerun()
                 else:
                     st.error(f"❌ Errore: {result.get('error', 'Connessione fallita')}")
 

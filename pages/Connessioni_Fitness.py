@@ -94,15 +94,26 @@ if myfitnesspal.is_myfitnesspal_connected(username):
         st.rerun()
 else:
     st.info("⚙️ MyFitnessPal non ancora connesso")
+
+    # Prova a caricare token salvato per mantenere la connessione tra le sessioni
+    saved_creds = myfitnesspal.load_token(username, "myfitnesspal")
+    if saved_creds:
+        myfit_user = saved_creds.get("username", "")
+        myfit_pass = saved_creds.get("password", "")
+    else:
+        myfit_user = ""
+        myfit_pass = ""
+
     with st.expander("Connetti a MyFitnessPal"):
-        myfit_user = st.text_input("Username MyFitnessPal")
-        myfit_pass = st.text_input("Password MyFitnessPal", type="password")
+        myfit_user = st.text_input("Username MyFitnessPal", value=myfit_user)
+        myfit_pass = st.text_input("Password MyFitnessPal", type="password", value=myfit_pass)
 
         if st.button("Conferma Connessione MyFitnessPal"):
             creds = {"username": myfit_user, "password": myfit_pass}
             result = myfitnesspal.auto_sync(username, creds)
             if "error" not in result:
+                myfitnesspal.save_token(username, "myfitnesspal", creds)
                 st.success("✅ Connessione completata e dati importati da MyFitnessPal!")
                 st.rerun()
             else:
-                st.error(f"❌ Errore: {result['error']}")
+                st.warning(f"⚠️ Errore durante la sincronizzazione: {result['error']}")
