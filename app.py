@@ -146,94 +146,67 @@ with chat_container:
         st.markdown(f"<div class='chat-message {role_class}'>{msg['content']}</div>", unsafe_allow_html=True)
 
 # ==============================
-# 🎙️ INPUT UTENTE (Testo o Voce)
+# 💬 INPUT UTENTE (Solo Testo)
+# ==============================
+# ==============================
+# 💬 INPUT UTENTE (Solo Testo)
 # ==============================
 st.divider()
-st.subheader("💬 Invia un messaggio o parla")
+st.subheader("💬 Invia un messaggio")
 
-col1, col2, col3 = st.columns([8, 1, 1])
+# 🔹 Form per invio con ENTER
+with st.form("chat_form", clear_on_submit=True):
+    col1, col2 = st.columns([9, 1])
+    with col1:
+        user_input = st.text_input("", key="input", placeholder="Come ti senti oggi?")
+    with col2:
+        send_btn = st.form_submit_button("📤")
 
-with col1:
-    user_input = st.text_input("", key="input", placeholder="Come ti senti oggi?")
-with col2:
-    send_btn = st.button("📤")
-with col3:
-    add_btn = st.button("➕")
-    if add_btn:
-        # Go to Fitness Connector page for third-party fitness accounts
+# ➕ Pulsante per la pagina Fitness Connector
+col_plus = st.columns([10, 1])[1]
+with col_plus:
+    if st.button("➕"):
         st.switch_page("pages/Fitness_Connector.py")
-
-# 🎤 Registrazione vocale
-audio = mic_recorder(
-    start_prompt="🎙️ Premi per parlare",
-    stop_prompt="⏹️ Ferma la registrazione",
-    just_once=True,
-    use_container_width=True
-)
 
 # ==============================
 # 🔄 GESTIONE INPUT
 # ==============================
-if send_btn and user_input:
-    user_text = user_input.strip()
-elif audio:
-    st.info("🎧 Elaboro la tua voce con Gemini...")
-    import google.generativeai as genai
-    from config.settings import GEMINI_API_KEY
-    genai.configure(api_key=GEMINI_API_KEY)
+user_text = user_input.strip() if send_btn and user_input else None
+# ==============================
+# 🔄 ELABORAZIONE INPUT UTENTE
+# ==============================
+if user_text:
+    st.session_state.messages.append({"role": "user", "content": user_text})
 
-    encoded_audio = base64.b64encode(audio["bytes"]).decode("utf-8")
+    # Carica dati utente aggiornati da CSV
+    username = st.session_state.get("username", "anonimo")
+    user_dir = f"data/users/{username}"
+    profilo_path = f"{user_dir}/profilo_utente.csv"
+    allenamenti_path = f"{user_dir}/allenamenti.csv"
+    fitness_path = f"{user_dir}/dati_fitness.csv"
 
-    model = genai.GenerativeModel("gemini-2.5-flash")
-    response = model.generate_content(
-        [
-            {
-                "inline_data": {
-                    "mime_type": "audio/webm",
-                    "data": encoded_audio
-                }
-            }
-        ]
-    )
-    user_text = response.text
-else:
-    user_text = None
+    user_data = {}
+    import pandas as pd, os
+    try:
+        if os.path.exists(profilo_path):
+            df = pd.read_csv(profilo_path)
+            user_data["profilo"] = df.iloc[-1].to_dict() if not df.empty else {}
+        if os.path.exists(allenamenti_path):
+            df = pd.read_csv(allenamenti_path)
+            user_data["allenamenti"] = df.to_dict("records")[-5:]  # ultimi 5
+        if os.path.exists(fitness_path):
+            df = pd.read_csv(fitness_path)
+            user_data["fitness"] = df.to_dict("records")[-5:]
+    except Exception as e:
+        st.warning(f"⚠️ Dati non accessibili: {e}")
 
-    # ==============================
-    # 🔄 ELABORAZIONE INPUT UTENTE
-    # ==============================
-    if user_text:
-        st.session_state.messages.append({"role": "user", "content": user_text})
+    # Passa i dati a MindBodyAgent per migliorare le risposte
+    with st.spinner("🤖 Il coach sta riflettendo sui tuoi dati..."):
+        response = st.session_state.agent.run(user_text, username=username, user_data=user_data)
+        reply_text = getattr(response, "text", str(response))
 
-        # Carica dati utente aggiornati da CSV
-        username = st.session_state.get("username", "anonimo")
-        user_dir = f"data/users/{username}"
-        profilo_path = f"{user_dir}/profilo_utente.csv"
-        allenamenti_path = f"{user_dir}/allenamenti.csv"
-        fitness_path = f"{user_dir}/dati_fitness.csv"
-
-        user_data = {}
-        import pandas as pd, os
-        try:
-            if os.path.exists(profilo_path):
-                df = pd.read_csv(profilo_path)
-                user_data["profilo"] = df.iloc[-1].to_dict() if not df.empty else {}
-            if os.path.exists(allenamenti_path):
-                df = pd.read_csv(allenamenti_path)
-                user_data["allenamenti"] = df.to_dict("records")[-5:]  # ultimi 5
-            if os.path.exists(fitness_path):
-                df = pd.read_csv(fitness_path)
-                user_data["fitness"] = df.to_dict("records")[-5:]
-        except Exception as e:
-            st.warning(f"⚠️ Dati non accessibili: {e}")
-
-        # Passa i dati a MindBodyAgent per migliorare le risposte
-        with st.spinner("🤖 Il coach sta riflettendo sui tuoi dati..."):
-            response = st.session_state.agent.run(user_text, username=username, user_data=user_data)
-            reply_text = getattr(response, "text", str(response))
-
-        st.session_state.messages.append({
-            "role": "bot",
-            "content": reply_text
-        })
-        st.rerun()
+    st.session_state.messages.append({
+        "role": "bot",
+        "content": reply_text
+    })
+    st.rerun()
