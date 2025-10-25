@@ -1,9 +1,5 @@
 import streamlit as st
 from agents.mindbody_agent import MindBodyAgent
-from streamlit_mic_recorder import mic_recorder
-from gtts import gTTS
-import base64
-import tempfile
 
 from agents.session_manager import load_session, save_session
 
@@ -202,7 +198,12 @@ if user_text:
 
     # Passa i dati a MindBodyAgent per migliorare le risposte
     with st.spinner("🤖 Il coach sta riflettendo sui tuoi dati..."):
-        response = st.session_state.agent.run(user_text, username=username, user_data=user_data)
+        try:
+            # Nuova firma con user_data
+            response = st.session_state.agent.run(user_text, username=username, user_data=user_data)
+        except TypeError:
+            # Retrocompatibilità: firma senza user_data
+            response = st.session_state.agent.run(user_text, username=username)
         reply_text = getattr(response, "text", str(response))
 
     st.session_state.messages.append({
