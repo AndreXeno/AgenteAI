@@ -148,6 +148,10 @@ class MindBodyAgent:
         return context
 
     def run(self, user_input: str, username: str = "anonimo"):
+        user_input = str(user_input).strip()
+        if not user_input:
+            return type("Response", (), {"text": "Non ho ricevuto alcun messaggio, puoi riprovare?"})()
+
         print("\n==============================")
         print(f"💬 Nuovo input utente: {user_input}")
 
