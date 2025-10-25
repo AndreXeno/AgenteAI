@@ -94,3 +94,26 @@ def auto_sync_user_data(username: str, provider: str, token_data: dict):
     except Exception as e:
         print(f"[LOG] ❌ Errore in auto_sync_user_data per {username}: {e}")
         return {"error": str(e)}
+
+
+def load_token(username: str, provider: str):
+    """
+    Carica il token salvato per un provider (Strava, MyFitnessPal, ecc.).
+    Restituisce un dizionario con i dati del token oppure {} se non trovato.
+    """
+    import os, json
+
+    user_dir = ensure_user_dir(username)
+    token_path = os.path.join(user_dir, "tokens.json")
+
+    if not os.path.exists(token_path):
+        print(f"[TOKEN] Nessun token trovato per {username}")
+        return {}
+
+    try:
+        with open(token_path, "r") as f:
+            tokens = json.load(f)
+        return tokens.get(provider, {})
+    except Exception as e:
+        print(f"[TOKEN] Errore durante il caricamento token per {username}: {e}")
+        return {}

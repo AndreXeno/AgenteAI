@@ -10,13 +10,14 @@ from agents.session_manager import load_session, save_session
 # ==============================
 # 🔐 GESTIONE SESSIONE UTENTE
 # ==============================
-# Assicura che la chiave esista sempre
-if "username" not in st.session_state:
-    st.session_state["username"] = None
-if "strava_connected" not in st.session_state:
-    st.session_state["strava_connected"] = False
-if "myfitnesspal_connected" not in st.session_state:
-    st.session_state["myfitnesspal_connected"] = False
+# ✅ Inizializza chiavi di sessione se mancanti
+for key, default in {
+    "username": None,
+    "strava_connected": False,
+    "myfitnesspal_connected": False
+}.items():
+    if key not in st.session_state:
+        st.session_state[key] = default
 
 # Carica la sessione precedente se esiste, in modo sicuro
 try:

@@ -2,7 +2,9 @@ import os
 import json
 import pandas as pd
 from pandas.errors import EmptyDataError
-from .base_utils import ensure_user_dir, save_token
+
+# ✅ Import compatibili da qualsiasi contesto (anche Streamlit Cloud)
+from agents.fitness_connector.base_utils import ensure_user_dir, save_token, load_token
 
 try:
     import myfitnesspal
@@ -49,7 +51,8 @@ def connect(username_mfp, password_mfp):
             "calories_consumed": today.totals.get("calories", 0),
             "protein": today.totals.get("protein", 0),
             "carbs": today.totals.get("carbohydrates", 0),
-            "fat": today.totals.get("fat", 0)
+            "fat": today.totals.get("fat", 0),
+            "data_importazione": pd.Timestamp.now().strftime("%Y-%m-%d %H:%M:%S")
         }
         return data
     except Exception as e:
@@ -73,21 +76,16 @@ def auto_sync(username: str, token_data: dict):
             print(f"[SYNC] ⚠️ Errore MyFitnessPal per {username}: {data['error']}")
             return {"error": f"Impossibile sincronizzare MyFitnessPal: {data['error']}"}
 
-        # Verifica o crea la directory utente
         if not os.path.exists(user_dir):
             os.makedirs(user_dir, exist_ok=True)
 
-        # Crea CSV se mancante o vuoto
         if not os.path.exists(csv_path) or os.stat(csv_path).st_size == 0:
-            df_existing = pd.DataFrame(columns=["calories_consumed", "protein", "carbs", "fat", "data_importazione"])
+            df_existing = pd.DataFrame(columns=data.keys())
         else:
             try:
                 df_existing = pd.read_csv(csv_path)
             except EmptyDataError:
-                df_existing = pd.DataFrame(columns=["calories_consumed", "protein", "carbs", "fat", "data_importazione"])
-
-        # Aggiunge data di importazione
-        data["data_importazione"] = pd.Timestamp.now().strftime("%Y-%m-%d %H:%M:%S")
+                df_existing = pd.DataFrame(columns=data.keys())
 
         df_new = pd.DataFrame([data])
         df_final = pd.concat([df_existing, df_new], ignore_index=True)
@@ -100,3 +98,33 @@ def auto_sync(username: str, token_data: dict):
     except Exception as e:
         print(f"[SYNC] ❌ Errore sincronizzazione MyFitnessPal: {e}")
         return {"error": str(e)}
+
+
+# Recupera le credenziali MyFitnessPal salvate per l'utente specificato
+def get_saved_credentials(username: str):
+    """
+    Recupera le credenziali MyFitnessPal salvate (username e password)
+    dal file tokens.json per l'utente specificato.
+    """
+    try:
+        user_dir = ensure_user_dir(username)
+        token_path = os.path.join(user_dir, "tokens.json")
+
+        if not os.path.exists(token_path):
+            print(f"[CRED] ⚠️ Nessun file token trovato per {username}")
+            return None
+
+        with open(token_path, "r") as f:
+            tokens = json.load(f)
+
+        creds = tokens.get("myfitnesspal")
+        if creds and "username" in creds and "password" in creds:
+            print(f"[CRED] 🔑 Credenziali MyFitnessPal recuperate per {username}")
+            return creds
+        else:
+            print(f"[CRED] ⚠️ Nessuna credenziale valida trovata per {username}")
+            return None
+
+    except Exception as e:
+        print(f"[CRED] ❌ Errore nel recupero delle credenziali MyFitnessPal: {e}")
+        return None

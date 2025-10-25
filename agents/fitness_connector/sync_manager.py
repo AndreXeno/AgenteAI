@@ -19,16 +19,25 @@ def auto_sync_user_data(username, provider, token_data):
 
         elif provider == "myfitnesspal":
             print(f"[SYNC] 🍎 Avvio sincronizzazione MyFitnessPal per {username}")
+
+            # Recupera credenziali dal token_data
             username_mfp = token_data.get("username")
             password_mfp = token_data.get("password")
             if not username_mfp or not password_mfp:
+                print("[SYNC] ❌ Credenziali MyFitnessPal mancanti durante auto_sync_user_data.")
                 return {"error": "Credenziali MyFitnessPal mancanti."}
-            result = myfitnesspal.connect(username_mfp, password_mfp)
-            if "error" not in result:
-                print(f"[SYNC] ✅ Sincronizzazione MyFitnessPal completata ({username})")
+
+            # Salva il token simulato nel file dell’utente
+            save_token(username, "myfitnesspal", token_data)
+
+            # Esegui la sincronizzazione
+            result = myfitnesspal.auto_sync(username, token_data)
+            if result and "error" not in result:
+                print(f"[SYNC] ✅ Sincronizzazione MyFitnessPal completata per {username}")
+                return result
             else:
                 print(f"[SYNC] ⚠️ Errore MyFitnessPal: {result}")
-            return result
+                return result
 
         else:
             print(f"[SYNC] ❌ Provider non supportato: {provider}")
