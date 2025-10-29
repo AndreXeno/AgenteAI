@@ -18,27 +18,38 @@ import google.generativeai as genai
 
 def classify_intent(user_input: str) -> str:
     """
-    Usa il modello Gemini per classificare l'intento dell'input utente
-    in una delle categorie: allenamento, mente, analisi, riflessione, generico.
+    Classifica l’intento dell’utente in:
+    'allenamento', 'mente', 'analisi', 'riflessione' o 'generico'.
+    Usa Gemini 2.5 Flash + comprensione semantica avanzata.
     """
-    prompt = (
-        "Classifica il seguente messaggio utente in una delle seguenti categorie: "
-        "'allenamento', 'mente', 'analisi', 'riflessione', 'generico'. "
-        "Rispondi solo con una parola corrispondente all'intento.\n\n"
-        f"Messaggio: {user_input}"
-    )
+    text = user_input.lower().strip()
+
     try:
-        response = genai.chat.completions.create(
-            model="models/chat-bison-001",
-            messages=[{"role": "user", "content": prompt}],
-            temperature=0,
-            max_output_tokens=10,
+        model = genai.GenerativeModel("gemini-2.5-flash")
+        prompt = (
+            "Analizza il seguente messaggio e decidi a quale categoria appartiene l'intento dell'utente. "
+            "Le categorie sono: 'allenamento', 'mente', 'analisi', 'riflessione', 'generico'. "
+            "Sii molto sensibile al linguaggio emotivo implicito. "
+            "Se il messaggio comunica un'emozione, un malessere, un calo di motivazione o uno stato d'animo (anche indiretto), "
+            "scegli 'mente'. Ecco alcuni esempi:\n"
+            "- 'non molto bene' → mente\n"
+            "- 'mi sento giù' → mente\n"
+            "- 'oggi non ho voglia' → mente\n"
+            "- 'settimana faticosa' → mente\n"
+            "- 'voglio analizzare i progressi' → analisi\n"
+            "- 'mi sono allenato ieri' → allenamento\n"
+            "- 'oggi ho riflettuto molto' → riflessione\n"
+            "Rispondi solo con una parola corrispondente all'intento.\n\n"
+            f"Messaggio utente: {user_input}"
         )
-        intent = response.choices[0].message.content.strip().lower()
-        return intent
+        response = model.generate_content(prompt)
+        intent = response.text.strip().lower() if response and response.text else "generico"
+        print(f"🤖 Intent Gemini 2.5 Flash (semantico): {intent}")
     except Exception as e:
-        print(f"[WARN] Errore nella classificazione intent: {e}")
-        return "generico"
+        print(f"[WARN] Errore classificazione Gemini: {e}")
+        intent = "generico"
+
+    return intent
 
 def load_user_data(username):
     user_data = {}
