@@ -238,6 +238,26 @@ class MindBodyAgent:
         intent = classify_intent(user_input)
         print(f"🔍 Intent rilevato: {intent}")
 
+        # 🔁 SISTEMA IBRIDO DI CLASSIFICAZIONE (fallback locale)
+        text = user_input.lower()
+
+        keywords_mind = ["felice", "triste", "stanco", "stressato", "agitato", "ansia", "motivato", "rilassato", "demotivato", "solo"]
+        keywords_train = ["allenamento", "palestra", "workout", "gambe", "petto", "corsa", "cardio"]
+        keywords_reflect = ["imparato", "giornata", "lezione", "riflettendo", "migliorare"]
+        keywords_analysis = ["report", "statistiche", "settimana", "grafico", "progressi", "analisi"]
+
+        if intent in ["generico", ""]:
+            if any(k in text for k in keywords_mind):
+                intent = "mente"
+            elif any(k in text for k in keywords_train):
+                intent = "allenamento"
+            elif any(k in text for k in keywords_reflect):
+                intent = "riflessione"
+            elif any(k in text for k in keywords_analysis):
+                intent = "analisi"
+
+        print(f"🧩 Intent finale (ibrido): {intent}")
+
         # 🏋️ Caso 1 — Aggiunta manuale di un allenamento (manteniamo la vecchia logica per i comandi espliciti)
         if text.startswith("/allenamento") or text.startswith("/aggiungi allenamento"):
             print("🏋️ Attivo modulo: TRAINING (aggiunta manuale).")
