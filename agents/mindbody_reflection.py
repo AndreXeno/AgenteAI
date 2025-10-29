@@ -5,9 +5,13 @@
 import os
 import pandas as pd
 import datetime
-import google.generativeai as genai
-from config.settings import GEMINI_API_KEY
-genai.configure(api_key=GEMINI_API_KEY)
+
+try:
+    import google.generativeai as genai
+    from config.settings import GEMINI_API_KEY
+    genai.configure(api_key=GEMINI_API_KEY)
+except Exception:
+    genai = None
 
 DATA_DIR = "data"
 
@@ -49,21 +53,31 @@ def handle_training_reflection(user_input: str, username: str = "anonimo"):
     else:
         summary = "Non ho ancora dati sui tuoi allenamenti."
 
-    # 2️⃣ Genera risposta empatica con Gemini
-    model = genai.GenerativeModel("gemini-2.5-flash")
-    prompt = f"""
-    L'utente ha detto: "{user_input}"
+    # 2️⃣ Genera risposta empatica con Gemini (con gestione errori e fallback)
+    try:
+        if genai is None:
+            raise ImportError("Modulo Gemini non disponibile")
 
-    Contesto sui suoi allenamenti:
-    {summary}
+        model = genai.GenerativeModel("gemini-2.5-flash")
+        prompt = f"""
+        L'utente ha detto: "{user_input}"
 
-    Rispondi come un coach di vita e motivatore sportivo empatico:
-    - Ascolta e riconosci le emozioni (felicità, stanchezza, stress, demotivazione, orgoglio, ecc.)
-    - Riconosci i suoi sforzi fisici e mentali senza dare dati numerici diretti
-    - Offri una riflessione e un consiglio umano e incoraggiante
-    - Evita schemi o elenchi, scrivi come se parlassi direttamente con lui.
-    """
+        Contesto sui suoi allenamenti:
+        {summary}
 
-    response = model.generate_content(prompt)
+        Rispondi come un coach di vita e motivatore sportivo empatico:
+        - Ascolta e riconosci le emozioni (felicità, stanchezza, stress, demotivazione, orgoglio, ecc.)
+        - Riconosci i suoi sforzi fisici e mentali senza dare dati numerici diretti
+        - Offri una riflessione e un consiglio umano e incoraggiante
+        - Evita schemi o elenchi, scrivi come se parlassi direttamente con lui.
+        """
+        response = model.generate_content(prompt)
+        return response.text
 
-    return response.text
+    except Exception as e:
+        print(f"[Reflection ERROR] ❌ Errore durante la generazione riflessione: {e}")
+        return (
+            "Non riesco a elaborare la riflessione con Gemini al momento. "
+            "Ti dico comunque che apprezzo il tuo impegno e che ogni passo, anche piccolo, "
+            "ti avvicina ai tuoi obiettivi. Continua così!"
+        )

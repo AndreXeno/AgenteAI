@@ -13,6 +13,33 @@ import pandas as pd
 # Fitness sync helper: try to fetch fresh data if Strava is connected
 from agents.fitness_connector.sync_manager import auto_sync_user_data
 
+# Import a generative model interface or internal helper for intent classification
+import google.generativeai as genai
+
+def classify_intent(user_input: str) -> str:
+    """
+    Usa il modello Gemini per classificare l'intento dell'input utente
+    in una delle categorie: allenamento, mente, analisi, riflessione, generico.
+    """
+    prompt = (
+        "Classifica il seguente messaggio utente in una delle seguenti categorie: "
+        "'allenamento', 'mente', 'analisi', 'riflessione', 'generico'. "
+        "Rispondi solo con una parola corrispondente all'intento.\n\n"
+        f"Messaggio: {user_input}"
+    )
+    try:
+        response = genai.chat.completions.create(
+            model="models/chat-bison-001",
+            messages=[{"role": "user", "content": prompt}],
+            temperature=0,
+            max_output_tokens=10,
+        )
+        intent = response.choices[0].message.content.strip().lower()
+        return intent
+    except Exception as e:
+        print(f"[WARN] Errore nella classificazione intent: {e}")
+        return "generico"
+
 def load_user_data(username):
     user_data = {}
     user_data["username"] = username
@@ -117,6 +144,32 @@ class MindBodyAgent:
         self.memory = []
         print("🚀 MindBodyAgent inizializzato con memoria vuota.")
 
+    def save_memory(self, username: str):
+        """Salva la memoria conversazionale su file JSON per l'utente."""
+        user_dir = os.path.join("data", "users", username)
+        os.makedirs(user_dir, exist_ok=True)
+        memory_path = os.path.join(user_dir, "memory.json")
+        try:
+            with open(memory_path, "w", encoding="utf-8") as f:
+                json.dump(self.memory, f, ensure_ascii=False, indent=2)
+            print(f"💾 Memoria salvata su file per {username} ({len(self.memory)} messaggi).")
+        except Exception as e:
+            print(f"[WARN] Errore durante il salvataggio della memoria per {username}: {e}")
+
+    def load_memory(self, username: str):
+        """Carica la memoria conversazionale da file, se esiste."""
+        memory_path = os.path.join("data", "users", username, "memory.json")
+        if os.path.exists(memory_path):
+            try:
+                with open(memory_path, "r", encoding="utf-8") as f:
+                    self.memory = json.load(f)
+                print(f"🧠 Memoria caricata per {username} ({len(self.memory)} messaggi).")
+            except Exception as e:
+                print(f"[WARN] Errore durante il caricamento della memoria per {username}: {e}")
+                self.memory = []
+        else:
+            self.memory = []
+
     def update_memory(self, role: str, content: str):
         """Aggiunge un messaggio alla memoria e limita a 10 scambi recenti."""
         self.memory.append({"role": role, "content": content})
@@ -155,6 +208,9 @@ class MindBodyAgent:
         print("\n==============================")
         print(f"💬 Nuovo input utente: {user_input}")
 
+        # Carica la memoria pregressa per l'utente
+        self.load_memory(username)
+
         # Normalizza testo
         text = user_input.lower().strip()
 
@@ -178,17 +234,30 @@ class MindBodyAgent:
         # Aggiorna la memoria conversazionale
         self.update_memory("utente", user_input)
 
-        # 🏋️ Caso 1 — Aggiunta manuale di un allenamento
+        # Classifica l'intento tramite modello Gemini
+        intent = classify_intent(user_input)
+        print(f"🔍 Intent rilevato: {intent}")
+
+        # 🏋️ Caso 1 — Aggiunta manuale di un allenamento (manteniamo la vecchia logica per i comandi espliciti)
         if text.startswith("/allenamento") or text.startswith("/aggiungi allenamento"):
             print("🏋️ Attivo modulo: TRAINING (aggiunta manuale).")
             clean_input = user_input.replace("/allenamento", "").replace("/aggiungi allenamento", "").strip()
             response = handle_training(clean_input, username)
             self.update_memory("coach", response)
+            self.save_memory(username)
             print("✅ Allenamento processato e registrato.")
             return type("Response", (), {"text": response})()
 
-        # 💭 Caso 2 — Riflessioni o emozioni legate all’allenamento o alla giornata
-        if any(word in text for word in ["corsa", "palestra", "allenamento", "allenato", "fatica", "giornata", "gara", "workout", "stanco", "demotivato", "solo", "stressato", "felice"]):
+        # Gestione moduli in base all'intento classificato
+        if intent == "allenamento":
+            print("🏋️ Attivo modulo: TRAINING.")
+            response = handle_training(user_input, username)
+            self.update_memory("coach", response)
+            self.save_memory(username)
+            print("✅ Risposta generata da modulo TRAINING.")
+            return type("Response", (), {"text": response})()
+
+        elif intent == "riflessione":
             print("💭 Attivo modulo: TRAINING_REFLECTION.")
             context = (
                 f"👤 Identità utente:\n{profile_summary}\n\n"
@@ -201,11 +270,11 @@ class MindBodyAgent:
             print(context[:500] + "...")
             response = handle_training_reflection(f"Contesto conversazione:\n{context}\n\nNuovo messaggio:\n{user_input}", username)
             self.update_memory("coach", response)
+            self.save_memory(username)
             print("✅ Risposta generata da modulo TRAINING_REFLECTION.")
             return type("Response", (), {"text": response})()
 
-        # 🧘 Caso 3 — Stato mentale o emozioni
-        if any(word in text for word in ["stress", "ansia", "rilassat", "motivato", "triste", "agitato", "scarico", "felice", "rassegnato"]):
+        elif intent == "mente":
             print("🧘 Attivo modulo: MIND_STATE.")
             context = (
                 f"👤 Identità utente:\n{profile_summary}\n\n"
@@ -218,19 +287,22 @@ class MindBodyAgent:
             print(context[:500] + "...")
             response = handle_mind_state(f"Contesto conversazione:\n{context}\n\nNuovo messaggio:\n{user_input}", username)
             self.update_memory("coach", response)
+            self.save_memory(username)
             print("✅ Risposta generata da modulo MIND_STATE.")
             return type("Response", (), {"text": response})()
 
-        # 📊 Caso 4 — Analisi settimanale
-        if any(word in text for word in ["settimana", "report", "analisi", "riepilogo"]):
+        elif intent == "analisi":
             print("📊 Attivo modulo: WEEKLY_ANALYSIS.")
             response = handle_weekly_analysis(username)
             self.update_memory("coach", response)
+            self.save_memory(username)
             print("✅ Report settimanale generato.")
             return type("Response", (), {"text": response})()
 
-        # ❓ Default — Fallback
-        print("❓ Input non riconosciuto, rispondo in fallback.")
-        response = "Non ho capito bene, puoi spiegarmi meglio o dirmi come ti senti?"
-        self.update_memory("coach", response)
-        return type("Response", (), {"text": response})()
+        else:
+            # ❓ Default — Fallback
+            print("❓ Input non riconosciuto, rispondo in fallback.")
+            response = "Non ho capito bene, puoi spiegarmi meglio o dirmi come ti senti?"
+            self.update_memory("coach", response)
+            self.save_memory(username)
+            return type("Response", (), {"text": response})()
