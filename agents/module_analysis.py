@@ -18,6 +18,8 @@ def handle_weekly_analysis(username: str = "anonimo"):
     Non si blocca mai se i nomi delle colonne non corrispondono perfettamente.
     Chiede conferma all’utente in caso di ambiguità.
     """
+    if not username or not isinstance(username, str):
+        username = "anonimo"
     # Crea la cartella utente e i percorsi dei file personali
     user_dir = os.path.join("data", "users", username)
     os.makedirs(user_dir, exist_ok=True)

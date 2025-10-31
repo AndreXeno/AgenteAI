@@ -99,29 +99,35 @@ def handle_training(user_input: str, username: str = "anonimo"):
     trend = "🔺" if diff > 0 else "🔻" if diff < 0 else "➖"
     trend_text = f"{'+' if diff > 0 else ''}{int(diff)} min {trend}"
 
-    # 🔹 Prompt Gemini per feedback tecnico
-    analysis_prompt = f"""
-    Analizza l'allenamento fornito:
+    from agents.prompts.base_prompt import BASE_PROMPT
+    from agents.prompts.modules.training_prompt import TRAINING_PROMPT
 
-    Tipo: {activity}
-    Durata: {duration or 'non indicata'} minuti
-    Distanza: {distance or 'non indicata'} km
-    Frequenza cardiaca media: {bpm or 'non disponibile'} bpm
-    Pendenza: {slope or 'non indicata'} %
-    Descrizione: "{notes}"
+    # 🔹 Prompt unificato per feedback tecnico + motivazione
+    analysis_prompt = f"""{BASE_PROMPT}
+{TRAINING_PROMPT}
 
-    Statistiche precedenti:
-      - Media durata {activity}: {avg_duration:.1f} minuti
-      - Differenza: {trend_text}
+Dati dell'allenamento:
+🏃 Tipo: {activity}
+⏱️ Durata: {duration or 'non indicata'} minuti
+📏 Distanza: {distance or 'non indicata'} km
+❤️ BPM medio: {bpm or 'non disponibile'}
+↗️ Pendenza: {slope or 'non indicata'} %
+📝 Descrizione: "{notes}"
 
-    Fornisci:
-    1. Un breve feedback tecnico (prestazione e ritmo)
-    2. Un consiglio pratico per migliorare
-    """
+📊 Statistiche precedenti:
+- Media durata {activity}: {avg_duration:.1f} minuti
+- Differenza rispetto alla media: {trend_text}
 
-    # ✅ Nuova chiamata corretta a Gemini
+Fornisci:
+1️⃣ Un feedback tecnico (prestazione, ritmo, andamento)
+2️⃣ Un consiglio pratico e motivante per migliorare
+3️⃣ Mantieni un tono realistico e positivo, come un coach empatico Mind&Body.
+"""
+
+    # ✅ Generazione del feedback tramite Gemini
     model = genai.GenerativeModel("gemini-2.5-flash")
     response = model.generate_content(analysis_prompt)
+    print(f"[LOG] 💬 Feedback generato con prompt unificato per {username}")
 
     # 🔹 Messaggio finale
     info_parts = [

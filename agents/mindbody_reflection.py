@@ -31,25 +31,34 @@ def handle_training_reflection(user_input: str, username: str = "anonimo"):
 
     summary = ""
     if os.path.exists(train_path):
-        df = pd.read_csv(train_path)
-        if df.empty or "durata_min" not in df.columns:
-            summary = "Non ho trovato dati sufficienti per analizzare i tuoi allenamenti recenti."
-        else:
-            df["data"] = pd.to_datetime(df["data"])
-            last_week = datetime.date.today() - datetime.timedelta(days=7)
-            recent = df[df["data"].dt.date >= last_week]
+        try:
+            df = pd.read_csv(train_path)
 
-            if not recent.empty:
-                tot = len(recent)
-                media = recent["durata_min"].mean() if "durata_min" in recent.columns else 0
-                ultima = df.iloc[-1]
-                summary = (
-                    f"Negli ultimi 7 giorni hai fatto {tot} allenamenti "
-                    f"con una durata media di {media:.0f} minuti. "
-                    f"L'ultimo è stato il {ultima['data']} ({ultima['tipo']}, {ultima['durata_min']} min)."
-                )
+            # Verifica se il file contiene i dati necessari
+            if df.empty or "data" not in df.columns or "durata_min" not in df.columns:
+                summary = "Non ho trovato abbastanza dati per analizzare i tuoi allenamenti recenti."
             else:
-                summary = "Negli ultimi giorni non ci sono stati allenamenti registrati."
+                # Conversione sicura della colonna data
+                df["data"] = pd.to_datetime(df["data"], errors="coerce")
+                df = df.dropna(subset=["data"])
+                last_week = datetime.date.today() - datetime.timedelta(days=7)
+                recent = df[df["data"].dt.date >= last_week]
+
+                if not recent.empty:
+                    tot = len(recent)
+                    media = recent["durata_min"].mean() if "durata_min" in recent.columns else 0
+                    ultima = df.iloc[-1]
+                    summary = (
+                        f"Negli ultimi 7 giorni hai completato {tot} sessioni "
+                        f"con una durata media di circa {media:.0f} minuti. "
+                        f"L'ultima risale al {ultima['data'].strftime('%d %B %Y')} "
+                        f"({ultima.get('tipo', 'allenamento')}, {int(ultima.get('durata_min', 0))} min)."
+                    )
+                else:
+                    summary = "Negli ultimi 7 giorni non risultano allenamenti registrati."
+        except Exception as e:
+            print(f"[Reflection WARN] Errore durante la lettura di {train_path}: {e}")
+            summary = "Non sono riuscito a leggere correttamente i tuoi dati di allenamento."
     else:
         summary = "Non ho ancora dati sui tuoi allenamenti."
 
