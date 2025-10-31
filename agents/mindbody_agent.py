@@ -14,37 +14,55 @@ import pandas as pd
 from agents.fitness_connector.sync_manager import auto_sync_user_data
 
 # Import a generative model interface or internal helper for intent classification
+
 import google.generativeai as genai
 
-def classify_intent(user_input: str) -> str:
+def classify_intent(user_input: str, context: str = "", profile_summary: str = "") -> str:
     """
     Classifica l’intento dell’utente in:
     'allenamento', 'mente', 'analisi', 'riflessione' o 'generico'.
-    Usa Gemini 2.5 Flash + comprensione semantica avanzata.
+    Usa Gemini 2.5 Flash con contesto emotivo e profilo utente.
     """
-    text = user_input.lower().strip()
+
+    prompt = f"""
+    Sei parte del sistema Mind&Body, un coach digitale empatico che integra benessere fisico e mentale.
+    Analizza il messaggio dell’utente considerando anche il contesto delle conversazioni precedenti
+    e il suo profilo personale.
+
+    Devi classificare il messaggio in UNA sola delle seguenti categorie:
+    - 'allenamento' → esercizi, obiettivi fisici, allenarsi, progressi, performance.
+    - 'mente' → emozioni, stress, felicità, ansia, riflessioni interiori, motivazione, malessere implicito.
+    - 'riflessione' → analisi personale o lezioni apprese da esperienze passate.
+    - 'analisi' → dati, statistiche, progressi numerici, report settimanali.
+    - 'generico' → saluti, messaggi neutri o non classificabili.
+
+    🔹 Se percepisci un tono emotivo o mentale, anche implicito, scegli 'mente'.
+    🔹 Se il messaggio riguarda numeri, analisi o performance → 'analisi'.
+    🔹 Se è auto-riflessivo → 'riflessione'.
+    🔹 Se parla di attività fisica o allenamenti → 'allenamento'.
+
+    Esempi:
+    - “oggi non mi sento molto bene” → mente
+    - “ieri ho corso 5 km” → allenamento
+    - “sto riflettendo su come migliorare la costanza” → riflessione
+    - “fammi vedere i progressi della settimana” → analisi
+    - “ciao” → generico
+
+    Contesto recente della conversazione:
+    {context if context else 'Nessun contesto recente disponibile.'}
+
+    Profilo utente sintetizzato:
+    {profile_summary if profile_summary else 'Profilo non disponibile.'}
+
+    Messaggio utente: {user_input}
+    Rispondi solo con la categoria scelta.
+    """
 
     try:
         model = genai.GenerativeModel("gemini-2.5-flash")
-        prompt = (
-            "Analizza il seguente messaggio e decidi a quale categoria appartiene l'intento dell'utente. "
-            "Le categorie sono: 'allenamento', 'mente', 'analisi', 'riflessione', 'generico'. "
-            "Sii molto sensibile al linguaggio emotivo implicito. "
-            "Se il messaggio comunica un'emozione, un malessere, un calo di motivazione o uno stato d'animo (anche indiretto), "
-            "scegli 'mente'. Ecco alcuni esempi:\n"
-            "- 'non molto bene' → mente\n"
-            "- 'mi sento giù' → mente\n"
-            "- 'oggi non ho voglia' → mente\n"
-            "- 'settimana faticosa' → mente\n"
-            "- 'voglio analizzare i progressi' → analisi\n"
-            "- 'mi sono allenato ieri' → allenamento\n"
-            "- 'oggi ho riflettuto molto' → riflessione\n"
-            "Rispondi solo con una parola corrispondente all'intento.\n\n"
-            f"Messaggio utente: {user_input}"
-        )
         response = model.generate_content(prompt)
         intent = response.text.strip().lower() if response and response.text else "generico"
-        print(f"🤖 Intent Gemini 2.5 Flash (semantico): {intent}")
+        print(f"🤖 Intent Gemini 2.5 Flash (contestuale): {intent}")
     except Exception as e:
         print(f"[WARN] Errore classificazione Gemini: {e}")
         intent = "generico"
