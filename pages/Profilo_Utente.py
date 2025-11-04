@@ -7,6 +7,10 @@ from agents.fitness_connector.sync_manager import auto_sync_user_data
 
 from agents.session_manager import load_session, save_session
 
+# Caricamento CSS personalizzato
+with open("profilo_utente.css") as f:
+    st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
+
 # ==============================
 # 🔐 GESTIONE SESSIONE UTENTE
 # ==============================

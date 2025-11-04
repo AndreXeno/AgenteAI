@@ -7,6 +7,7 @@ from agents.module_training import handle_training
 from agents.module_analysis import handle_weekly_analysis
 from agents.mindbody_reflection import handle_training_reflection
 from agents.knowledge_loader import load_all_knowledge
+import google.generativeai as genai
 import json
 import os
 import pandas as pd
@@ -291,18 +292,67 @@ class MindBodyAgent:
             print("✅ Risposta generata da modulo MIND_STATE.")
             return type("Response", (), {"text": response})()
 
+
         elif intent == "analisi":
+
             print("📊 Attivo modulo: WEEKLY_ANALYSIS.")
+
             response = handle_weekly_analysis(username)
+
             self.update_memory("coach", response)
+
             self.save_memory(username)
+
             print("✅ Report settimanale generato.")
+
             return type("Response", (), {"text": response})()
 
+
+        # ==============================
+
+        # 🤖 FALLBACK INTELLIGENTE CON PROMPT DINAMICO
+
+        # ==============================
+
         else:
-            # ❓ Default — Fallback
-            print("❓ Input non riconosciuto, rispondo in fallback.")
-            response = "Non ho capito bene, puoi spiegarmi meglio o dirmi come ti senti?"
-            self.update_memory("coach", response)
-            self.save_memory(username)
-            return type("Response", (), {"text": response})()
+
+            print("🧠 Nessun modulo specifico attivato — uso sistema di prompt dinamico.")
+
+            try:
+
+                from agents.prompts.base_prompt import get_dynamic_prompt
+
+                model = genai.GenerativeModel("gemini-2.5-flash")
+
+                prompt = get_dynamic_prompt(intent, user_input, user_data or {})
+
+                print(f"[PROMPT DINAMICO USATO] → {intent.upper()}")
+
+                gemini_response = model.generate_content(prompt)
+
+                response_text = gemini_response.text.strip() if hasattr(gemini_response, "text") else str(
+                    gemini_response)
+
+                if not response_text:
+                    response_text = "Posso aiutarti a capire meglio come ti senti o su cosa vuoi concentrarti oggi?"
+
+                self.update_memory("coach", response_text)
+
+                self.save_memory(username)
+
+                print("✅ Risposta generata da Gemini con prompt dinamico.")
+
+                return type("Response", (), {"text": response_text})()
+
+
+            except Exception as e:
+
+                print(f"[ERROR] ❌ Errore durante l'elaborazione del prompt dinamico: {e}")
+
+                response = "Mi dispiace, ho avuto un piccolo problema tecnico."
+
+                self.update_memory("coach", response)
+
+                self.save_memory(username)
+
+                return type("Response", (), {"text": response})()

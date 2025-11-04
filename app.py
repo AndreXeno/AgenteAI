@@ -94,31 +94,13 @@ else:
             del st.session_state[k]
         st.rerun()
 
-st.markdown("""
-<style>
-.chat-message {
-    padding: 1rem;
-    margin-bottom: 0.7rem;
-    border-radius: 1rem;
-    width: 90%;
-    color: black !important;
-}
-.user-msg {
-    background-color: #DCF8C6;
-    align-self: flex-end;
-    margin-left: auto;
-}
-.bot-msg {
-    background-color: #F1F0F0;
-    align-self: flex-start;
-    margin-right: auto;
-}
-.chat-container {
-    display: flex;
-    flex-direction: column;
-}
-</style>
-""", unsafe_allow_html=True)
+# ==============================
+# 🎨 STILE CHAT (CSS ESTERNO)
+# ==============================
+css_path = os.path.join("static", "chat_styles.css")
+if os.path.exists(css_path):
+    with open(css_path) as f:
+        st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
 
 # ==============================
 # 🧠 INIZIALIZZAZIONE AGENTE
@@ -154,7 +136,12 @@ st.subheader("💬 Invia un messaggio")
 with st.form("chat_form", clear_on_submit=True):
     col1, col2 = st.columns([9, 1])
     with col1:
-        user_input = st.text_input("", key="input", placeholder="Come ti senti oggi?")
+        user_input = st.text_input(
+            "Scrivi un messaggio al tuo coach:",
+            key="input",
+            placeholder="Come ti senti oggi?",
+            label_visibility="collapsed"
+        )
     with col2:
         send_btn = st.form_submit_button("📤")
 
