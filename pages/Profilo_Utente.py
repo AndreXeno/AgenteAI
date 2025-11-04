@@ -7,9 +7,18 @@ from agents.fitness_connector.sync_manager import auto_sync_user_data
 
 from agents.session_manager import load_session, save_session
 
-# Caricamento CSS personalizzato
-with open("profilo_utente.css") as f:
-    st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
+
+# ==============================
+# 🎨 Caricamento CSS personalizzato
+# ==============================
+css_path = os.path.join(os.path.dirname(__file__), "..", "static", "profilo_utente.css")
+css_path = os.path.abspath(css_path)
+
+if os.path.exists(css_path):
+    with open(css_path) as f:
+        st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
+else:
+    st.warning(f"⚠️ File CSS non trovato: {css_path}")
 
 # ==============================
 # 🔐 GESTIONE SESSIONE UTENTE
