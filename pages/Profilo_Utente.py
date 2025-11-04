@@ -80,7 +80,7 @@ username = st.session_state["username"]
 # Percorso base corretto per la directory utente
 USER_DIR = os.path.join("data", "users", username)
 # Assicurati che tutti i riferimenti ai file partano da USER_DIR
-PROFILE_PATH = os.path.join(USER_DIR, "profilo_utente.csv")
+PROFILE_PATH = os.path.join(USER_DIR, "profilo_utente.css.csv")
 os.makedirs(USER_DIR, exist_ok=True)
 
 # ==========================

@@ -164,7 +164,7 @@ if user_text:
     # Carica dati utente aggiornati da CSV
     username = st.session_state.get("username", "anonimo")
     user_dir = f"data/users/{username}"
-    profilo_path = f"{user_dir}/profilo_utente.csv"
+    profilo_path = f"{user_dir}/profilo_utente.css.csv"
     allenamenti_path = f"{user_dir}/allenamenti.csv"
     fitness_path = f"{user_dir}/dati_fitness.csv"
 

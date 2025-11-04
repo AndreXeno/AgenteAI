@@ -27,7 +27,7 @@ def load_user_data(username):
     base_path = os.path.join("data", "users", username)
     if os.path.exists(base_path):
         allenamenti_path = os.path.join(base_path, "allenamenti.csv")
-        profilo_path = os.path.join(base_path, "profilo_utente.csv")
+        profilo_path = os.path.join(base_path, "profilo_utente.css.csv")
         # fitness_path = os.path.join(base_path, "dati_fitness.csv")
 
         # --- Carica token e (se necessario) sincronizza Strava automaticamente ---
@@ -64,9 +64,9 @@ def load_user_data(username):
         if os.path.exists(profilo_path):
             try:
                 df_profilo = pd.read_csv(profilo_path)
-                user_data["profilo_utente"] = df_profilo.to_dict(orient="records")
+                user_data["profilo_utente.css"] = df_profilo.to_dict(orient="records")
             except Exception as e:
-                user_data["profilo_utente"] = f"Errore caricamento profilo: {e}"
+                user_data["profilo_utente.css"] = f"Errore caricamento profilo: {e}"
         # if os.path.exists(fitness_path):
         #     try:
         #         df_fitness = pd.read_csv(fitness_path)
@@ -200,8 +200,8 @@ class MindBodyAgent:
         print(f"📂 Dati utente caricati per contesto: {list(user_data.keys())}")
 
         # Costruisci un riassunto sintetico del profilo
-        if isinstance(user_data.get("profilo_utente"), list) and len(user_data["profilo_utente"]) > 0:
-            prof = user_data["profilo_utente"][-1]
+        if isinstance(user_data.get("profilo_utente.css"), list) and len(user_data["profilo_utente.css"]) > 0:
+            prof = user_data["profilo_utente.css"][-1]
             profile_summary = (
                 f"L'utente si chiama {username}, ha {prof.get('eta', 'un’età non specificata')} anni, "
                 f"pesa {prof.get('peso', 'un peso non indicato')} kg, è alto {prof.get('altezza', 'un’altezza non indicata')} cm "
