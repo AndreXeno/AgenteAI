@@ -6,6 +6,7 @@ import streamlit as st
 # ============ CONFIG ============
 st.set_page_config(page_title="Mind&Body Coach AI", page_icon="🧘‍♂️", layout="centered")
 
+
 # ============ SESSIONE ============
 if "username" not in st.session_state:
     st.session_state["username"] = "a"  # metti il tuo meccanismo reale di login
@@ -13,6 +14,24 @@ if "logged_in" not in st.session_state:
     st.session_state["logged_in"] = True
 if "messages" not in st.session_state:
     st.session_state["messages"] = []   # [{role:"user"|"bot", content:"...", ts: "..."}]
+
+# ============ MESSAGGIO INTRODUTTIVO DINAMICO ============
+from agents.module_intro_message import generate_intro_message
+
+if not st.session_state.get("intro_message_shown", False):
+    try:
+        from agents.mindbody_agent import MindBodyAgent
+        if "agent" not in st.session_state:
+            st.session_state.agent = MindBodyAgent()
+        intro_msg = generate_intro_message(st.session_state.agent.memory)
+        st.session_state.messages.append({
+            "role": "bot",
+            "content": intro_msg,
+            "ts": st.session_state.get("last_intro_ts", "")
+        })
+        st.session_state.intro_message_shown = True
+    except Exception as e:
+        print(f"[WARN] Errore nel messaggio introduttivo: {e}")
 
 # ============ STILE INLINE (niente CSS esterno) ============
 def inject_inline_chat_css():
