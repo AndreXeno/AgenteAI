@@ -14,13 +14,15 @@ if "messages" not in st.session_state:
     st.session_state["messages"] = []
 
 # ==============================
-# LOGIN
+# LOGIN / REGISTRAZIONE
 # ==============================
 if not st.session_state["logged_in"]:
-    rerun = login_page()
-    if rerun:  # 👈 controlla il flag ritornato
-        st.experimental_rerun()
+    rerun_needed = login_page()
+    if rerun_needed:
+        # niente st.experimental_rerun()
+        st.session_state["logged_in"] = True
     st.stop()
+
 # ==============================
 # INTERFACCIA PRINCIPALE
 # ==============================
