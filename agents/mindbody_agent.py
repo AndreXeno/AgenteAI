@@ -2,6 +2,9 @@
 # 🤖 MIND-BODY AGENT — Orchestratore centrale con memoria conversazionale
 # ======================================
 
+# ======================================
+# Import standard e datetime
+# ======================================
 from agents.module_mind import handle_mind_state
 from agents.module_training import handle_training
 from agents.module_analysis import handle_weekly_analysis
@@ -11,6 +14,7 @@ import google.generativeai as genai
 import json
 import os
 import pandas as pd
+import datetime
 # Fitness sync helper: try to fetch fresh data if Strava is connected
 from agents.fitness_connector.sync_manager import auto_sync_user_data
 
@@ -191,6 +195,75 @@ class MindBodyAgent:
 
         # Carica la memoria pregressa per l'utente
         self.load_memory(username)
+
+        # ======== MESSAGGIO INTRODUTTIVO DINAMICO UNA VOLTA AL GIORNO ========
+        try:
+            today = datetime.date.today()
+            last_coach_msg_date = None
+            # Trova l'ultimo messaggio del coach
+            for msg in reversed(self.memory):
+                if msg.get("role") == "coach":
+                    # Prova a ricavare la data dal messaggio, se c'è un campo timestamp, altrimenti da file non c'è
+                    # quindi usiamo la data di oggi solo se non c'è già un messaggio del coach oggi
+                    # Qui si assume che i messaggi non abbiano timestamp, quindi lo facciamo una volta per giorno
+                    # Cerchiamo se esiste già un messaggio del coach oggi (memoria caricata da file)
+                    # Se la memoria è vuota o nessun messaggio coach, va bene.
+                    # In alternativa, potresti aggiungere un campo 'date', ma qui usiamo solo la presenza del coach oggi.
+                    break
+            # Controlla se c'è già un messaggio del coach oggi
+            # Se non c'è, genera un messaggio introduttivo dinamico
+            # Per semplicità, se non c'è nessun messaggio del coach nella memoria, lo inviamo.
+            # Se c'è almeno un messaggio del coach e la memoria contiene un messaggio di oggi, non lo inviamo.
+            # Per sapere se già inviato oggi, cerchiamo l'ultimo messaggio del coach e, se presente, controlliamo se la memoria è aggiornata oggi.
+            # In assenza di timestamp, inviamo solo se l'ultimo messaggio coach NON è stato generato oggi, oppure se la memoria è vuota.
+            # Per maggiore affidabilità, aggiungiamo un campo 'date' nei messaggi coach da ora in poi, ma per ora, logica semplificata:
+            # Se l'ultimo messaggio coach NON è stato generato oggi (o non c'è), generiamo il messaggio introduttivo.
+            # Per sapere se già inviato oggi, cerchiamo un messaggio del coach che contiene la data di oggi (solo se abbiamo aggiunto il campo, qui no).
+            # Quindi, per ora, controlliamo solo se l'ultimo messaggio coach è stato inserito oggi (se la memoria è vuota o se la memoria coach è vecchia).
+            # In assenza di timestamp, inviamo solo se la memoria è vuota o se l'ultimo messaggio coach non è stato generato oggi.
+            # Per evitare di inviare più volte, controlliamo se la memoria contiene un messaggio coach con un identificatore speciale di messaggio introduttivo di oggi.
+            # Per ora, controlliamo se la memoria è vuota o se l'ultimo messaggio coach non contiene la data di oggi.
+            # Quindi, cerchiamo l'ultimo messaggio coach, e se non contiene la data di oggi (come stringa), lo inviamo.
+            # In futuro, meglio aggiungere un campo timestamp.
+            # Trova l'ultimo messaggio coach e prova a capire se è stato inviato oggi (grezzo)
+            last_coach_msg = None
+            for msg in reversed(self.memory):
+                if msg.get("role") == "coach":
+                    last_coach_msg = msg
+                    break
+            already_sent_today = False
+            if last_coach_msg:
+                content = last_coach_msg.get("content", "")
+                # Se il messaggio contiene la data di oggi, non inviare
+                if today.strftime("%Y-%m-%d") in content:
+                    already_sent_today = True
+            if not already_sent_today:
+                # Analizza i messaggi recenti dell'utente per determinare il tono
+                recent_msgs = [m["content"] for m in self.memory[-6:] if m["role"] == "utente"]
+                # Semplice analisi del tono: conta parole positive/negative
+                positive_words = ["bene", "felice", "motivato", "contento", "entusiasta", "ottimo", "positivo", "rilassato", "grato", "soddisfatto"]
+                negative_words = ["male", "triste", "stanco", "stressato", "agitato", "demotivato", "ansia", "solitudine", "deluso", "preoccupato"]
+                pos_count = sum(any(w in m.lower() for w in positive_words) for m in recent_msgs)
+                neg_count = sum(any(w in m.lower() for w in negative_words) for m in recent_msgs)
+                if pos_count > neg_count:
+                    mood = "positivo"
+                elif neg_count > pos_count:
+                    mood = "negativo"
+                else:
+                    mood = "neutro"
+                # Genera il messaggio coerente con l'umore
+                if mood == "positivo":
+                    intro_msg = f"🌞 Buongiorno! Oggi ({today.strftime('%Y-%m-%d')}) sento una bella energia da parte tua! Continua così e affronta la giornata con il sorriso. Se vuoi condividere i tuoi obiettivi o hai bisogno di una spinta in più, sono qui!"
+                elif mood == "negativo":
+                    intro_msg = f"🌧️ Ciao! Oggi ({today.strftime('%Y-%m-%d')}) percepisco che potresti aver bisogno di una parola di incoraggiamento. Ricorda che ogni giorno è una nuova opportunità e sono qui per sostenerti. Vuoi parlarne o fissare un piccolo obiettivo insieme?"
+                else:
+                    intro_msg = f"👋 Buongiorno! Oggi è il {today.strftime('%Y-%m-%d')}. Come ti senti? Se vuoi raccontarmi come va o hai bisogno di qualche consiglio per affrontare la giornata, sono qui per te!"
+                # Salva in memoria e restituisci subito questo messaggio
+                self.update_memory("coach", intro_msg + f" [msg-intro-{today.strftime('%Y-%m-%d')}]")
+                self.save_memory(username)
+                return type("Response", (), {"text": intro_msg})()
+        except Exception as e:
+            print(f"[WARN] Errore generazione messaggio introduttivo: {e}")
 
         # Normalizza testo
         text = user_input.lower().strip()
