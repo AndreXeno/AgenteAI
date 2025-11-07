@@ -1,33 +1,56 @@
-import datetime
+import os
+import json
 
-def generate_intro_message(memory):
+def generate_intro_message(memory, username="utente"):
     """
-    Genera un messaggio introduttivo dinamico ogni volta che l'app viene aperta.
-    Analizza la memoria recente per dedurre l'umore dell'utente.
+    Genera un messaggio introduttivo dinamico basato sul diario utente (ultimi 2 giorni)
+    o, in mancanza, sull'ultima memoria conversazionale.
     """
-    today = datetime.date.today()
-
-    # Estrai ultimi messaggi utente
-    recent_msgs = [m["content"] for m in memory[-6:] if m["role"] == "utente"]
+    # Path del diario
+    diary_path = os.path.join("data", "users", username, "diario_utente.json")
 
     # Liste base di parole chiave
     positive_words = ["bene", "felice", "motivato", "contento", "entusiasta", "ottimo", "positivo", "rilassato", "grato", "soddisfatto"]
     negative_words = ["male", "triste", "stanco", "stressato", "agitato", "demotivato", "ansia", "solitudine", "deluso", "preoccupato"]
 
-    pos_count = sum(any(w in m.lower() for w in positive_words) for m in recent_msgs)
-    neg_count = sum(any(w in m.lower() for w in negative_words) for m in recent_msgs)
+    mood = "neutro"
 
-    if pos_count > neg_count:
-        mood = "positivo"
-    elif neg_count > pos_count:
-        mood = "negativo"
-    else:
-        mood = "neutro"
+    # 🔹 1. Se esiste il diario → leggi ultimi 2 giorni
+    if os.path.exists(diary_path):
+        try:
+            with open(diary_path, "r", encoding="utf-8") as f:
+                diary_entries = json.load(f)
 
-    # Messaggio finale basato sull'umore
+            # Prendiamo le ultime due voci
+            recent_entries = diary_entries[-2:] if len(diary_entries) >= 2 else diary_entries
+            combined_text = " ".join(entry.get("contenuto", "") for entry in recent_entries)
+
+            pos_count = sum(w in combined_text.lower() for w in positive_words)
+            neg_count = sum(w in combined_text.lower() for w in negative_words)
+
+            if pos_count > neg_count:
+                mood = "positivo"
+            elif neg_count > pos_count:
+                mood = "negativo"
+
+        except Exception as e:
+            print(f"[WARN] Errore lettura diario per {username}: {e}")
+
+    # 🔸 2. Fallback — usa la memoria conversazionale
+    if mood == "neutro" and memory:
+        recent_msgs = [m["content"] for m in memory[-6:] if m["role"] == "utente"]
+        combined_text = " ".join(recent_msgs)
+        pos_count = sum(w in combined_text.lower() for w in positive_words)
+        neg_count = sum(w in combined_text.lower() for w in negative_words)
+        if pos_count > neg_count:
+            mood = "positivo"
+        elif neg_count > pos_count:
+            mood = "negativo"
+
+    # 🔹 3. Genera messaggio coerente
     if mood == "positivo":
-        return f"🌞 Bentornato! Oggi ({today.strftime('%Y-%m-%d')}) sento un'ottima energia da parte tua! Continua così e affronta la giornata con il sorriso. Hai nuovi obiettivi o sfide da condividere?"
+        return "🌞 Ieri avevi un’ottima energia! Ti senti ancora così motivato oggi?"
     elif mood == "negativo":
-        return f"🌧️ Ciao! Oggi ({today.strftime('%Y-%m-%d')}) potresti aver bisogno di un po’ di motivazione. Ricorda che anche un piccolo passo è progresso. Vuoi raccontarmi come ti senti?"
+        return "🌧️ Ieri sembravi un po’ giù… Oggi vogliamo ripartire con calma e fiducia?"
     else:
-        return f"👋 Bentornato! Oggi è il {today.strftime('%Y-%m-%d')}. Come ti senti? Possiamo fissare insieme un piccolo obiettivo per la giornata?"
+        return "👋 Bentornato! Come ti senti oggi? Possiamo fissare insieme un piccolo obiettivo per la giornata?"
