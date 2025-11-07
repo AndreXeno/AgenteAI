@@ -19,7 +19,7 @@ git status
 git add .
 
 # Crea un commit con timestamp automatico
-commit_msg="Auto-update: $(date '+%Y-%m-%d %H:%M:%S') — memoria persistente + fix Enter"
+commit_msg="Auto-update: $(date '+%Y-%m-%d %H:%M:%S') — aggiunta diario py e css"
 git commit -m "$commit_msg"
 
 # Allinea con il repository remoto
