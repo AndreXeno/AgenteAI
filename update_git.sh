@@ -19,7 +19,7 @@ git status
 git add .
 
 # Crea un commit con timestamp automatico
-commit_msg="Auto-update: $(date '+%Y-%m-%d %H:%M:%S') —miglioramento grafica chat, versione stabile"
+commit_msg="Auto-update: $(date '+%Y-%m-%d %H:%M:%S') —ia risponde correttamente, versione stabile"
 git commit -m "$commit_msg"
 
 # Allinea con il repository remoto
