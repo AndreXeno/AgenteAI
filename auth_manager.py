@@ -20,6 +20,7 @@ def login_page():
 
     tab1, tab2 = st.tabs(["Accedi", "Registrati"])
     users_df = _load_users()
+    rerun_needed = False  # 👈 flag che useremo in app.py
 
     with tab1:
         username = st.text_input("Username", key="login_user")
@@ -30,7 +31,7 @@ def login_page():
                     st.session_state["logged_in"] = True
                     st.session_state["username"] = username
                     st.success("✅ Accesso effettuato!")
-                    st.experimental_rerun()
+                    rerun_needed = True
                 else:
                     st.error("❌ Password errata.")
             else:
@@ -49,6 +50,9 @@ def login_page():
                 users_df = pd.concat([users_df, new_row], ignore_index=True)
                 users_df.to_csv(USERS_FILE, index=False)
                 st.success("🎉 Registrazione completata! Ora effettua l'accesso.")
+
+    return rerun_needed  # 👈 restituiamo il flag invece di rerun diretto
+
 
 def logout_user():
     """Esegue il logout e resetta la sessione."""

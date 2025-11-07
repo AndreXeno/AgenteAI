@@ -1,9 +1,7 @@
 import streamlit as st
-import os
-import json
-from agents.mindbody_agent import MindBodyAgent
 from auth_manager import login_page, logout_user
 from chat_input_manager import render_chat_input, process_user_message
+from agents.mindbody_agent import MindBodyAgent
 
 # ==============================
 # SESSIONE
@@ -19,9 +17,10 @@ if "messages" not in st.session_state:
 # LOGIN
 # ==============================
 if not st.session_state["logged_in"]:
-    login_page()
+    rerun = login_page()
+    if rerun:  # 👈 controlla il flag ritornato
+        st.experimental_rerun()
     st.stop()
-
 # ==============================
 # INTERFACCIA PRINCIPALE
 # ==============================
