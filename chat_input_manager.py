@@ -24,7 +24,12 @@ def render_chat_input(form_key="chat_form_main", input_key="chat_text_main",
 
 def _ensure_agent():
     if "agent" not in st.session_state:
-        st.session_state.agent = MindBodyAgent() if _HAS_AGENT else None
+        try:
+            print("[LOG] Inizializzo MindBodyAgent")
+            st.session_state.agent = MindBodyAgent() if _HAS_AGENT else None
+        except Exception as e:
+            print("[ERROR] Errore inizializzando MindBodyAgent:", e)
+            st.session_state.agent = None
 
 def _append_message(role, content):
     st.session_state.messages.append({
@@ -48,7 +53,14 @@ def process_user_message(user_input, send_btn):
     if st.session_state.get("agent") is not None:
         try:
             res = st.session_state.agent.run(user_input, username=username)
-            reply = res.text if hasattr(res, "text") else str(res)
+            if isinstance(res, str):
+                reply = res
+            elif hasattr(res, "text"):
+                reply = res.text
+            elif isinstance(res, dict) and "text" in res:
+                reply = res["text"]
+            else:
+                reply = str(res)
         except Exception as e:
             print("[ERROR] agent.run:", e)
             reply = "Ops, ho avuto un piccolo problema tecnico. Riproviamo."
