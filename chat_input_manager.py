@@ -1,47 +1,71 @@
-# chat_input_manager.py
+# chat_input_manager.py — form + invio + risposta AI, nessun rendering HTML qui
 import os
 import json
+import datetime
 import streamlit as st
-from agents.mindbody_agent import MindBodyAgent
 
-def render_chat_input():
-    """Mostra l’input di chat e ritorna testo + pulsante di invio."""
-    with st.form("chat_form", clear_on_submit=True):
-        user_input = st.text_input("Scrivi un messaggio...", placeholder="Come ti senti oggi?")
-        send_btn = st.form_submit_button("📤 Invia")
-    return user_input, send_btn
+# Usa il tuo agente reale
+try:
+    from agents.mindbody_agent import MindBodyAgent
+    _HAS_AGENT = True
+except Exception as e:
+    print("[WARN] MindBodyAgent non disponibile:", e)
+    _HAS_AGENT = False
+
+def _now_ts():
+    return datetime.datetime.now().strftime("%Y-%m-%d %H:%M")
+
+def render_chat_input(form_key="chat_form_main", input_key="chat_text_main",
+                      button_key="chat_send_main", placeholder="Scrivi un messaggio…"):
+    with st.form(form_key, clear_on_submit=True):
+        txt = st.text_input("", key=input_key, placeholder=placeholder)
+        btn = st.form_submit_button("📤 Invia")
+    return txt, btn
+
+def _ensure_agent():
+    if "agent" not in st.session_state:
+        st.session_state.agent = MindBodyAgent() if _HAS_AGENT else None
+
+def _append_message(role, content):
+    st.session_state.messages.append({
+        "role": role, "content": content, "ts": _now_ts()
+    })
 
 def process_user_message(user_input, send_btn):
-    """Processa il messaggio e aggiorna la conversazione."""
-    if not (send_btn and user_input and user_input.strip()):
+    # evita doppie renderizzazioni: questo file NON visualizza messaggi, solo muta lo stato
+    if not (send_btn and isinstance(user_input, str) and user_input.strip()):
         return
 
-    # salva messaggio utente
-    st.session_state.messages.append({"role": "user", "content": user_input})
+    user_input = user_input.strip()
+    _append_message("user", user_input)
 
-    if "agent" not in st.session_state:
-        st.session_state.agent = MindBodyAgent()
-
+    # prepara agente
+    _ensure_agent()
     username = st.session_state.get("username", "anonimo")
 
-    try:
-        response = st.session_state.agent.run(user_input, username=username)
-        ai_reply = response.text if hasattr(response, "text") else str(response)
-    except Exception as e:
-        ai_reply = "Mi dispiace, ho avuto un problema tecnico."
-        print(f"[ERROR] process_user_message: {e}")
+    # genera risposta
+    reply = None
+    if st.session_state.get("agent") is not None:
+        try:
+            res = st.session_state.agent.run(user_input, username=username)
+            reply = res.text if hasattr(res, "text") else str(res)
+        except Exception as e:
+            print("[ERROR] agent.run:", e)
+            reply = "Ops, ho avuto un piccolo problema tecnico. Riproviamo."
 
-    st.session_state.messages.append({"role": "bot", "content": ai_reply})
-    save_chat_history(username)
-    st.rerun()
+    else:
+        # fallback se l'agente non è importabile
+        reply = "Ciao! Per ora sono offline, ma ho ricevuto il tuo messaggio. 😊"
 
-def save_chat_history(username):
-    """Salva la chat dell’utente su file JSON."""
-    user_dir = os.path.join("data", "users", username)
-    os.makedirs(user_dir, exist_ok=True)
-    chat_file = os.path.join(user_dir, "chat_history.json")
+    _append_message("bot", reply)
+
+    # persistenza minima (opzionale)
     try:
-        with open(chat_file, "w", encoding="utf-8") as f:
+        user_dir = os.path.join("data", "users", username)
+        os.makedirs(user_dir, exist_ok=True)
+        with open(os.path.join(user_dir, "chat_history.json"), "w", encoding="utf-8") as f:
             json.dump(st.session_state.messages, f, ensure_ascii=False, indent=2)
     except Exception as e:
-        print(f"[ERROR] ❌ Impossibile salvare chat: {e}")
+        print("[WARN] salvataggio chat_history.json:", e)
+
+    st.rerun()

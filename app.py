@@ -1,72 +1,77 @@
+# app.py — chat con bolle stile chat, senza CSS esterni
+import os
+import json
 import streamlit as st
-from auth_manager import login_page, logout_user
-from chat_input_manager import render_chat_input, process_user_message
-from agents.mindbody_agent import MindBodyAgent
 
-# ==============================
-# SESSIONE
-# ==============================
-if "logged_in" not in st.session_state:
-    st.session_state["logged_in"] = False
-if "username" not in st.session_state:
-    st.session_state["username"] = None
-if "messages" not in st.session_state:
-    st.session_state["messages"] = []
-
-# ==============================
-# LOGIN / REGISTRAZIONE
-# ==============================
-if not st.session_state["logged_in"]:
-    rerun_needed = login_page()
-    # Rendering chat messages with modern chat bubble style
-    if rerun_needed:
-        # niente st.experimental_rerun()
-        st.session_state["logged_in"] = True
-    st.stop()
-
-# ==============================
-# INTERFACCIA PRINCIPALE
-# ==============================
+# ============ CONFIG ============
 st.set_page_config(page_title="Mind&Body Coach AI", page_icon="🧘‍♂️", layout="centered")
-st.sidebar.title(f"Benvenuto, {st.session_state['username']} 👋")
-logout_user()
 
-st.title("🧠 Mind&Body Coach AI")
-st.subheader("Parla con il tuo coach personale")
+# ============ SESSIONE ============
+if "username" not in st.session_state:
+    st.session_state["username"] = "a"  # metti il tuo meccanismo reale di login
+if "logged_in" not in st.session_state:
+    st.session_state["logged_in"] = True
+if "messages" not in st.session_state:
+    st.session_state["messages"] = []   # [{role:"user"|"bot", content:"...", ts: "..."}]
 
-# ==============================
-# MESSAGGI CHAT
-# ==============================
-for msg in st.session_state.messages:
-    role_class = "🧍 Utente" if msg["role"] == "user" else "🤖 Coach"
-    st.markdown(f"**{role_class}:** {msg['content']}")
+# ============ STILE INLINE (niente CSS esterno) ============
+def inject_inline_chat_css():
+    st.markdown("""
+    <style>
+      .chat-wrap { max-width: 800px; margin: 0 auto; }
+      .msg { display: inline-block; padding: 10px 14px; border-radius: 16px; margin: 6px 0; line-height: 1.35; }
+      .row { display: flex; margin: 0.25rem 0; }
+      .row.user { justify-content: flex-end; }
+      .row.bot  { justify-content: flex-start; }
+      .msg.user {
+        background: #e8f0fe; color: #0b132b; border: 1px solid #d1e3ff;
+        border-top-right-radius: 6px;
+        max-width: 75%;
+      }
+      .msg.bot {
+        background: #f6f7f9; color: #111; border: 1px solid #e6e6e6;
+        border-top-left-radius: 6px;
+        max-width: 75%;
+      }
+      .ts { font-size: 0.75rem; opacity: 0.6; margin-top: 2px; }
+      .bubble { display:flex; flex-direction:column; }
+    </style>
+    """, unsafe_allow_html=True)
 
-st.markdown('<div class="chat-container">', unsafe_allow_html=True)
-for msg in st.session_state.messages:
-    if msg["role"] == "user":
-        st.markdown(
-            f'''
-            <div class="chat-message user-message">
-                <div class="user-bubble">{msg["content"]}</div>
-                <div class="avatar user-avatar">🧍</div>
-            </div>
-            ''',
-            unsafe_allow_html=True
-        )
-    else:
-        st.markdown(
-            f'''
-            <div class="chat-message bot-message">
-                <div class="avatar bot-avatar">🤖</div>
-                <div class="bot-bubble">{msg["content"]}</div>
-            </div>
-            ''',
-            unsafe_allow_html=True
-        )
+inject_inline_chat_css()
+
+# ============ TITOLO ============
+st.title("Sono Mind&Body, il tuo coach personale")
+
+# ============ RENDER MESSAGGI ============
+st.markdown('<div class="chat-wrap">', unsafe_allow_html=True)
+for m in st.session_state.messages:
+    role = m.get("role", "bot")
+    content = m.get("content", "")
+    ts = m.get("ts", "")
+    row_cls = "user" if role == "user" else "bot"
+    bubble_cls = "msg user" if role == "user" else "msg bot"
+    st.markdown(
+        f'''
+        <div class="row {row_cls}">
+          <div class="bubble">
+            <div class="{bubble_cls}">{content}</div>
+            <div class="ts">{ts}</div>
+          </div>
+        </div>
+        ''',
+        unsafe_allow_html=True
+    )
 st.markdown('</div>', unsafe_allow_html=True)
 
-# ==============================
-# INPUT CHAT
-# ==============================
-user_input, send_btn = render_chat_input()
+# ============ INPUT / INVIO ============
+from chat_input_manager import render_chat_input, process_user_message
+
+user_input, send_btn = render_chat_input(
+    form_key="chat_form_main",
+    input_key="chat_text_main",
+    button_key="chat_send_main",
+    placeholder="Scrivi un messaggio…"
+)
+
 process_user_message(user_input, send_btn)
