@@ -18,6 +18,7 @@ if "messages" not in st.session_state:
 # ==============================
 if not st.session_state["logged_in"]:
     rerun_needed = login_page()
+    # Rendering chat messages with modern chat bubble style
     if rerun_needed:
         # niente st.experimental_rerun()
         st.session_state["logged_in"] = True
@@ -39,6 +40,30 @@ st.subheader("Parla con il tuo coach personale")
 for msg in st.session_state.messages:
     role_class = "🧍 Utente" if msg["role"] == "user" else "🤖 Coach"
     st.markdown(f"**{role_class}:** {msg['content']}")
+
+st.markdown('<div class="chat-container">', unsafe_allow_html=True)
+for msg in st.session_state.messages:
+    if msg["role"] == "user":
+        st.markdown(
+            f'''
+            <div class="chat-message user-message">
+                <div class="user-bubble">{msg["content"]}</div>
+                <div class="avatar user-avatar">🧍</div>
+            </div>
+            ''',
+            unsafe_allow_html=True
+        )
+    else:
+        st.markdown(
+            f'''
+            <div class="chat-message bot-message">
+                <div class="avatar bot-avatar">🤖</div>
+                <div class="bot-bubble">{msg["content"]}</div>
+            </div>
+            ''',
+            unsafe_allow_html=True
+        )
+st.markdown('</div>', unsafe_allow_html=True)
 
 # ==============================
 # INPUT CHAT

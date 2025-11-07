@@ -19,7 +19,7 @@ git status
 git add .
 
 # Crea un commit con timestamp automatico
-commit_msg="Auto-update: $(date '+%Y-%m-%d %H:%M:%S') — prova modularizzazione app.py con chat_manger e auth_mnager"
+commit_msg="Auto-update: $(date '+%Y-%m-%d %H:%M:%S') —miglioramento grafica chat"
 git commit -m "$commit_msg"
 
 # Allinea con il repository remoto
