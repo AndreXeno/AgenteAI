@@ -18,7 +18,13 @@ def _now_ts():
 def render_chat_input(form_key="chat_form_main", input_key="chat_text_main",
                       button_key="chat_send_main", placeholder="Scrivi un messaggio…"):
     with st.form(form_key, clear_on_submit=True):
-        txt = st.text_input("", key=input_key, placeholder=placeholder)
+        # Usa label non vuota per evitare warning Streamlit, ma nascondila visivamente
+        txt = st.text_input(
+            "Messaggio",
+            key=input_key,
+            placeholder=placeholder,
+            label_visibility="collapsed"
+        )
         btn = st.form_submit_button("📤 Invia")
     return txt, btn
 
