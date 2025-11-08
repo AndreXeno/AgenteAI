@@ -259,13 +259,43 @@ class MindBodyAgent:
             return type("Response", (), {"text": response})()
 
         # Gestione moduli in base all'intento classificato
-        if intent == "allenamento":
-            print("🏋️ Attivo modulo: TRAINING.")
-            response = handle_training(user_input, username)
-            self.update_memory("coach", response)
-            self.save_memory(username)
-            print("✅ Risposta generata da modulo TRAINING.")
-            return type("Response", (), {"text": response})()
+        elif intent == "allenamento":
+            try:
+                model = genai.GenerativeModel("gemini-2.5-flash")
+                intent_check_prompt = f"""
+                L'utente ha scritto: "{user_input}".
+                Devi classificare se questo messaggio:
+                1️⃣ descrive semplicemente un'attività o esperienza ("descrittivo")
+                2️⃣ fornisce un allenamento strutturato da registrare ("allenamento")
+
+                Rispondi SOLO con una parola: "descrittivo" oppure "allenamento".
+                """
+                result = model.generate_content(intent_check_prompt)
+                mode = result.text.strip().lower() if hasattr(result, "text") else "descrittivo"
+
+                if "descrittivo" in mode:
+                    response = (
+                        "Grande! 💪 Mi fa piacere che ti stia muovendo. "
+                        "Vuoi che lo registri come allenamento oppure preferisci solo parlarne?"
+                    )
+                    self.update_memory("coach", response)
+                    self.save_memory(username)
+                    print("🤖 Gemini ha classificato l'input come descrittivo.")
+                    return type("Response", (), {"text": response})()
+                else:
+                    print("🏋️ Gemini ha classificato l'input come allenamento strutturato.")
+                    response = handle_training(user_input, username)
+                    self.update_memory("coach", response)
+                    self.save_memory(username)
+                    return type("Response", (), {"text": response})()
+
+            except Exception as e:
+                print(f"[AI CHECK ERROR] {e}")
+                # fallback classico
+                response = handle_training(user_input, username)
+                self.update_memory("coach", response)
+                self.save_memory(username)
+                return type("Response", (), {"text": response})()
 
         elif intent == "riflessione":
             print("💭 Attivo modulo: TRAINING_REFLECTION.")

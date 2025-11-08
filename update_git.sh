@@ -19,7 +19,7 @@ git status
 git add .
 
 # Crea un commit con timestamp automatico
-commit_msg="Auto-update: $(date '+%Y-%m-%d %H:%M:%S') —aggiustamento label vuota chat_input_maanger"
+commit_msg="Auto-update: $(date '+%Y-%m-%d %H:%M:%S') —aggiustamento mindbody_agent per riconsocere se frase e descrittiva o di inserimento allenamento"
 git commit -m "$commit_msg"
 
 # Allinea con il repository remoto
