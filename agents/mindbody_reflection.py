@@ -9,9 +9,27 @@ import json
 
 try:
     import google.generativeai as genai
-    from config.settings import GEMINI_API_KEY
-    genai.configure(api_key=GEMINI_API_KEY)
 except Exception:
+    genai = None
+
+# Robust Gemini initialization with fallback to dotenv
+GEMINI_API_KEY = None
+try:
+    from config.settings import GEMINI_API_KEY
+except ImportError:
+    GEMINI_API_KEY = None
+
+if GEMINI_API_KEY is None:
+    try:
+        from dotenv import load_dotenv
+        load_dotenv()
+        GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
+    except Exception:
+        GEMINI_API_KEY = None
+
+if genai is not None and GEMINI_API_KEY:
+    genai.configure(api_key=GEMINI_API_KEY)
+else:
     genai = None
 
 DATA_DIR = "data"
@@ -124,7 +142,15 @@ Includi nell'analisi uno stato emotivo inferito (es. gioia, stress, determinazio
 
         model = genai.GenerativeModel("gemini-2.5-flash")
         response = model.generate_content(prompt)
-        riflessione = response.text.strip()
+        riflessione = (response.text or "").strip()
+
+        # Fallback se response.text è vuoto o None
+        if not riflessione:
+            riflessione = (
+                "Apprezzo molto la tua condivisione. Anche se non posso analizzare in dettaglio "
+                "in questo momento, ricorda che ogni passo che fai è un progresso importante. "
+                "Continua a credere in te stesso!"
+            )
 
         # Prova a inferire umore dall'inizio della riflessione (semplice estrazione)
         umore_inferito = "Non specificato"

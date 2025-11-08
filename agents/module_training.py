@@ -7,9 +7,16 @@ import re
 import datetime
 import json
 import pandas as pd
-import google.generativeai as genai
+import logging
 from config.settings import GEMINI_API_KEY
-genai.configure(api_key=GEMINI_API_KEY)
+from dotenv import load_dotenv
+import google.generativeai as genai
+
+load_dotenv()
+api_key = GEMINI_API_KEY or os.getenv("GEMINI_API_KEY")
+if not api_key:
+    logging.error("Gemini API key not found in config.settings or .env")
+genai.configure(api_key=api_key)
 
 DATA_DIR = "data"
 
@@ -190,10 +197,19 @@ Fornisci:
 3️⃣ Mantieni un tono realistico e positivo, come un coach empatico Mind&Body.
 """
 
-    # ✅ Generazione del feedback tramite Gemini
-    model = genai.GenerativeModel("gemini-2.5-flash")
-    response = model.generate_content(analysis_prompt)
-    print(f"[LOG] 💬 Feedback generato con prompt unificato per {username}")
+    # ✅ Generazione del feedback tramite Gemini con gestione errori e fallback
+    try:
+        if not api_key:
+            raise ValueError("API key for Gemini not configured.")
+        model = genai.GenerativeModel("gemini-2.5-flash")
+        response = model.generate_content(analysis_prompt)
+        feedback_text = response.text.strip() if response and hasattr(response, "text") and response.text else None
+        if not feedback_text:
+            logging.error(f"[LOG] 💬 Feedback generato vuoto per {username}, uso fallback.")
+            feedback_text = "Non sono riuscito a generare un feedback dettagliato al momento, ma il tuo allenamento è stato registrato con successo. Continua così!"
+    except Exception as e:
+        logging.error(f"[LOG] Errore durante generazione feedback Gemini per {username}: {e}")
+        feedback_text = "Non sono riuscito a generare un feedback dettagliato al momento, ma il tuo allenamento è stato registrato con successo. Continua così!"
 
     # 🔹 Messaggio finale
     info_parts = [
@@ -201,7 +217,7 @@ Fornisci:
         f"Durata: {duration} min | Distanza: {distance or '–'} km | BPM: {bpm or '–'} | Pendenza: {slope or '–'}%",
         f"Media precedente: {avg_duration:.1f} min → {trend_text}",
         "",
-        response.text
+        feedback_text
     ]
 
     return "\n".join(info_parts)

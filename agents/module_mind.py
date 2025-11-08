@@ -7,14 +7,27 @@ import datetime
 import json
 import pandas as pd
 import google.generativeai as genai
+from dotenv import load_dotenv
 
 from config.settings import GEMINI_API_KEY
 from agents.knowledge_loader import query_knowledge
 from agents.prompts.base_prompt import BASE_PROMPT
 from agents.prompts.modules.mind_prompt import MIND_PROMPT
 
-# Inizializza Gemini
-genai.configure(api_key=GEMINI_API_KEY)
+# Inizializza Gemini con fallback robusto
+def initialize_gemini():
+    api_key = GEMINI_API_KEY
+    if not api_key:
+        load_dotenv()
+        api_key = os.getenv("GEMINI_API_KEY")
+    if api_key:
+        genai.configure(api_key=api_key)
+        return True
+    else:
+        print("[WARN] Chiave API Gemini non trovata. Il modulo Mind funzionerà in modalità ridotta.")
+        return False
+
+gemini_initialized = initialize_gemini()
 
 DATA_DIR = "data"
 
@@ -99,29 +112,39 @@ Usa il seguente contesto per rispondere con empatia, realismo e conoscenze psico
 Utente: {user_input}
 Coach:"""
 
-    # Genera risposta con Gemini
-    model = genai.GenerativeModel("gemini-2.5-flash")
-    response = model.generate_content(prompt)
+    if not gemini_initialized:
+        fallback_response = "Mi dispiace, al momento non posso fornire una risposta dettagliata. Riprova più tardi."
+        print("[WARN] Gemini non inizializzato, risposta di fallback fornita.")
+        return f"🧠 {fallback_response}"
 
-    risposta_testo = response.text.strip()
+    try:
+        # Genera risposta con Gemini
+        model = genai.GenerativeModel("gemini-2.5-flash")
+        response = model.generate_content(prompt)
+        risposta_testo = response.text.strip()
 
-    # Stima umore basata su input e risposta
-    mood_prompt = f"""Determina l'umore complessivo (positivo, neutro, negativo) basandoti sul testo dell'utente e sulla risposta del coach.
+        # Stima umore basata su input e risposta
+        mood_prompt = f"""Determina l'umore complessivo (positivo, neutro, negativo) basandoti sul testo dell'utente e sulla risposta del coach.
 
 Testo utente: {user_input}
 Risposta coach: {risposta_testo}
 
 Rispondi solo con una parola: positivo, neutro o negativo."""
-    mood_response = model.generate_content(mood_prompt)
-    umore_inferito = mood_response.text.strip().lower()
-    if umore_inferito not in {"positivo", "neutro", "negativo"}:
-        umore_inferito = "neutro"
+        mood_response = model.generate_content(mood_prompt)
+        umore_inferito = mood_response.text.strip().lower()
+        if umore_inferito not in {"positivo", "neutro", "negativo"}:
+            umore_inferito = "neutro"
 
-    # Salva lo stato mentale in CSV personale
-    today = datetime.date.today().strftime("%Y-%m-%d")
-    entry = pd.DataFrame([[today, username, user_input, risposta_testo, umore_inferito]],
-                         columns=["data", "username", "input", "risposta", "umore_inferito"])
-    entry.to_csv(mind_path, mode="a", header=not os.path.exists(mind_path), index=False)
+        # Salva lo stato mentale in CSV personale
+        today = datetime.date.today().strftime("%Y-%m-%d")
+        entry = pd.DataFrame([[today, username, user_input, risposta_testo, umore_inferito]],
+                             columns=["data", "username", "input", "risposta", "umore_inferito"])
+        entry.to_csv(mind_path, mode="a", header=not os.path.exists(mind_path), index=False)
 
-    print(f"[LOG] 💾 Stato mentale salvato in {mind_path} con umore inferito: {umore_inferito}")
-    return f"🧠 {risposta_testo}"
+        print(f"[LOG] 💾 Stato mentale salvato in {mind_path} con umore inferito: {umore_inferito}")
+        return f"🧠 {risposta_testo}"
+
+    except Exception as e:
+        print(f"[ERROR] Errore durante la generazione della risposta con Gemini: {e}")
+        fallback_response = "Mi dispiace, si è verificato un problema tecnico. Riprova più tardi."
+        return f"🧠 {fallback_response}"
