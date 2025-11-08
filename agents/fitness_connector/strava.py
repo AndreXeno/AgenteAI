@@ -23,21 +23,71 @@ DATA_DIR = "data/users"
 # =====================================
 def connect_strava(username=None):
     """
-    Genera l'URL di autorizzazione Strava, includendo sia il parametro 'state' (standard OAuth)
-    sia il parametro '?user=<username>' nel redirect URI per permettere il ripristino della sessione.
+    Genera l'URL di autorizzazione Strava per collegare l'account dell'utente.
+    Include un parametro di stato sicuro e log utile per il debug.
     """
-    redirect_uri = f"{STRAVA_REDIRECT_URI}?user={username}" if username else STRAVA_REDIRECT_URI
-    state_param = f"&state={username}" if username else ""
+    if not username:
+        st.error("⚠️ Nessun utente in sessione. Effettua l’accesso prima di collegare Strava.")
+        return None
+
+    redirect_uri = f"{STRAVA_REDIRECT_URI}?user={username}"
     auth_url = (
         f"{STRAVA_AUTH_URL}?client_id={STRAVA_CLIENT_ID}"
         f"&response_type=code"
         f"&redirect_uri={redirect_uri}"
         f"&approval_prompt=auto"
-        f"&scope=activity:read_all"
-        f"{state_param}"
+        f"&scope=read,activity:read_all"
+        f"&state={username}"
     )
-    print(f"[DEBUG] 🔗 URL autorizzazione Strava generato per {username}: {auth_url}")
+    print(f"[STRAVA] 🔗 URL generato per {username}: {auth_url}")
     return auth_url
+
+
+def refresh_strava_token(username: str, refresh_token: str):
+    """Aggiorna il token Strava scaduto e lo salva su file."""
+    try:
+        payload = {
+            "client_id": STRAVA_CLIENT_ID,
+            "client_secret": STRAVA_CLIENT_SECRET,
+            "grant_type": "refresh_token",
+            "refresh_token": refresh_token
+        }
+        res = requests.post(STRAVA_TOKEN_URL, data=payload)
+        data = res.json()
+
+        if "access_token" in data:
+            save_token(username, "strava", data)
+            print(f"[STRAVA] ♻️ Token aggiornato correttamente per {username}")
+            return data
+        else:
+            print(f"[STRAVA] ⚠️ Errore aggiornamento token: {data}")
+            return None
+    except Exception as e:
+        print(f"[STRAVA] ❌ Errore refresh token per {username}: {e}")
+        return None
+
+
+def get_valid_access_token(username: str, token_data: dict):
+    """
+    Verifica la validità del token Strava e lo rinnova se scaduto.
+    Restituisce un token valido o None.
+    """
+    import time
+    access_token = token_data.get("access_token")
+    expires_at = token_data.get("expires_at")
+    refresh_token = token_data.get("refresh_token")
+
+    if not access_token or not expires_at:
+        print("[STRAVA] ❌ Nessun token access valido trovato.")
+        return None
+
+    # Se scaduto → refresh
+    if time.time() > expires_at:
+        print(f"[STRAVA] 🔄 Token scaduto per l’utente, rigenero...")
+        new_data = refresh_strava_token(username, refresh_token)
+        return new_data.get("access_token") if new_data else None
+
+    return access_token
 
 
 def exchange_strava_token(code):
@@ -105,8 +155,9 @@ def auto_sync(username: str, token_data: dict):
     Sincronizza automaticamente profilo e attività Strava nel CSV dell’utente.
     """
     try:
-        access_token = token_data.get("access_token")
+        access_token = get_valid_access_token(username, token_data)
         if not access_token:
+            st.error("⚠️ Token Strava non valido o scaduto. Ricollega il tuo account Strava.")
             return {"error": "Token Strava non valido"}
 
         user_dir = ensure_user_dir(username)

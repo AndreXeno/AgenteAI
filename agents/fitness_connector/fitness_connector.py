@@ -15,15 +15,11 @@ from .base_utils import (
 from .strava import (
     connect_strava,
     exchange_strava_token,
-    is_connected as is_strava_connected,
-    disconnect as disconnect_strava
+    is_strava_connected,
+    disconnect_strava
 )
 
-from .myfitnesspal import (
-    connect as connect_myfitnesspal,
-    is_connected as is_myfitnesspal_connected,
-    disconnect as disconnect_myfitnesspal
-)
+
 
 from .sync_manager import (
     auto_sync_user_data
@@ -41,10 +37,7 @@ __all__ = [
     "is_strava_connected",
     "disconnect_strava",
 
-    # MyFitnessPal
-    "connect_myfitnesspal",
-    "is_myfitnesspal_connected",
-    "disconnect_myfitnesspal",
+
 
     # Sync manager
     "auto_sync_user_data",

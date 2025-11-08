@@ -6,10 +6,25 @@ def auto_sync_user_data(username, provider, token_data):
     """
     🔄 Sincronizza automaticamente i dati utente in base al provider.
     Recupera e salva nel CSV le informazioni dell’utente e le attività.
+    Include gestione token Strava con refresh automatico.
     """
     try:
         if provider == "strava":
+            from .strava import get_valid_access_token
+
             print(f"[SYNC] 🚴 Avvio sincronizzazione Strava per {username}")
+
+            # Verifica validità token
+            access_token = get_valid_access_token(username, token_data)
+            if not access_token:
+                print(f"[SYNC] ❌ Nessun token Strava valido disponibile per {username}")
+                return {"error": "Token Strava non valido o scaduto"}
+
+            # Aggiorna token_data se rinnovato
+            token_data["access_token"] = access_token
+            save_token(username, "strava", token_data)
+
+            # Avvia la sincronizzazione
             result = strava.auto_sync(username, token_data)
             if result and "error" not in result:
                 print(f"[SYNC] ✅ Sincronizzazione Strava completata ({username})")
@@ -20,17 +35,14 @@ def auto_sync_user_data(username, provider, token_data):
         elif provider == "myfitnesspal":
             print(f"[SYNC] 🍎 Avvio sincronizzazione MyFitnessPal per {username}")
 
-            # Recupera credenziali dal token_data
             username_mfp = token_data.get("username")
             password_mfp = token_data.get("password")
             if not username_mfp or not password_mfp:
                 print("[SYNC] ❌ Credenziali MyFitnessPal mancanti durante auto_sync_user_data.")
                 return {"error": "Credenziali MyFitnessPal mancanti."}
 
-            # Salva il token simulato nel file dell’utente
             save_token(username, "myfitnesspal", token_data)
 
-            # Esegui la sincronizzazione
             result = myfitnesspal.auto_sync(username, token_data)
             if result and "error" not in result:
                 print(f"[SYNC] ✅ Sincronizzazione MyFitnessPal completata per {username}")
