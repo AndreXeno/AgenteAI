@@ -19,7 +19,7 @@ git status
 git add .
 
 # Crea un commit con timestamp automatico
-commit_msg="Auto-update: $(date '+%Y-%m-%d %H:%M:%S') —consigli allenamento basato su umore e stato dell'utente"
+commit_msg="Auto-update: $(date '+%Y-%m-%d %H:%M:%S') —miglioramento risposte di module_mind e mindbody_reflection"
 git commit -m "$commit_msg"
 
 # Allinea con il repository remoto
