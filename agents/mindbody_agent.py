@@ -263,36 +263,59 @@ class MindBodyAgent:
             try:
                 model = genai.GenerativeModel("gemini-2.5-flash")
                 intent_check_prompt = f"""
-                L'utente ha scritto: "{user_input}".
-                Devi classificare se questo messaggio:
-                1️⃣ descrive semplicemente un'attività o esperienza ("descrittivo")
-                2️⃣ fornisce un allenamento strutturato da registrare ("allenamento")
+L'utente ha scritto: "{user_input}".
+Classifica questo messaggio in UNA delle seguenti tre categorie:
+1️⃣ "descrittivo" → se l'utente parla di esperienze o giornate (es: "sono andato in palestra oggi", "oggi ho fatto attività fisica");
+2️⃣ "allenamento" → se fornisce un allenamento strutturato da registrare (es: "corsa 40 minuti", "ho fatto 5 km in bici", "nuoto 30 vasche");
+3️⃣ "conversazione" → se l'utente vuole solo parlare o riflettere, senza registrare nulla (es: "voglio solo parlarne", "mi va di chiacchierare", "niente registrazione").
 
-                Rispondi SOLO con una parola: "descrittivo" oppure "allenamento".
-                """
+Rispondi SOLO con una delle tre parole: "descrittivo", "allenamento" oppure "conversazione".
+
+Tieni sempre in priorità ciò che l’utente ha detto in questo messaggio. 
+Puoi collegarti a conversazioni passate solo se sono rilevanti o coerenti con quanto espresso ora.
+"""
                 result = model.generate_content(intent_check_prompt)
                 mode = result.text.strip().lower() if hasattr(result, "text") else "descrittivo"
 
                 if "descrittivo" in mode:
                     response = (
-                        "Grande! 💪 Mi fa piacere che ti stia muovendo. "
-                        "Vuoi che lo registri come allenamento oppure preferisci solo parlarne?"
+                        "Hai fatto bene a muoverti 💪 Vuoi che lo registri come allenamento o lo segni solo come attività?"
                     )
                     self.update_memory("coach", response)
                     self.save_memory(username)
                     print("🤖 Gemini ha classificato l'input come descrittivo.")
                     return type("Response", (), {"text": response})()
-                else:
-                    print("🏋️ Gemini ha classificato l'input come allenamento strutturato.")
-                    response = handle_training(user_input, username)
+                elif "conversazione" in mode:
+                    response = "Va bene 😊 raccontami pure, sono qui per ascoltare."
                     self.update_memory("coach", response)
                     self.save_memory(username)
+                    print("🤖 Gemini ha classificato l'input come conversazione.")
                     return type("Response", (), {"text": response})()
+                else:
+                    # Solo registra se l'utente chiede esplicitamente
+                    reg_keywords = ["registra", "aggiungi", "salva", "inserisci", "metti nel diario"]
+                    if any(kw in user_input.lower() for kw in reg_keywords):
+                        print("🏋️ Gemini ha classificato l'input come allenamento strutturato e l'utente ha chiesto la registrazione esplicita.")
+                        response = handle_training(user_input, username)
+                        self.update_memory("coach", response)
+                        self.save_memory(username)
+                        return type("Response", (), {"text": response})()
+                    else:
+                        # Comportati come descrittivo: chiedi conferma
+                        response = (
+                            "Hai fatto bene a muoverti 💪 Vuoi che lo registri come allenamento o lo segni solo come attività?"
+                        )
+                        self.update_memory("coach", response)
+                        self.save_memory(username)
+                        print("🤖 Allenamento NON registrato: attendo conferma esplicita.")
+                        return type("Response", (), {"text": response})()
 
             except Exception as e:
                 print(f"[AI CHECK ERROR] {e}")
-                # fallback classico
-                response = handle_training(user_input, username)
+                # fallback classico: NON registra, chiede conferma
+                response = (
+                    "Hai fatto bene a muoverti 💪 Vuoi che lo registri come allenamento o lo segni solo come attività?"
+                )
                 self.update_memory("coach", response)
                 self.save_memory(username)
                 return type("Response", (), {"text": response})()

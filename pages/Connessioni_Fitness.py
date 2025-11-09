@@ -26,7 +26,7 @@ def save_token(username: str, provider: str, token_data: dict):
             try:
                 with open(token_path, "r") as f:
                     tokens = json.load(f)
-            except json.decoder.JSONDecodeError:
+            except json.JSONDecodeError:
                 print(f"[WARN] ⚠️ Il file tokens.json di {username} era corrotto, ricreato da zero.")
                 tokens = {}
         tokens[provider] = token_data
