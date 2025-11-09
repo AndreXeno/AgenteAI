@@ -23,8 +23,12 @@ def save_token(username: str, provider: str, token_data: dict):
         token_path = os.path.join(user_dir, "tokens.json")
         tokens = {}
         if os.path.exists(token_path):
-            with open(token_path, "r") as f:
-                tokens = json.load(f)
+            try:
+                with open(token_path, "r") as f:
+                    tokens = json.load(f)
+            except json.JSONDecodeError:
+                print(f"[WARN] ⚠️ Il file tokens.json di {username} era corrotto, ricreato da zero.")
+                tokens = {}
         tokens[provider] = token_data
         with open(token_path, "w") as f:
             json.dump(tokens, f, indent=2)
