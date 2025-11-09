@@ -161,7 +161,7 @@ def auto_sync(username: str, token_data: dict):
             return {"error": "Token Strava non valido"}
 
         user_dir = ensure_user_dir(username)
-        profile_path = os.path.join(user_dir, "profilo_utente.css.csv")
+        profile_path = os.path.join(user_dir, "profilo_utente.csv")
         fitness_path = os.path.join(user_dir, "dati_fitness.csv")
 
         # --- Profilo Strava ---
