@@ -260,62 +260,53 @@ class MindBodyAgent:
 
         # Gestione moduli in base all'intento classificato
         elif intent == "allenamento":
+            print("🏋️ Intent riconosciuto come allenamento — conversazione libera, nessuna registrazione dati.")
+            # 🧩 Controllo se l'utente parla di un allenamento già registrato
             try:
-                model = genai.GenerativeModel("gemini-2.5-flash")
-                intent_check_prompt = f"""
-L'utente ha scritto: "{user_input}".
-Classifica questo messaggio in UNA delle seguenti tre categorie:
-1️⃣ "descrittivo" → se l'utente parla di esperienze o giornate (es: "sono andato in palestra oggi", "oggi ho fatto attività fisica");
-2️⃣ "allenamento" → se fornisce un allenamento strutturato da registrare (es: "corsa 40 minuti", "ho fatto 5 km in bici", "nuoto 30 vasche");
-3️⃣ "conversazione" → se l'utente vuole solo parlare o riflettere, senza registrare nulla (es: "voglio solo parlarne", "mi va di chiacchierare", "niente registrazione").
-
-Rispondi SOLO con una delle tre parole: "descrittivo", "allenamento" oppure "conversazione".
-
-Tieni sempre in priorità ciò che l’utente ha detto in questo messaggio. 
-Puoi collegarti a conversazioni passate solo se sono rilevanti o coerenti con quanto espresso ora.
-"""
-                result = model.generate_content(intent_check_prompt)
-                mode = result.text.strip().lower() if hasattr(result, "text") else "descrittivo"
-
-                if "descrittivo" in mode:
-                    response = (
-                        "Hai fatto bene a muoverti 💪 Vuoi che lo registri come allenamento o lo segni solo come attività?"
-                    )
-                    self.update_memory("coach", response)
-                    self.save_memory(username)
-                    print("🤖 Gemini ha classificato l'input come descrittivo.")
-                    return type("Response", (), {"text": response})()
-                elif "conversazione" in mode:
-                    response = "Va bene 😊 raccontami pure, sono qui per ascoltare."
-                    self.update_memory("coach", response)
-                    self.save_memory(username)
-                    print("🤖 Gemini ha classificato l'input come conversazione.")
-                    return type("Response", (), {"text": response})()
-                else:
-                    # Solo registra se l'utente chiede esplicitamente
-                    reg_keywords = ["registra", "aggiungi", "salva", "inserisci", "metti nel diario"]
-                    if any(kw in user_input.lower() for kw in reg_keywords):
-                        print("🏋️ Gemini ha classificato l'input come allenamento strutturato e l'utente ha chiesto la registrazione esplicita.")
+                user_dir = os.path.join("data", "users", username)
+                csv_path = os.path.join(user_dir, "allenamenti.csv")
+                if os.path.exists(csv_path):
+                    df = pd.read_csv(csv_path)
+                    found = False
+                    for _, row in df.iterrows():
+                        tipo = str(row.get("tipo", "")).lower()
+                        if tipo and tipo in text:
+                            found = True
+                            break
+                    if found:
+                        print("📈 Rilevato riferimento a un allenamento registrato → analisi dettagliata.")
                         response = handle_training(user_input, username)
                         self.update_memory("coach", response)
                         self.save_memory(username)
                         return type("Response", (), {"text": response})()
-                    else:
-                        # Comportati come descrittivo: chiedi conferma
-                        response = (
-                            "Hai fatto bene a muoverti 💪 Vuoi che lo registri come allenamento o lo segni solo come attività?"
-                        )
-                        self.update_memory("coach", response)
-                        self.save_memory(username)
-                        print("🤖 Allenamento NON registrato: attendo conferma esplicita.")
-                        return type("Response", (), {"text": response})()
-
             except Exception as e:
-                print(f"[AI CHECK ERROR] {e}")
-                # fallback classico: NON registra, chiede conferma
-                response = (
-                    "Hai fatto bene a muoverti 💪 Vuoi che lo registri come allenamento o lo segni solo come attività?"
-                )
+                print(f"[WARN] Errore nel controllo allenamenti registrati: {e}")
+            try:
+                model = genai.GenerativeModel("gemini-2.5-flash")
+                chat_prompt = f"""
+L'utente ha scritto: "{user_input}"
+
+Contesto:
+{self.get_context()}
+
+Istruzioni:
+- Rispondi in modo empatico e naturale.
+- Non registrare o salvare nessun allenamento.
+- Se l'utente parla della sua esperienza fisica, commenta e incoraggia.
+- Evita di proporre di aggiungere o registrare nulla.
+- Concentrati solo sull'aspetto umano, motivazionale e riflessivo.
+"""
+                gemini_response = model.generate_content(chat_prompt)
+                response = gemini_response.text.strip() if hasattr(gemini_response, "text") else str(gemini_response)
+                if not response:
+                    response = "Sembra che tu voglia parlare di allenamento 💪 raccontami pure com’è andata, senza pensare ai dettagli tecnici."
+                self.update_memory("coach", response)
+                self.save_memory(username)
+                print("✅ Risposta generata per conversazione su allenamento, senza registrazione.")
+                return type("Response", (), {"text": response})()
+            except Exception as e:
+                print(f"[AI ERROR] {e}")
+                response = "Parliamo pure del tuo allenamento 💬, ma non salverò nessun dato. Com’è andata oggi?"
                 self.update_memory("coach", response)
                 self.save_memory(username)
                 return type("Response", (), {"text": response})()

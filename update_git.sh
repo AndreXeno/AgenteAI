@@ -19,7 +19,7 @@ git status
 git add .
 
 # Crea un commit con timestamp automatico
-commit_msg="Auto-update: $(date '+%Y-%m-%d %H:%M:%S') —aggiustare collegamento strava(al momento non ce myfitnespal)"
+commit_msg="Auto-update: $(date '+%Y-%m-%d %H:%M:%S') —prova rimozione inserimento allenamenti da chat"
 git commit -m "$commit_msg"
 
 # Allinea con il repository remoto
