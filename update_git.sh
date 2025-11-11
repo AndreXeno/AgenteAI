@@ -19,7 +19,7 @@ git status
 git add .
 
 # Crea un commit con timestamp automatico
-commit_msg="Auto-update: $(date '+%Y-%m-%d %H:%M:%S') —prova rimozione inserimento allenamenti da chat"
+commit_msg="Auto-update: $(date '+%Y-%m-%d %H:%M:%S') —generazione primo messaggio dinamico"
 git commit -m "$commit_msg"
 
 # Allinea con il repository remoto
