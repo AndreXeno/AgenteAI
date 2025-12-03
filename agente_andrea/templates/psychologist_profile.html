@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html class="light" lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Psychologist Profile Page</title>
+    <link href="https://fonts.googleapis.com" rel="preconnect" />
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect" />
+    <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700&amp;display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
+    <script src="https://cdn.tailwindcss.com?plugins=forms,typography"></script>
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            DEFAULT: "#45D4B3",
+                            light: "#E1F9F4"
+                        },
+                        "background-light": "#FFFFFF",
+                        "background-dark": "#111827",
+                        "surface-light": "#F8FAFC",
+                        "surface-dark": "#1F2937",
+                        "text-light-primary": "#1E293B",
+                        "text-dark-primary": "#F9FAFB",
+                        "text-light-secondary": "#64748B",
+                        "text-dark-secondary": "#9CA3AF",
+                        "border-light": "#E2E8F0",
+                        "border-dark": "#374151"
+                    },
+                    fontFamily: {
+                        display: ["Sora", "sans-serif"],
+                    },
+                    borderRadius: {
+                        DEFAULT: "1rem",
+                        lg: "1.25rem",
+                        xl: "1.5rem",
+                        "2xl": "2rem",
+                    },
+                },
+            },
+        };
+    </script>
+    <style>
+        body {
+            font-family: 'Sora', sans-serif;
+        }
+
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+</head>
+
+<body class="bg-surface-light dark:bg-background-dark text-text-light-primary dark:text-text-dark-primary">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <header class="flex justify-between items-center py-6">
+            <div class="flex items-center space-x-8">
+                <a class="flex items-center space-x-2" href="/">
+                    <svg fill="none" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg">
+                        <path
+                            d="M11.9999 15.0832C11.9999 15.0832 8.41659 14.0832 7.16659 10.4998C5.91659 6.9165 8.91659 3.58317 11.9999 4.4165C15.0832 5.24984 16.9166 9.4165 11.9999 15.0832Z"
+                            fill="#45D4B3"></path>
+                        <path
+                            d="M12.0001 15.0832C12.0001 15.0832 15.5834 14.0832 16.8334 10.4998C18.0834 6.9165 15.0834 3.58317 12.0001 4.4165C8.91675 5.24984 7.08342 9.4165 12.0001 15.0832Z"
+                            fill="#45D4B3" fill-opacity="0.6"></path>
+                        <path d="M12 15.0833V20.5" stroke="#45D4B3" stroke-linecap="round" stroke-width="1.5"></path>
+                    </svg>
+                    <span class="font-bold text-xl">Mind&amp;Body</span>
+                </a>
+                <nav
+                    class="hidden md:flex items-center space-x-8 text-text-light-secondary dark:text-text-dark-secondary">
+                    <a class="hover:text-text-light-primary dark:hover:text-text-dark-primary transition-colors"
+                        href="#">Nutrition</a>
+                    <a class="hover:text-text-light-primary dark:hover:text-text-dark-primary transition-colors"
+                        href="#">Training</a>
+                    <a class="text-primary-default font-semibold border-b-2 border-primary-default pb-1"
+                        href="/mental-wellbeing">Well-being</a>
+                </nav>
+            </div>
+            <div class="flex items-center space-x-4">
+                <button class="p-2 rounded-full hover:bg-white dark:hover:bg-surface-dark transition-colors">
+                    <span
+                        class="material-symbols-outlined text-text-light-secondary dark:text-text-dark-secondary">notifications</span>
+                </button>
+                <div class="w-10 h-10 bg-orange-200 rounded-full"></div>
+            </div>
+        </header>
+        <main class="py-12">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
+                <div class="lg:col-span-2 space-y-8">
+                    <div class="bg-background-light dark:bg-surface-dark p-8 rounded-2xl shadow-sm">
+                        <div class="flex flex-col sm:flex-row items-start gap-6">
+                            <div class="relative flex-shrink-0">
+                                <img alt="Portrait of Dr. Anika Sharma" class="w-32 h-32 rounded-full object-cover"
+                                    src="https://lh3.googleusercontent.com/aida-public/AB6AXuC7w62ts1VA5uIV7l-3b9gw9_Mt3HIdW_POil8JMbnsRvmka3NNj7HpgWVMSesK_AP8IrsUqjW1NCDmI2inP5I4JKXD8c4Ll9WILMiVshM2FKEL42f4nMIXbCZysJe7bQHWeAvuAFlDjWpLxHilgGzyhn_xjEF9ffqR8HB5iuyQXvq_IfeA73tJ3YFuzcRDfO6P4NxhSzQ3x4AeysHHDBBqf5b0EJnpHaiJJ2tvT0RICJ4LxX6y32lw1Any0jBJ5uGITxN_fpgxog" />
+                                <span
+                                    class="absolute bottom-1 right-1 block w-5 h-5 bg-green-500 rounded-full border-2 border-background-light dark:border-surface-dark"></span>
+                            </div>
+                            <div class="flex-grow">
+                                <h1 class="text-3xl font-bold">Dr. Anika Sharma</h1>
+                                <p class="text-text-light-secondary dark:text-text-dark-secondary mt-1">Psy.D.,
+                                    Terapista Matrimoniale e Familiare Autorizzata</p>
+                                <div class="flex flex-wrap gap-2 mt-4">
+                                    <span
+                                        class="text-sm font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300 px-3 py-1.5 rounded-full">Ansia</span>
+                                    <span
+                                        class="text-sm font-medium bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-300 px-3 py-1.5 rounded-full">Gestione
+                                        dello Stress</span>
+                                    <span
+                                        class="text-sm font-medium bg-rose-100 text-rose-800 dark:bg-rose-900 dark:text-rose-300 px-3 py-1.5 rounded-full">Relazioni</span>
+                                </div>
+                                <div class="flex gap-4 mt-6">
+                                    <a href="/psychologist/anika-sharma/contact"
+                                        class="flex items-center justify-center px-6 py-3 bg-primary-default text-white font-semibold rounded-lg hover:opacity-90 transition-opacity">
+                                        Contatta
+                                    </a>
+                                    <button
+                                        class="flex items-center justify-center px-6 py-3 bg-surface-light dark:bg-surface-dark border border-border-light dark:border-border-dark font-semibold rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition">
+                                        Prenota Sessione
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mt-8">
+                            <h2 class="text-xl font-bold mb-3">Chi Sono</h2>
+                            <p class="text-text-light-secondary dark:text-text-dark-secondary leading-relaxed">
+                                Con oltre 12 anni di esperienza, sono specializzata nell'aiutare adulti e coppie a
+                                navigare le sfide della vita. Il mio approccio è radicato nell'empatia e nella
+                                collaborazione, creando uno spazio sicuro per esplorare pensieri e sentimenti. Credo nel
+                                dare ai miei clienti strumenti pratici per favorire la resilienza e raggiungere il
+                                benessere emotivo. Insieme, possiamo lavorare per costruire una vita più appagante ed
+                                equilibrata.
+                            </p>
+                        </div>
+                    </div>
+                    <div class="bg-background-light dark:bg-surface-dark p-8 rounded-2xl shadow-sm">
+                        <h2 class="text-xl font-bold mb-4">Approcci Terapeutici</h2>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div class="flex items-center gap-3">
+                                <span class="material-symbols-outlined text-primary-default">check_circle</span>
+                                <span class="text-text-light-secondary dark:text-text-dark-secondary">Terapia Cognitivo
+                                    Comportamentale (CBT)</span>
+                            </div>
+                            <div class="flex items-center gap-3">
+                                <span class="material-symbols-outlined text-primary-default">check_circle</span>
+                                <span class="text-text-light-secondary dark:text-text-dark-secondary">Riduzione dello
+                                    Stress Basata sulla Mindfulness</span>
+                            </div>
+                            <div class="flex items-center gap-3">
+                                <span class="material-symbols-outlined text-primary-default">check_circle</span>
+                                <span class="text-text-light-secondary dark:text-text-dark-secondary">Terapia
+                                    Focalizzata sulle Emozioni (EFT)</span>
+                            </div>
+                            <div class="flex items-center gap-3">
+                                <span class="material-symbols-outlined text-primary-default">check_circle</span>
+                                <span class="text-text-light-secondary dark:text-text-dark-secondary">Terapia Breve
+                                    Focalizzata sulla Soluzione</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-background-light dark:bg-surface-dark p-8 rounded-2xl shadow-sm">
+                        <h2 class="text-xl font-bold mb-6">Recensioni dei Pazienti</h2>
+                        <div class="space-y-6">
+                            <div class="flex items-start gap-4">
+                                <img alt="Avatar of patient Sarah L." class="w-12 h-12 rounded-full object-cover"
+                                    src="https://lh3.googleusercontent.com/aida-public/AB6AXuBNPlIBYY1HwCRuyuBU8F7LxuVA2olzB2b7sGvHasU7ZJnEk70gPl7dJNuC9YgyQLbgmwdrxBcROiH2fPrRMs5GxOPQUMeROvO6-EmlM4JIXJlYvLmCvpHt78nagFN9T3ALcKPw9sNiw8xKl6CzqZ9q7iWCZaoSxUPHxYkKYhP9VegxMJJMEwF-errwzEDfJmymFWTT8RaWABRVYB5M3VHak6IDmRiWZDs-__rr-h-s3eEn8Rf5k5Afbz8H3k6ZrSdt7lA6OA3egA" />
+                                <div>
+                                    <div class="flex items-center mb-1">
+                                        <h3 class="font-semibold">Sarah L.</h3>
+                                        <div class="flex items-center ml-4">
+                                            <span class="material-symbols-outlined text-yellow-400"
+                                                style="font-variation-settings: 'FILL' 1">star</span>
+                                            <span class="material-symbols-outlined text-yellow-400"
+                                                style="font-variation-settings: 'FILL' 1">star</span>
+                                            <span class="material-symbols-outlined text-yellow-400"
+                                                style="font-variation-settings: 'FILL' 1">star</span>
+                                            <span class="material-symbols-outlined text-yellow-400"
+                                                style="font-variation-settings: 'FILL' 1">star</span>
+                                            <span class="material-symbols-outlined text-yellow-400"
+                                                style="font-variation-settings: 'FILL' 1">star</span>
+                                        </div>
+                                    </div>
+                                    <p class="text-text-light-secondary dark:text-text-dark-secondary text-sm">"La
+                                        Dr.ssa
+                                        Sharma ha creato un ambiente accogliente e non giudicante. La sua guida è stata
+                                        inestimabile nell'aiutarmi a gestire la mia ansia. La raccomando vivamente."</p>
+                                </div>
+                            </div>
+                            <div class="border-t border-border-light dark:border-border-dark my-6"></div>
+                            <div class="flex items-start gap-4">
+                                <img alt="Avatar of patient Mark T." class="w-12 h-12 rounded-full object-cover"
+                                    src="https://lh3.googleusercontent.com/aida-public/AB6AXuCcF2Wq510Jgl12bZZGWkw5brh7LBsnjSs4ZfI4VWOKCzQ8mGSIb62vlPuYgOhq9rY_NAo9bczAMnKmZO6mncHYJSBMi7i_BxaFBmaN3Cftj45BClchA4la23zoxaBK74Mr2fDDd0jUGlgQlRX-oidifPnY_kpGfMu3i5XoVDn84zLLsRJVM_d8OWhfq1qmOf6DQQ2ptGzRANrKErJalsmr9qZgUpngqBC8cfW_iFGCEOCh7HzKRDRIM2qhzmTLFD_613c_7mdq3Q" />
+                                <div>
+                                    <div class="flex items-center mb-1">
+                                        <h3 class="font-semibold">Mark T.</h3>
+                                        <div class="flex items-center ml-4">
+                                            <span class="material-symbols-outlined text-yellow-400"
+                                                style="font-variation-settings: 'FILL' 1">star</span>
+                                            <span class="material-symbols-outlined text-yellow-400"
+                                                style="font-variation-settings: 'FILL' 1">star</span>
+                                            <span class="material-symbols-outlined text-yellow-400"
+                                                style="font-variation-settings: 'FILL' 1">star</span>
+                                            <span class="material-symbols-outlined text-yellow-400"
+                                                style="font-variation-settings: 'FILL' 1">star</span>
+                                            <span class="material-symbols-outlined text-yellow-400"
+                                                style="font-variation-settings: 'FILL' 1">star</span>
+                                        </div>
+                                    </div>
+                                    <p class="text-text-light-secondary dark:text-text-dark-secondary text-sm">"Lavorare
+                                        con la Dr.ssa Sharma è stata un'esperienza trasformativa. Le sue intuizioni
+                                        sulla
+                                        gestione dello stress hanno migliorato significativamente il mio equilibrio
+                                        vita-lavoro."</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="lg:col-span-1 space-y-6 sticky top-12">
+                    <div class="bg-background-light dark:bg-surface-dark p-6 rounded-2xl shadow-sm">
+                        <div class="flex justify-between items-center mb-4">
+                            <h2 class="text-xl font-bold">Disponibilità</h2>
+                            <p class="text-sm font-semibold text-primary-default">Giugno 2024</p>
+                        </div>
+                        <div
+                            class="grid grid-cols-7 text-center text-sm text-text-light-secondary dark:text-text-dark-secondary">
+                            <div class="py-2">Lu</div>
+                            <div class="py-2">Ma</div>
+                            <div class="py-2">Me</div>
+                            <div class="py-2">Gi</div>
+                            <div class="py-2">Ve</div>
+                            <div class="py-2">Sa</div>
+                            <div class="py-2">Do</div>
+                            <div class="py-2"></div>
+                            <div class="py-2"></div>
+                            <div class="py-2"></div>
+                            <div class="py-2">1</div>
+                            <div class="py-2">2</div>
+                            <div class="py-2">3</div>
+                            <div class="py-2">4</div>
+                            <div
+                                class="py-2 w-10 h-10 flex items-center justify-center rounded-full hover:bg-primary-light dark:hover:bg-primary-dark cursor-pointer">
+                                5</div>
+                            <div
+                                class="py-2 w-10 h-10 flex items-center justify-center rounded-full bg-primary-default text-white cursor-pointer">
+                                6</div>
+                            <div class="py-2">7</div>
+                            <div class="py-2">8</div>
+                            <div class="py-2">9</div>
+                            <div class="py-2">10</div>
+                            <div class="py-2">11</div>
+                            <div
+                                class="py-2 w-10 h-10 flex items-center justify-center rounded-full hover:bg-primary-light dark:hover:bg-primary-dark cursor-pointer">
+                                12</div>
+                            <div class="py-2">13</div>
+                            <div class="py-2">14</div>
+                            <div class="py-2">15</div>
+                            <div
+                                class="py-2 w-10 h-10 flex items-center justify-center rounded-full hover:bg-primary-light dark:hover:bg-primary-dark cursor-pointer">
+                                16</div>
+                            <div class="py-2">17</div>
+                            <div class="py-2">18</div>
+                            <div
+                                class="py-2 w-10 h-10 flex items-center justify-center rounded-full hover:bg-primary-light dark:hover:bg-primary-dark cursor-pointer">
+                                19</div>
+                            <div class="py-2">20</div>
+                            <div class="py-2">21</div>
+                            <div class="py-2">22</div>
+                            <div class="py-2">23</div>
+                            <div class="py-2">24</div>
+                            <div class="py-2">25</div>
+                            <div class="py-2">26</div>
+                            <div class="py-2">27</div>
+                            <div class="py-2">28</div>
+                            <div class="py-2">29</div>
+                            <div class="py-2">30</div>
+                        </div>
+                        <button
+                            class="w-full mt-6 bg-primary-default text-white font-semibold py-3 rounded-lg hover:opacity-90 transition-opacity">Book
+                            a Session</button>
+                    </div>
+                    <div class="bg-background-light dark:bg-surface-dark p-6 rounded-2xl shadow-sm text-center">
+                        <h3 class="font-bold mb-2">Not ready to book?</h3>
+                        <p class="text-sm text-text-light-secondary dark:text-text-dark-secondary mb-4">Send a message
+                            to Dr. Sharma to ask any questions you may have.</p>
+                        <a href="/psychologist/anika-sharma/contact"
+                            class="block w-full bg-surface-light dark:bg-surface-dark text-text-light-primary dark:text-text-dark-primary font-semibold py-3 rounded-lg border border-border-light dark:border-border-dark hover:bg-gray-100 dark:hover:bg-gray-700 transition">Contact
+                            Me</a>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+</body>
+
+</html>

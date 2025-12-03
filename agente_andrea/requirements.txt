@@ -1,4 +1,4 @@
-streamlit
+
 pandas
 google-generativeai
 openpyxl
@@ -9,5 +9,6 @@ langchain-community
 langchain-google-genai
 faiss-cpu
 gtts
-streamlit-mic-recorder
+
 python-dotenv
+flask

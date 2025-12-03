@@ -24,3 +24,24 @@ Obiettivi: {COACH_PROFILE.get('goals', '')}.
 Istruzioni generali: {COACH_PROFILE.get('instructions', '')}.
 Rispondi sempre in modo empatico, realistico e motivante.
 """
+
+def get_dynamic_prompt(intent, user_input, user_data):
+    """
+    Genera un prompt dinamico per Gemini basato sull'intento e sui dati utente.
+    """
+    user_name = user_data.get("username", "Utente")
+    
+    prompt = f"""
+{BASE_PROMPT}
+
+Contesto Utente:
+Nome: {user_name}
+Intento rilevato: {intent}
+
+Messaggio Utente:
+"{user_input}"
+
+Rispondi direttamente all'utente in modo coerente con il tuo ruolo di coach.
+Se l'intento è generico, sii accogliente e pronto ad aiutare.
+"""
+    return prompt

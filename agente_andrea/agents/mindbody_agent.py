@@ -5,7 +5,7 @@
 # ======================================
 # Import standard e datetime
 # ======================================
-from agents.module_mind import handle_mind_state
+from agents.data_manager import log_workout, log_mind_state, get_recent_logs
 from agents.module_training import handle_training
 from agents.module_analysis import handle_weekly_analysis
 from agents.mindbody_reflection import handle_training_reflection
@@ -16,7 +16,7 @@ import os
 import pandas as pd
 import datetime
 # Fitness sync helper: try to fetch fresh data if Strava is connected
-from agents.fitness_connector.sync_manager import auto_sync_user_data
+
 
 # ======= Import modulo messaggio introduttivo dinamico =======
 from agents.module_intro_message import generate_intro_message
@@ -37,7 +37,7 @@ def load_user_data(username):
         profilo_path = os.path.join(base_path, "profilo_utente.css.csv")
         # fitness_path = os.path.join(base_path, "dati_fitness.csv")
 
-        # --- Carica token e (se necessario) sincronizza Strava automaticamente ---
+        # --- Carica token ---
         tokens_path = os.path.join(base_path, "tokens.json")
         user_data["tokens"] = {}
         if os.path.exists(tokens_path):
@@ -47,20 +47,6 @@ def load_user_data(username):
                     user_data["tokens"] = tokens
             except Exception as e:
                 print(f"[WARN] Impossibile leggere tokens.json per {username}: {e}")
-
-            # Se è presente un token Strava e non esistono dati allenamenti, proviamo una sincronizzazione rapida
-            try:
-                if "strava" in user_data["tokens"]:
-                    token_info = user_data["tokens"]["strava"]
-                    if (not os.path.exists(allenamenti_path)) or (os.path.exists(allenamenti_path) and os.stat(allenamenti_path).st_size == 0):
-                        print(f"[SYNC] Dati allenamenti mancanti per {username}, avvio sync Strava...")
-                        try:
-                            auto_sync_user_data(username, "strava", token_info)
-                            print(f"[SYNC] Sync Strava completata per {username}.")
-                        except Exception as sync_e:
-                            print(f"[SYNC] Errore durante auto_sync Strava per {username}: {sync_e}")
-            except Exception as e:
-                print(f"[WARN] Errore controllo sync Strava per {username}: {e}")
 
         if os.path.exists(allenamenti_path):
             try:
@@ -187,6 +173,35 @@ class MindBodyAgent:
         context = "\n".join(summary)
         print(f"🧩 Contesto generato ({len(context)} caratteri).")
         return context
+
+    def analyze_mental_logs(self, username: str):
+        """
+        Analizza i log mentali recenti dell'utente e genera un insight.
+        """
+        recent_logs = get_recent_logs(username, limit=5)
+        
+        if not recent_logs:
+            return "Non ho abbastanza dati recenti per fornirti un'analisi approfondita. Continua a registrare il tuo stato d'animo!"
+
+        # Costruisci il prompt per l'analisi
+        logs_text = "\n".join([f"- {log['timestamp']}: Umore {log['mood']}, Emozioni: {log['emotions']}, Note: {log['note']}" for log in recent_logs])
+        
+        prompt = f"""
+        Sei un mental coach esperto. Analizza i seguenti log dello stato d'animo di un utente:
+
+        {logs_text}
+
+        Identifica pattern ricorrenti, possibili cause di stress o benessere, e fornisci un breve insight empatico e un consiglio pratico immediato (massimo 3 frasi).
+        Rivolgiti direttamente all'utente.
+        """
+        
+        try:
+            model = genai.GenerativeModel("gemini-2.5-flash")
+            response = model.generate_content(prompt)
+            return response.text
+        except Exception as e:
+            print(f"[ERROR] Errore durante l'analisi dei log mentali: {e}")
+            return "Non sono riuscito ad analizzare i tuoi dati al momento. Riprova più tardi."
 
     def run(self, user_input: str, username: str = "anonimo"):
         user_input = str(user_input).strip()

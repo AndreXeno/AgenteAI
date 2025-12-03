@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="it">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Pagina di Supporto Psicologico</title>
+    <!-- Fonts and Tailwind -->
+    <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700&amp;display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
+    <script src="https://cdn.tailwindcss.com?plugins=forms,typography"></script>
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        primary: { DEFAULT: "#45D4B3", light: "#E1F9F4" },
+                        "background-light": "#FFFFFF", "background-dark": "#111827",
+                        "surface-light": "#F8FAFC", "surface-dark": "#1F2937",
+                        "text-light-primary": "#1E293B", "text-dark-primary": "#F9FAFB",
+                        "text-light-secondary": "#64748B", "text-dark-secondary": "#9CA3AF",
+                        "border-light": "#E2E8F0", "border-dark": "#374151"
+                    },
+                    fontFamily: { display: ["Sora", "sans-serif"] },
+                    borderRadius: { DEFAULT: "1rem", lg: "1.25rem", xl: "1.5rem", "2xl": "2rem" },
+                },
+            },
+        };
+    </script>
+    <style>
+        body {
+            font-family: 'Sora', sans-serif;
+        }
+
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+</head>
+
+<body class="bg-background-light dark:bg-background-dark text-text-light-primary dark:text-text-dark-primary">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <header class="flex justify-between items-center py-6">
+            <div class="flex items-center space-x-8">
+                <a class="flex items-center space-x-2" href="/">
+                    <svg fill="none" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg">
+                        <path
+                            d="M11.9999 15.0832C11.9999 15.0832 8.41659 14.0832 7.16659 10.4998C5.91659 6.9165 8.91659 3.58317 11.9999 4.4165C15.0832 5.24984 16.9166 9.4165 11.9999 15.0832Z"
+                            fill="#45D4B3"></path>
+                        <path
+                            d="M12.0001 15.0832C12.0001 15.0832 15.5834 14.0832 16.8334 10.4998C18.0834 6.9165 15.0834 3.58317 12.0001 4.4165C8.91675 5.24984 7.08342 9.4165 12.0001 15.0832Z"
+                            fill="#45D4B3" fill-opacity="0.6"></path>
+                        <path d="M12 15.0833V20.5" stroke="#45D4B3" stroke-linecap="round" stroke-width="1.5"></path>
+                    </svg>
+                    <span class="font-bold text-xl">Mind&amp;Body</span>
+                </a>
+                <nav
+                    class="hidden md:flex items-center space-x-8 text-text-light-secondary dark:text-text-dark-secondary">
+                    <a class="hover:text-text-light-primary dark:hover:text-text-dark-primary transition-colors"
+                        href="#">Nutrizione</a>
+                    <a class="hover:text-text-light-primary dark:hover:text-text-dark-primary transition-colors"
+                        href="#">Allenamento</a>
+                    <a class="text-primary-default font-semibold border-b-2 border-primary-default pb-1"
+                        href="/mental-wellbeing">Benessere</a>
+                </nav>
+            </div>
+            <div class="flex items-center space-x-4">
+                <a href="/account"
+                    class="p-2 rounded-full hover:bg-surface-light dark:hover:bg-surface-dark transition-colors">
+                    <span
+                        class="material-symbols-outlined text-text-light-secondary dark:text-text-dark-secondary">account_circle</span>
+                </a>
+            </div>
+        </header>
+
+        <main class="py-12">
+            <!-- Hero Section -->
+            <div class="text-center mb-16">
+                <h1 class="text-4xl md:text-5xl font-bold mb-4">Il tuo Hub per il Benessere Mentale</h1>
+                <p class="text-lg text-text-light-secondary dark:text-text-dark-secondary max-w-2xl mx-auto">Connettiti
+                    con psicologi professionisti o parla con il nostro assistente AI per un supporto immediato.</p>
+            </div>
+
+            <!-- Mental Log Card -->
+            <div class="mb-16">
+                <div
+                    class="bg-surface-light dark:bg-surface-dark rounded-2xl p-8 shadow-sm border border-border-light dark:border-border-dark flex flex-col md:flex-row items-center justify-between gap-6">
+                    <div>
+                        <h2 class="text-2xl font-bold mb-2">Come ti senti oggi?</h2>
+                        <p class="text-text-light-secondary dark:text-text-dark-secondary">Tieni traccia del tuo umore e
+                            ricevi insight personalizzati.</p>
+                    </div>
+                    <a href="/mental-log"
+                        class="flex items-center justify-center px-6 py-3 bg-black text-white font-semibold rounded-lg hover:opacity-90 transition-opacity whitespace-nowrap">
+                        <span class="material-symbols-outlined mr-2">edit_note</span>
+                        Vai al Diario
+                    </a>
+                </div>
+            </div>
+
+            <!-- Psychologists Section -->
+            <div class="mb-16">
+                <div class="flex justify-between items-end mb-8">
+                    <div>
+                        <h2 class="text-2xl font-bold mb-2">I Nostri Psicologi</h2>
+                        <p class="text-text-light-secondary dark:text-text-dark-secondary">Professionisti esperti pronti
+                            ad aiutarti.</p>
+                    </div>
+                    <a href="#" class="text-primary-default font-semibold hover:underline">Vedi tutti</a>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <!-- Psychologist Card -->
+                    <div
+                        class="bg-surface-light dark:bg-surface-dark rounded-2xl p-6 shadow-sm border border-border-light dark:border-border-dark hover:shadow-md transition-shadow">
+                        <div class="flex items-start gap-4 mb-4">
+                            <div
+                                class="w-16 h-16 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden">
+                                <span class="material-symbols-outlined text-3xl text-gray-400">person</span>
+                            </div>
+                            <div>
+                                <h3 class="font-bold text-lg">Dr. Anika Sharma</h3>
+                                <p class="text-sm text-text-light-secondary dark:text-text-dark-secondary">Psicologa
+                                    Clinica</p>
+                                <div class="flex items-center mt-1 text-yellow-500">
+                                    <span class="material-symbols-outlined text-sm"
+                                        style="font-variation-settings: 'FILL' 1">star</span>
+                                    <span
+                                        class="text-sm font-semibold ml-1 text-text-light-primary dark:text-text-dark-primary">4.9</span>
+                                    <span
+                                        class="text-xs text-text-light-secondary dark:text-text-dark-secondary ml-1">(120+
+                                        recensioni)</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="flex flex-wrap gap-2 mb-6">
+                            <span
+                                class="text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300 px-2 py-1 rounded-full">Ansia</span>
+                            <span
+                                class="text-xs font-medium bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-300 px-2 py-1 rounded-full">Stress</span>
+                        </div>
+                        <a href="/psychologist/anika-sharma"
+                            class="block w-full text-center py-2 border border-border-light dark:border-border-dark rounded-lg font-semibold hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">Visualizza
+                            Profilo</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- AI Assistant Section -->
+            <div
+                class="bg-surface-light dark:bg-surface-dark rounded-2xl shadow-sm border border-border-light dark:border-border-dark overflow-hidden">
+                <div
+                    class="p-6 border-b border-border-light dark:border-border-dark bg-gray-50 dark:bg-gray-800 flex justify-between items-center">
+                    <div>
+                        <h2 class="text-xl font-bold">Assistente AI Mind&Body</h2>
+                        <p class="text-sm text-text-light-secondary dark:text-text-dark-secondary">Disponibile 24/7 per
+                            supporto immediato</p>
+                    </div>
+                    <span class="flex items-center text-green-500 text-sm font-semibold">
+                        <span class="w-2 h-2 bg-green-500 rounded-full mr-2"></span> Online
+                    </span>
+                </div>
+                <div id="chat-messages" class="h-96 overflow-y-auto p-6 space-y-4 bg-white dark:bg-gray-900">
+                    <div class="flex items-start gap-3">
+                        <div
+                            class="w-10 h-10 bg-primary-light flex-shrink-0 rounded-full flex items-center justify-center">
+                            <span class="material-symbols-outlined text-primary-default">support_agent</span>
+                        </div>
+                        <div class="bg-gray-100 dark:bg-gray-700 p-4 rounded-lg rounded-tl-none max-w-md">
+                            <p class="text-sm">Ciao! Sono qui per ascoltarti. Come ti senti oggi?</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="p-4 bg-white dark:bg-gray-900 border-t border-border-light dark:border-border-dark">
+                    <div class="flex items-center gap-3">
+                        <input id="chat-input"
+                            class="flex-grow bg-background-light dark:bg-background-dark border border-border-light dark:border-border-dark rounded-lg px-4 py-3 focus:ring-2 focus:ring-primary-default focus:border-primary-default transition"
+                            placeholder="Scrivi il tuo messaggio..." type="text" onkeypress="handleKeyPress(event)" />
+                        <button onclick="sendMessage()"
+                            class="w-12 h-12 flex-shrink-0 bg-primary-default text-white rounded-full flex items-center justify-center hover:opacity-90 transition-opacity">
+                            <span class="material-symbols-outlined">send</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        const chatMessages = document.getElementById('chat-messages');
+        const chatInput = document.getElementById('chat-input');
+
+        function handleKeyPress(event) {
+            if (event.key === 'Enter') {
+                sendMessage();
+            }
+        }
+
+        async function sendMessage() {
+            const text = chatInput.value.trim();
+            if (!text) return;
+
+            appendMessage(text, 'user');
+            chatInput.value = '';
+
+            try {
+                const response = await fetch('/api/chat', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message: text, username: 'guest' })
+                });
+                const data = await response.json();
+                appendMessage(data.response, 'bot');
+            } catch (error) {
+                console.error('Error:', error);
+                appendMessage('Mi dispiace, si è verificato un errore di connessione.', 'bot');
+            }
+        }
+
+        function appendMessage(text, sender) {
+            const div = document.createElement('div');
+            if (sender === 'user') {
+                div.className = 'flex justify-end';
+                div.innerHTML = `<div class="bg-cyan-400 text-white p-4 rounded-lg rounded-br-none max-w-md"><p class="text-sm">${text.replace(/\n/g, '<br>')}</p></div>`;
+            } else {
+                div.className = 'flex items-start gap-3';
+                div.innerHTML = `<div class="w-10 h-10 bg-primary-light flex-shrink-0 rounded-full flex items-center justify-center"><span class="material-symbols-outlined text-primary-default">support_agent</span></div><div class="bg-gray-100 dark:bg-gray-700 p-4 rounded-lg rounded-tl-none max-w-md"><p class="text-sm">${text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\n/g, '<br>')}</p></div>`;
+            }
+            chatMessages.appendChild(div);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+    </script>
+</body>
+
+</html>
