@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+  <title>Mind&Body Home Page</title>
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700&amp;display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com?plugins=forms,typography"></script>
+  <script>
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            primary: "#30e3ca",
+            "background-light": "#ffffff",
+            "background-dark": "#0a101f",
+          },
+          fontFamily: {
+            display: ["Sora", "sans-serif"],
+          },
+          borderRadius: {
+            DEFAULT: "20px",
+          },
+        },
+      },
+    };
+  </script>
+  <style>
+    body {
+      font-family: 'Sora', sans-serif;
+    }
+  </style>
+</head>
+
+<body class="bg-background-light dark:bg-background-dark font-display text-gray-800 dark:text-gray-200 antialiased">
+  <div class="container mx-auto px-6 py-6">
+    <header class="flex justify-between items-center">
+      <div class="flex items-center space-x-2">
+        <svg class="w-8 h-8 text-primary" fill="none" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path
+            d="M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2ZM10.5 16.5C8.01 16.5 6 14.49 6 12C6 9.51 8.01 7.5 10.5 7.5C12.99 7.5 15 9.51 15 12C15 14.49 12.99 16.5 10.5 16.5Z"
+            fill="#30e3ca" fill-opacity="0.5"></path>
+          <path d="M16 9C16 10.1 15.1 11 14 11C12.9 11 12 10.1 12 9C12 7.9 12.9 7 14 7C15.1 7 16 7.9 16 9Z"
+            fill="#30e3ca"></path>
+        </svg>
+        <span class="text-xl font-bold text-gray-900 dark:text-white">Mind&amp;Body</span>
+      </div>
+      <nav class="hidden md:flex items-center space-x-8">
+        <a class="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors"
+          href="#">Nutrition</a>
+        <a class="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors"
+          href="#">Training</a>
+        <a class="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors"
+          href="/mental-wellbeing">Mental Well-being</a>
+        <a class="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors"
+          href="#">Community</a>
+      </nav>
+      <a class="bg-primary text-gray-900 font-semibold px-6 py-3 rounded-lg shadow-md hover:shadow-lg hover:brightness-105 transition-all"
+        href="/chat">
+        Get Started
+      </a>
+    </header>
+    <main class="mt-16">
+      <div class="relative rounded-lg overflow-hidden h-[600px] flex items-center justify-center">
+        <img
+          alt="A serene landscape at sunrise with misty hills in the background, representing a path to a balanced life."
+          class="absolute inset-0 w-full h-full object-cover"
+          src="https://lh3.googleusercontent.com/aida-public/AB6AXuCeX4tse35q33t767oUTqTzYuyuN3rkzVWlLXQj8RG0Nd2JktJMAP4T4lUHiwELudd7IHM5TJPf8-HlX854WE7I444o_kxZoztPIxYdqyW8rg-ywzv4GGMDGVGLLMoOjrFAwifeiVfeWunV1SN_-z80Km89E1slAP3hHsem23u3Mh1wbaU_GCcvnv3BGFTlQ8XCE-GhdEsGYYrkqumWyurF4m4C0oAmQ_PqSmJifURkX-aIzommmAKdLT8PF4HmdOIfnb9PmqPbmQ" />
+        <div class="absolute inset-0 bg-black bg-opacity-40"></div>
+        <div class="relative z-10 text-center text-white px-4">
+          <h1 class="text-5xl md:text-6xl font-bold leading-tight mb-4">Your Path to a Balanced Life</h1>
+          <p class="text-lg md:text-xl max-w-3xl mx-auto mb-8 text-gray-200">
+            Unify your nutrition, training, and mental well-being with personalized food boxes, custom training plans,
+            and psychological support.
+          </p>
+          <a class="bg-primary text-gray-900 font-semibold px-8 py-4 rounded-lg shadow-lg hover:shadow-xl hover:brightness-105 transition-all text-lg"
+            href="/chat">
+            Get Started
+          </a>
+        </div>
+      </div>
+    </main>
+  </div>
+
+</body>
+
+</html>

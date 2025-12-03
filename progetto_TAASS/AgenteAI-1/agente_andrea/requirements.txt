@@ -1,0 +1,14 @@
+
+pandas
+google-generativeai
+openpyxl
+PyPDF2
+python-docx
+langchain
+langchain-community
+langchain-google-genai
+faiss-cpu
+gtts
+
+python-dotenv
+flask

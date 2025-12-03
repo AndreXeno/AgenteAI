@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html class="light" lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Contact Psychologist Page</title>
+    <link href="https://fonts.googleapis.com" rel="preconnect" />
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect" />
+    <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700&amp;display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
+    <script src="https://cdn.tailwindcss.com?plugins=forms,typography"></script>
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            DEFAULT: "#45D4B3",
+                            light: "#E1F9F4"
+                        },
+                        "background-light": "#FFFFFF",
+                        "background-dark": "#111827",
+                        "surface-light": "#F8FAFC",
+                        "surface-dark": "#1F2937",
+                        "text-light-primary": "#1E293B",
+                        "text-dark-primary": "#F9FAFB",
+                        "text-light-secondary": "#64748B",
+                        "text-dark-secondary": "#9CA3AF",
+                        "border-light": "#E2E8F0",
+                        "border-dark": "#374151"
+                    },
+                    fontFamily: {
+                        display: ["Sora", "sans-serif"],
+                    },
+                    borderRadius: {
+                        DEFAULT: "1rem",
+                        lg: "1.25rem",
+                        xl: "1.5rem",
+                        "2xl": "2rem",
+                    },
+                },
+            },
+        };
+    </script>
+    <style>
+        body {
+            font-family: 'Sora', sans-serif;
+        }
+
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+</head>
+
+<body class="bg-surface-light dark:bg-background-dark text-text-light-primary dark:text-text-dark-primary">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <header class="flex justify-between items-center py-6">
+            <div class="flex items-center space-x-8">
+                <a class="flex items-center space-x-2" href="/">
+                    <svg fill="none" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg">
+                        <path
+                            d="M11.9999 15.0832C11.9999 15.0832 8.41659 14.0832 7.16659 10.4998C5.91659 6.9165 8.91659 3.58317 11.9999 4.4165C15.0832 5.24984 16.9166 9.4165 11.9999 15.0832Z"
+                            fill="#45D4B3"></path>
+                        <path
+                            d="M12.0001 15.0832C12.0001 15.0832 15.5834 14.0832 16.8334 10.4998C18.0834 6.9165 15.0834 3.58317 12.0001 4.4165C8.91675 5.24984 7.08342 9.4165 12.0001 15.0832Z"
+                            fill="#45D4B3" fill-opacity="0.6"></path>
+                        <path d="M12 15.0833V20.5" stroke="#45D4B3" stroke-linecap="round" stroke-width="1.5"></path>
+                    </svg>
+                    <span class="font-bold text-xl">Mind&amp;Body</span>
+                </a>
+                <nav
+                    class="hidden md:flex items-center space-x-8 text-text-light-secondary dark:text-text-dark-secondary">
+                    <a class="hover:text-text-light-primary dark:hover:text-text-dark-primary transition-colors"
+                        href="#">Nutrition</a>
+                    <a class="hover:text-text-light-primary dark:hover:text-text-dark-primary transition-colors"
+                        href="#">Training</a>
+                    <a class="text-primary-default font-semibold border-b-2 border-primary-default pb-1"
+                        href="/mental-wellbeing">Well-being</a>
+                </nav>
+            </div>
+            <div class="flex items-center space-x-4">
+                <button class="p-2 rounded-full hover:bg-surface-light dark:hover:bg-surface-dark transition-colors">
+                    <span
+                        class="material-symbols-outlined text-text-light-secondary dark:text-text-dark-secondary">notifications</span>
+                </button>
+                <div class="w-10 h-10 bg-orange-200 rounded-full"></div>
+            </div>
+        </header>
+        <main class="py-12">
+            <a class="inline-flex items-center gap-2 text-text-light-secondary dark:text-text-dark-secondary hover:text-text-light-primary dark:hover:text-text-dark-primary transition-colors mb-8"
+                href="/psychologist/anika-sharma">
+                <span class="material-symbols-outlined">arrow_back</span>
+                <span>Back to profile</span>
+            </a>
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-12 items-start">
+                <div
+                    class="lg:col-span-2 bg-background-light dark:bg-surface-dark p-8 rounded-2xl border border-border-light dark:border-border-dark">
+                    <div class="mb-8">
+                        <h1 class="text-3xl font-bold mb-2">Contact Dr. Anika Sharma</h1>
+                        <p class="text-text-light-secondary dark:text-text-dark-secondary">Send a message directly to
+                            Dr. Sharma. She will get back to you as soon as possible.</p>
+                    </div>
+                    <form class="space-y-6">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label
+                                    class="block text-sm font-medium text-text-light-secondary dark:text-text-dark-secondary mb-2"
+                                    for="name">Your Name</label>
+                                <input
+                                    class="w-full px-4 py-3 bg-surface-light dark:bg-background-dark border border-border-light dark:border-border-dark rounded-lg focus:ring-2 focus:ring-primary-default focus:border-primary-default transition"
+                                    id="name" placeholder="John Doe" type="text" />
+                            </div>
+                            <div>
+                                <label
+                                    class="block text-sm font-medium text-text-light-secondary dark:text-text-dark-secondary mb-2"
+                                    for="email">Your Email</label>
+                                <input
+                                    class="w-full px-4 py-3 bg-surface-light dark:bg-background-dark border border-border-light dark:border-border-dark rounded-lg focus:ring-2 focus:ring-primary-default focus:border-primary-default transition"
+                                    id="email" placeholder="john.doe@example.com" type="email" />
+                            </div>
+                        </div>
+                        <div>
+                            <label
+                                class="block text-sm font-medium text-text-light-secondary dark:text-text-dark-secondary mb-2"
+                                for="subject">Subject</label>
+                            <input
+                                class="w-full px-4 py-3 bg-surface-light dark:bg-background-dark border border-border-light dark:border-border-dark rounded-lg focus:ring-2 focus:ring-primary-default focus:border-primary-default transition"
+                                id="subject" placeholder="Question about sessions" type="text" />
+                        </div>
+                        <div>
+                            <label
+                                class="block text-sm font-medium text-text-light-secondary dark:text-text-dark-secondary mb-2"
+                                for="message">Your Message</label>
+                            <textarea
+                                class="w-full px-4 py-3 bg-surface-light dark:bg-background-dark border border-border-light dark:border-border-dark rounded-lg focus:ring-2 focus:ring-primary-default focus:border-primary-default transition"
+                                id="message" placeholder="Type your message here..." rows="6"></textarea>
+                        </div>
+                        <div class="flex justify-end">
+                            <button
+                                class="bg-primary-default text-white font-semibold py-3 px-8 rounded-lg hover:opacity-90 transition-opacity flex items-center gap-2"
+                                type="submit">
+                                <span>Send Message</span>
+                                <span class="material-symbols-outlined">send</span>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+                <div class="space-y-6">
+                    <div
+                        class="bg-background-light dark:bg-surface-dark p-6 rounded-2xl border border-border-light dark:border-border-dark flex flex-col items-center text-center">
+                        <img alt="Portrait of Dr. Anika Sharma" class="w-24 h-24 rounded-full object-cover mb-4"
+                            src="https://lh3.googleusercontent.com/aida-public/AB6AXuC7w62ts1VA5uIV7l-3b9gw9_Mt3HIdW_POil8JMbnsRvmka3NNj7HpgWVMSesK_AP8IrsUqjW1NCDmI2inP5I4JKXD8c4Ll9WILMiVshM2FKEL42f4nMIXbCZysJe7bQHWeAvuAFlDjWpLxHilgGzyhn_xjEF9ffqR8HB5iuyQXvq_IfeA73tJ3YFuzcRDfO6P4NxhSzQ3x4AeysHHDBBqf5b0EJnpHaiJJ2tvT0RICJ4LxX6y32lw1Any0jBJ5uGITxN_fpgxog" />
+                        <h3 class="font-bold text-lg">Dr. Anika Sharma</h3>
+                        <p class="text-sm text-text-light-secondary dark:text-text-dark-secondary mb-4">Psy.D., LMFT</p>
+                        <div
+                            class="flex items-center gap-2 text-sm text-text-light-secondary dark:text-text-dark-secondary bg-primary-light dark:bg-opacity-10 px-4 py-2 rounded-full">
+                            <span class="material-symbols-outlined text-base">schedule</span>
+                            <span>Responds within 24 hours</span>
+                        </div>
+                    </div>
+                    <div
+                        class="bg-background-light dark:bg-surface-dark p-6 rounded-2xl border border-border-light dark:border-border-dark">
+                        <h3 class="text-xl font-bold mb-4">Need a session now?</h3>
+                        <p class="text-text-light-secondary dark:text-text-dark-secondary mb-6">Book an available slot
+                            directly in Dr. Sharma's calendar.</p>
+                        <button
+                            class="w-full bg-primary-default text-white font-semibold py-3 rounded-lg hover:opacity-90 transition-opacity flex items-center justify-center gap-2">
+                            <span class="material-symbols-outlined">calendar_month</span>
+                            <span>Book a Session</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+</body>
+
+</html>
