@@ -102,7 +102,9 @@ import re
 from PyPDF2 import PdfReader
 from docx import Document
 
-KNOWLEDGE_DIR = "knowledge"
+# Ottieni il percorso assoluto della directory base del progetto (agente_andrea)
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+KNOWLEDGE_DIR = os.path.join(BASE_DIR, "knowledge")
 MAX_CHARS_PER_FILE = 10000  # limite massimo di testo per file
 
 # ======================================

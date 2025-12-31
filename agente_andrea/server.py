@@ -10,31 +10,7 @@ agent = MindBodyAgent()
 
 @app.route('/')
 def home():
-    return render_template('index.html')
-
-@app.route('/chat')
-def chat_page():
-    return render_template('chat.html')
-
-@app.route('/mental-wellbeing')
-def mental_wellbeing_page():
-    return render_template('mental_wellbeing.html')
-
-@app.route('/psychologist/anika-sharma')
-def psychologist_profile():
-    return render_template('psychologist_profile.html')
-
-@app.route('/psychologist/anika-sharma/contact')
-def contact_psychologist():
-    return render_template('contact_psychologist.html')
-
-@app.route('/account')
-def account_page():
-    return render_template('account.html')
-
-@app.route('/mental-log')
-def mental_log_page():
-    return render_template('mental_log.html')
+    return "Backend API Running. Use the frontend on port 5183."
 
 @app.route('/api/mental-log', methods=['POST'])
 def save_mental_log():
@@ -76,4 +52,4 @@ def chat_api():
         return jsonify({'response': 'Mi dispiace, si è verificato un errore.'}), 500
 
 if __name__ == '__main__':
-    app.run(debug=True, port=5000)
+    app.run(debug=True, port=5001)

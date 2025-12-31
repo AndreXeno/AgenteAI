@@ -3,7 +3,9 @@ import pandas as pd
 import datetime
 
 
-DATA_DIR="data"
+# Ottieni il percorso assoluto della directory base del progetto (agente_andrea)
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+DATA_DIR = os.path.join(BASE_DIR, "data")
 
 def log_workout(activity: str, duration: int, intensity:str):
     """

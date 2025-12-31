@@ -1,0 +1,15 @@
+/* Payment Page Styles */
+/* Shared CSS loaded globally */
+
+/* Specific overrides for payment page */
+.pay-head {
+    margin-bottom: 22px;
+}
+
+/* ...rest of payment specific layout ... */
+
+.pay-inputWrap {
+    position: relative;
+}
+
+/* Label, Input, CTA are now using .form-* and .btn-cta from shared.css */

@@ -1,0 +1,292 @@
+/* Box Setup Page Styles */
+/* Shared CSS loaded globally */
+
+/* Box Setup Page Styles */
+/* Shared CSS loaded globally */
+
+/* Specific overrides for box page */
+.mb-breadcrumbs {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    color: rgba(15, 23, 42, .55);
+    margin-bottom: 24px;
+}
+
+.mb-crumb {
+    text-decoration: none;
+    color: inherit;
+    font-weight: 500;
+}
+
+.mb-crumbActive {
+    font-weight: 700;
+    color: #0f172a;
+}
+
+.mb-sep {
+    opacity: 0.4;
+}
+
+.mb-cols {
+    display: grid;
+    grid-template-columns: 1fr 380px;
+    gap: 32px;
+    align-items: start;
+}
+
+.mb-hero {
+    margin-bottom: 32px;
+}
+
+.mb-h1 {
+    font-size: 42px;
+    font-weight: 900;
+    letter-spacing: -1px;
+    margin: 0;
+    line-height: 1.1;
+}
+
+.mb-grad {
+    color: rgb(13, 148, 136);
+}
+
+.mb-sub {
+    font-size: 18px;
+    color: rgba(15, 23, 42, .6);
+    margin-top: 12px;
+    line-height: 1.5;
+}
+
+
+.mb-card--shadow {
+    box-shadow: 0 20px 40px rgba(0, 0, 0, .08);
+    border: none;
+}
+
+.mb-cardHead {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+}
+
+.mb-cardTitleRow {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.mb-icon {
+    font-size: 24px;
+}
+
+.mb-h2 {
+    margin: 0;
+    font-size: 20px;
+    font-weight: 800;
+}
+
+.mb-linkBtn {
+    background: none;
+    border: none;
+    font-weight: 700;
+    cursor: pointer;
+    color: rgb(13, 148, 136);
+}
+
+.mb-pillRow {
+    display: flex;
+    gap: 10px;
+    margin-top: 16px;
+    flex-wrap: wrap;
+}
+
+.mb-pill {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(13, 148, 136, 0.1);
+    padding: 8px 14px;
+    border-radius: 99px;
+    font-weight: 700;
+    font-size: 14px;
+    color: rgb(13, 148, 136);
+}
+
+.mb-pill--strong {
+    background: rgb(13, 148, 136);
+    color: #fff;
+}
+
+.mb-chef {
+    position: relative;
+    border-radius: 20px;
+    overflow: hidden;
+    height: 320px;
+    display: flex;
+    align-items: flex-end;
+}
+
+.mb-chefBg {
+    position: absolute;
+    inset: 0;
+    background-size: cover;
+    background-position: center;
+}
+
+.mb-chefOverlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(0deg, rgba(0, 0, 0, 0.8), transparent);
+}
+
+.mb-chefInner {
+    position: relative;
+    z-index: 1;
+    padding: 24px;
+    color: #fff;
+}
+
+.mb-chefQuoteRow {
+    display: flex;
+    gap: 16px;
+    align-items: flex-start;
+}
+
+.mb-chefAvatar img {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    border: 2px solid #fff;
+}
+
+.mb-quote {
+    font-style: italic;
+    font-size: 16px;
+    line-height: 1.5;
+    opacity: 0.9;
+    margin: 0 0 8px;
+}
+
+.mb-chefName {
+    font-weight: 700;
+    font-size: 14px;
+    opacity: 0.8;
+}
+
+.mb-chefBadges {
+    display: flex;
+    gap: 12px;
+    margin-top: 16px;
+}
+
+.mb-chefBadge {
+    background: rgba(255, 255, 255, .2);
+    backdrop-filter: blur(4px);
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    display: flex;
+    gap: 6px;
+    align-items: center;
+}
+
+/* Sidebar Box List */
+.mb-boxHead {
+    margin-bottom: 20px;
+    border-bottom: 1px solid rgba(15, 23, 42, .06);
+    padding-bottom: 16px;
+}
+
+.mb-h3 {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 800;
+}
+
+.mb-boxList {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.mb-boxItem {
+    display: flex;
+    gap: 12px;
+}
+
+.mb-boxIcon {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    display: grid;
+    place-items: center;
+    font-size: 20px;
+    flex-shrink: 0;
+}
+
+.mb-boxIcon--green {
+    background: #d1fae5;
+    color: #059669;
+}
+
+.mb-boxIcon--orange {
+    background: #ffedd5;
+    color: #ea580c;
+}
+
+.mb-boxIcon--purple {
+    background: #f3e8ff;
+    color: #9333ea;
+}
+
+.mb-boxTitle {
+    font-weight: 700;
+    font-size: 14px;
+    margin-bottom: 2px;
+}
+
+.mb-total {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 24px;
+    padding-top: 20px;
+    border-top: 1px solid rgba(15, 23, 42, .06);
+}
+
+.mb-totalNum {
+    font-weight: 900;
+    font-size: 18px;
+}
+
+.mb-actions {
+    margin-top: 24px;
+}
+
+
+
+.mb-footnote {
+    text-align: center;
+    font-size: 12px;
+    color: rgba(15, 23, 42, .5);
+    margin-top: 16px;
+}
+
+.mb-trust {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 24px;
+    font-size: 12px;
+    font-weight: 600;
+    color: rgba(15, 23, 42, .6);
+}
+
+.mb-trustItem {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}

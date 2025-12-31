@@ -1,0 +1,5 @@
+timestamp,username,input,risposta,umore_inferito
+2025-12-27 22:16:44,test_user,Oggi mi sento un po' stanco ma va tutto bene.,"Ah, capisco. L'importante è che va tutto bene, allora!",neutral
+2025-12-27 22:16:55,test_user,"Ultimamente non vedo più i colori nel mondo, è tutto grigio.","Capisco che stai vivendo un momento in cui il mondo ti appare senza colori, tutto avvolto nel grigio. Deve essere davvero pesante portare questo peso.
+
+Quando le sensazioni si fanno così intense e pervasive, è un segnale importante. Non devi affrontare tutto questo da solo/a. Ti incoraggio con affetto a parlarne con un professionista della salute mentale. Possono offrirti un sostegno prezioso per esplorare queste emozioni e aiutarti a ritrovare la tua serenità. Sono qui per ascoltarti.",sad

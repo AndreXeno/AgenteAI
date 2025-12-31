@@ -1,0 +1,441 @@
+/* Therapist Chat Styles */
+/* Shared CSS loaded globally */
+
+
+/* Specific overrides or unique elements */
+.tc-bell {
+    opacity: .6;
+    font-size: 20px;
+}
+
+.tc-main {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 34px 22px 40px;
+    height: calc(100vh - 74px);
+}
+
+.tc-layout {
+    display: grid;
+    grid-template-columns: 1fr 360px;
+    gap: 24px;
+    height: 100%;
+}
+
+.tc-chatCard {
+    background: #fff;
+    border: 1px solid rgba(15, 23, 42, .08);
+    border-radius: 20px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, .02);
+}
+
+.tc-chatHeader {
+    padding: 16px 20px;
+    border-bottom: 1px solid rgba(15, 23, 42, .06);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #fff;
+}
+
+.tc-headerLeft {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.tc-headerAvatar {
+    position: relative;
+    width: 44px;
+    height: 44px;
+}
+
+.tc-headerAvatar img {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.tc-onlineDot {
+    position: absolute;
+    right: 2px;
+    bottom: 2px;
+    width: 10px;
+    height: 10px;
+    background: #22c55e;
+    border: 2px solid #fff;
+    border-radius: 50%;
+}
+
+.tc-headerName {
+    font-weight: 800;
+    font-size: 16px;
+    line-height: 1.2;
+}
+
+.tc-headerStatus {
+    font-size: 12px;
+    color: rgba(15, 23, 42, .5);
+    font-weight: 600;
+}
+
+.tc-headerActions {
+    display: flex;
+    gap: 8px;
+}
+
+.tc-iconBtn {
+    background: transparent;
+    border: none;
+    font-size: 18px;
+    padding: 8px;
+    cursor: pointer;
+    border-radius: 8px;
+    opacity: .6;
+    transition: background .2s;
+}
+
+.tc-iconBtn:hover {
+    background: rgba(15, 23, 42, .05);
+    opacity: 1;
+}
+
+.tc-chatBody {
+    flex: 1;
+    background: #fbfcfd;
+    overflow-y: auto;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.tc-msgRow {
+    display: flex;
+    gap: 12px;
+    align-items: flex-end;
+    max-width: 85%;
+}
+
+.tc-msgRow.is-user {
+    align-self: flex-end;
+    flex-direction: row-reverse;
+}
+
+.tc-miniAvatar {
+    width: 32px;
+    height: 32px;
+    flex-shrink: 0;
+}
+
+.tc-miniAvatar img {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.tc-bubbleWrap {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.tc-bubble {
+    padding: 12px 16px;
+    border-radius: 18px;
+    font-size: 15px;
+    line-height: 1.5;
+    font-weight: 500;
+    position: relative;
+}
+
+.tc-bubble--therapist {
+    background: #fff;
+    border: 1px solid rgba(15, 23, 42, .08);
+    border-bottom-left-radius: 4px;
+    color: #0f172a;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, .01);
+}
+
+.tc-bubble--user {
+    background: #0f172a;
+    color: #fff;
+    border-bottom-right-radius: 4px;
+}
+
+.tc-time {
+    font-size: 11px;
+    opacity: .5;
+    margin: 0 4px;
+}
+
+.tc-time--user {
+    text-align: right;
+}
+
+.tc-typingBubble {
+    background: rgba(15, 23, 42, .06);
+    padding: 12px 16px;
+    border-radius: 18px;
+    border-bottom-left-radius: 4px;
+    display: flex;
+    gap: 4px;
+    width: fit-content;
+}
+
+.tc-dot {
+    width: 6px;
+    height: 6px;
+    background: rgba(15, 23, 42, .4);
+    border-radius: 50%;
+    animation: typing 1.4s infinite ease-in-out;
+}
+
+.tc-dot:nth-child(1) {
+    animation-delay: 0s;
+}
+
+.tc-dot:nth-child(2) {
+    animation-delay: .2s;
+}
+
+.tc-dot:nth-child(3) {
+    animation-delay: .4s;
+}
+
+@keyframes typing {
+
+    0%,
+    100% {
+        transform: translateY(0);
+    }
+
+    50% {
+        transform: translateY(-4px);
+    }
+}
+
+.tc-inputBar {
+    background: #fff;
+    padding: 16px 20px;
+    border-top: 1px solid rgba(15, 23, 42, .08);
+    display: flex;
+    gap: 12px;
+    align-items: center;
+}
+
+.tc-plusBtn {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    border: 1px solid rgba(15, 23, 42, .15);
+    background: transparent;
+    font-size: 20px;
+    color: rgba(15, 23, 42, .6);
+    cursor: pointer;
+    display: grid;
+    place-items: center;
+}
+
+.tc-input {
+    flex: 1;
+    background: #f1f5f9;
+    border: 1px solid transparent;
+    border-radius: 12px;
+    padding: 12px 16px;
+    font-size: 15px;
+    outline: none;
+    font-weight: 500;
+}
+
+.tc-input:focus {
+    background: #fff;
+    border-color: rgb(13, 148, 136);
+}
+
+.tc-sendBtn {
+    background: #0f172a;
+    color: #fff;
+    border: none;
+    padding: 10px 18px;
+    border-radius: 10px;
+    font-weight: 800;
+    cursor: pointer;
+}
+
+.tc-side {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    overflow-y: auto;
+}
+
+.tc-card {
+    background: #fff;
+    border: 1px solid rgba(15, 23, 42, .08);
+    border-radius: 20px;
+    overflow: hidden;
+}
+
+.tc-cardPad {
+    padding: 20px;
+}
+
+.tc-cardHead {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+}
+
+.tc-cardTitle {
+    font-weight: 800;
+    font-size: 15px;
+    color: rgba(15, 23, 42, .5);
+    text-transform: uppercase;
+    letter-spacing: .5px;
+}
+
+.tc-cardLink {
+    font-size: 13px;
+    font-weight: 700;
+    color: rgb(13, 148, 136);
+    text-decoration: none;
+}
+
+.tc-sessionBox {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+    margin-bottom: 16px;
+}
+
+.tc-sessionIcon {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    background: #f0fdf4;
+    color: #16a34a;
+    display: grid;
+    place-items: center;
+    font-size: 18px;
+    flex-shrink: 0;
+}
+
+.tc-sessionTitle {
+    font-weight: 800;
+    font-size: 15px;
+    margin-bottom: 4px;
+}
+
+.tc-sessionMeta {
+    font-size: 13px;
+    color: rgba(15, 23, 42, .6);
+    line-height: 1.4;
+}
+
+.tc-outlineBtn {
+    width: 100%;
+    border: 1px solid rgba(15, 23, 42, .15);
+    background: transparent;
+    padding: 10px;
+    border-radius: 10px;
+    font-weight: 700;
+    cursor: pointer;
+    font-size: 13px;
+}
+
+.tc-profTitle {
+    font-weight: 900;
+    font-size: 18px;
+    margin-bottom: 8px;
+}
+
+.tc-profText {
+    font-size: 13px;
+    line-height: 1.5;
+    color: rgba(15, 23, 42, .7);
+    margin-bottom: 16px;
+}
+
+.tc-profGrid {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 8px 16px;
+    font-size: 13px;
+}
+
+.tc-k {
+    font-weight: 700;
+    color: rgba(15, 23, 42, .5);
+}
+
+.tc-v {
+    font-weight: 600;
+}
+
+.tc-divider {
+    height: 1px;
+    background: rgba(15, 23, 42, .08);
+    margin: 16px 0;
+}
+
+.tc-filesTitle {
+    font-weight: 800;
+    font-size: 14px;
+    margin-bottom: 12px;
+}
+
+.tc-fileRow {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    background: #f8fafc;
+    padding: 10px;
+    border-radius: 10px;
+}
+
+.tc-fileIcon {
+    font-size: 20px;
+}
+
+.tc-fileName {
+    font-weight: 700;
+    font-size: 13px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 140px;
+}
+
+.tc-fileMeta {
+    font-size: 11px;
+    color: rgba(15, 23, 42, .5);
+}
+
+@media (max-width: 900px) {
+    .tc-layout {
+        grid-template-columns: 1fr;
+    }
+
+    .tc-side {
+        display: none;
+    }
+
+    .tc-nav {
+        padding: 0 16px;
+    }
+
+    .tc-links {
+        display: none;
+    }
+
+    .tc-right {
+        min-width: auto;
+    }
+}

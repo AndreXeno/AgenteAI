@@ -1,0 +1,143 @@
+/* Diary Page Styles */
+/* Shared CSS loaded globally */
+
+/* Diary Page Styles */
+/* Shared CSS loaded globally */
+
+/* Page layout base in shared.css */
+/* Navbar, Brand, Links in shared.css */
+
+
+.d-main {
+    max-width: 980px;
+    margin: 0 auto;
+    padding: 54px 34px 70px;
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+}
+
+.d-title {
+    margin: 0;
+    font-size: 52px;
+    letter-spacing: -1px;
+    line-height: 1.05;
+    font-weight: 800;
+    color: rgba(15, 23, 42, .92);
+    margin-bottom: 28px;
+}
+
+.d-card {
+    width: min(720px, 92vw);
+    background: var(--card);
+    border: 1px solid rgba(15, 23, 42, .08);
+    border-radius: 18px;
+    padding: 28px 30px 26px;
+    box-shadow: var(--shadow);
+}
+
+.d-h2 {
+    margin: 0 0 14px;
+    font-size: 24px;
+    font-weight: 900;
+    letter-spacing: -.4px;
+}
+
+.d-mt {
+    margin-top: 26px;
+}
+
+.d-seg {
+    width: 100%;
+    background: rgba(15, 23, 42, .04);
+    border: 1px solid rgba(15, 23, 42, .07);
+    border-radius: 12px;
+    padding: 6px;
+    display: flex;
+    gap: 8px;
+}
+
+.d-segBtn {
+    flex: 1;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    padding: 11px 8px;
+    border-radius: 10px;
+    font-weight: 800;
+    color: rgba(15, 23, 42, .62);
+}
+
+.d-segBtn.is-active {
+    background: #fff;
+    color: rgba(15, 23, 42, .88);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, .08);
+}
+
+.d-chipGrid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.d-chip {
+    border: 1px solid rgba(15, 23, 42, .10);
+    background: #fff;
+    border-radius: 999px;
+    padding: 10px 14px;
+    font-weight: 900;
+    color: rgba(15, 23, 42, .70);
+    cursor: pointer;
+}
+
+.d-chip.is-selected {
+    background: rgba(34, 197, 94, .14);
+    border-color: rgba(34, 197, 94, .35);
+    color: rgba(15, 23, 42, .88);
+}
+
+.d-textarea {
+    width: 100%;
+    min-height: 120px;
+    resize: vertical;
+    padding: 14px 14px;
+    border-radius: 12px;
+    border: 1px solid rgba(15, 23, 42, .10);
+    outline: none;
+    font-size: 16px;
+    font-weight: 650;
+    color: rgba(15, 23, 42, .85);
+    background: #fbfcfd;
+}
+
+.d-saveBtn {
+    margin-top: 22px;
+    width: 100%;
+    border: none;
+    cursor: pointer;
+    background: rgba(34, 197, 94, .65);
+    color: rgba(15, 23, 42, .95);
+    font-weight: 950;
+    font-size: 18px;
+    padding: 16px 18px;
+    border-radius: 14px;
+}
+
+.d-saveBtn:hover {
+    filter: brightness(0.98);
+}
+
+@media (max-width: 1080px) {
+    .d-nav {
+        padding: 0 18px;
+    }
+
+    .d-links {
+        display: none;
+    }
+
+    .d-brand,
+    .d-right {
+        min-width: unset;
+    }
+}

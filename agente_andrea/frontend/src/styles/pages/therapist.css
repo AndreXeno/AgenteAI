@@ -1,0 +1,281 @@
+/* Therapist Profile Styles */
+/* Shared CSS loaded globally */
+
+/* Therapist Profile Styles */
+/* Shared CSS loaded globally */
+
+/* Base layout, navbar, brand, links in shared.css */
+
+
+.tp-main {
+    max-width: 1240px;
+    margin: 0 auto;
+    padding: 54px 34px 70px;
+}
+
+.tp-grid {
+    display: grid;
+    grid-template-columns: 1fr 380px;
+    gap: 28px;
+    align-items: start;
+}
+
+.tp-card {
+    background: var(--card);
+    border: 1px solid rgba(15, 23, 42, .08);
+    border-radius: 24px;
+    box-shadow: var(--shadow);
+}
+
+.tp-card--pad {
+    padding: 22px 22px;
+}
+
+.tp-profileCard {
+    padding: 22px 26px 10px;
+}
+
+.tp-profileTop {
+    display: flex;
+    gap: 22px;
+    align-items: flex-start;
+    padding-bottom: 10px;
+}
+
+.tp-photoWrap {
+    position: relative;
+    width: 120px;
+    height: 120px;
+    flex: 0 0 auto;
+}
+
+.tp-photo {
+    width: 120px;
+    height: 120px;
+    border-radius: 999px;
+    object-fit: cover;
+    background: #ddd;
+}
+
+.tp-onlineDot {
+    position: absolute;
+    right: 6px;
+    bottom: 6px;
+    width: 16px;
+    height: 16px;
+    border-radius: 999px;
+    background: rgba(34, 197, 94, .95);
+    border: 3px solid #fff;
+}
+
+.tp-profileInfo {
+    flex: 1;
+}
+
+.tp-name {
+    margin: 2px 0 4px;
+    font-size: 44px;
+    letter-spacing: -1px;
+    font-weight: 950;
+    color: rgba(15, 23, 42, .92);
+}
+
+.tp-role {
+    color: rgba(15, 23, 42, .55);
+    font-weight: 700;
+    font-size: 18px;
+}
+
+/* .tp-pill and .tp-bookBtn replaced by .tag and .btn-outline from shared.css */
+
+
+.tp-section {
+    margin-top: 18px;
+    padding-top: 12px;
+}
+
+.tp-h2 {
+    margin: 0 0 12px;
+    font-size: 26px;
+    font-weight: 950;
+    letter-spacing: -.5px;
+}
+
+.tp-par {
+    margin: 0;
+    color: rgba(15, 23, 42, .55);
+    font-weight: 650;
+    font-size: 18px;
+    line-height: 1.65;
+}
+
+.tp-rightCol {
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+}
+
+.tp-cardHead {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    margin-bottom: 10px;
+}
+
+.tp-cardTitle {
+    font-weight: 950;
+    font-size: 26px;
+    letter-spacing: -.5px;
+}
+
+.tp-cardMeta {
+    font-weight: 900;
+    color: rgba(15, 23, 42, .68);
+}
+
+.tp-cal {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 10px 12px;
+    padding-top: 8px;
+}
+
+.tp-calDow {
+    font-weight: 900;
+    color: rgba(15, 23, 42, .55);
+    text-align: center;
+}
+
+.tp-calEmpty {
+    height: 34px;
+}
+
+.tp-calDay {
+    height: 34px;
+    display: grid;
+    place-items: center;
+    border-radius: 10px;
+    color: rgba(15, 23, 42, .62);
+    font-weight: 800;
+}
+
+.tp-contactCard {
+    text-align: center;
+}
+
+.tp-contactTitle {
+    font-weight: 950;
+    font-size: 22px;
+    letter-spacing: -.3px;
+}
+
+.tp-contactSub {
+    margin-top: 6px;
+    color: rgba(15, 23, 42, .55);
+    font-weight: 700;
+}
+
+/* .tp-ctaOutline replaced by .btn-outline (inline width: 100%) */
+
+
+.tp-approaches {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 18px 30px;
+}
+
+.tp-checkItem {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+}
+
+.tp-check {
+    width: 22px;
+    height: 22px;
+    border-radius: 999px;
+    border: 2px solid rgba(15, 23, 42, .75);
+    display: grid;
+    place-items: center;
+    font-size: 13px;
+    font-weight: 900;
+    flex: 0 0 auto;
+    margin-top: 2px;
+}
+
+.tp-checkText {
+    color: rgba(15, 23, 42, .55);
+    font-weight: 700;
+    font-size: 18px;
+    line-height: 1.35;
+}
+
+.tp-reviews {
+    margin-top: 8px;
+}
+
+.tp-reviewTop {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+}
+
+.tp-reviewAvatar {
+    width: 44px;
+    height: 44px;
+    border-radius: 999px;
+    background: rgba(15, 23, 42, .10);
+    display: grid;
+    place-items: center;
+}
+
+.tp-reviewName {
+    font-weight: 950;
+    font-size: 18px;
+}
+
+.tp-stars {
+    color: #f6b100;
+    font-weight: 900;
+    letter-spacing: 1px;
+}
+
+.tp-reviewText {
+    margin: 10px 0 0;
+    color: rgba(15, 23, 42, .55);
+    font-weight: 650;
+    font-size: 16px;
+    line-height: 1.5;
+}
+
+.tp-divider {
+    margin: 18px 0;
+    border-top: 1px solid rgba(15, 23, 42, .10);
+}
+
+@media (max-width: 1080px) {
+    .tp-nav {
+        padding: 0 18px;
+    }
+
+    .tp-links {
+        display: none;
+    }
+
+    .tp-brand,
+    .tp-right {
+        min-width: unset;
+    }
+
+    .tp-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .tp-rightCol {
+        order: -1;
+    }
+
+    .tp-approaches {
+        grid-template-columns: 1fr;
+    }
+}

@@ -8,6 +8,8 @@ import json
 import pandas as pd
 import google.generativeai as genai
 from dotenv import load_dotenv
+import time
+import random
 
 from config.settings import GEMINI_API_KEY
 from agents.knowledge_loader import query_knowledge
@@ -33,33 +35,57 @@ DATA_DIR = "data"
 
 def handle_mind_state(user_input: str, username: str = "anonimo"):
     """
-    Risponde al messaggio dell'utente in modo empatico e naturale,
-    usando il sistema di prompt unificati (BASE_PROMPT + MIND_PROMPT).
-    Integra dati recenti dal diario, allenamenti e profilo utente,
-    genera un prompt più sofisticato e profondo con Gemini,
-    stima l'umore e salva tutto in mind_state.csv.
+    Risponde al messaggio dell'utente usando un'unica chiamata a Gemini,
+    ma FILTRATA da keyword per evitare di consumare quota su messaggi generici.
     """
     user_dir = os.path.join(DATA_DIR, "users", username)
     os.makedirs(user_dir, exist_ok=True)
     mind_path = os.path.join(user_dir, "mind_state.csv")
 
-    # Pre-analisi del messaggio per classificare il contenuto
+    # 1. FILTRO KEYWORD (Stabilità/Quota)
     emotive_keywords = [
         "mi sento", "sono stressato", "ansia", "felice", "triste", "arrabbiato", "depress*", "preoccupat*",
         "agitato", "ansioso", "stress", "paura", "disperato", "emozion*", "nervoso", "sereno", "contento",
-        "rabbia", "gioia", "solitudine", "angoscia", "malinconia", "stanco", "affaticato", "frustrato"
+        "rabbia", "gioia", "solitudine", "angoscia", "malinconia", "stanco", "affaticato", "frustrato",
+        "suicid*", "mort*", "uccider*", "farla finita", "non voglio vivere", "non ce la faccio", "disperazion",
+        "dolore", "sofferenza", "aiuto", "morire", "grigio", "buio", "inutile", "fallito", "finito"
     ]
     neutral_keywords = [
         "allenamento", "scuola", "amici", "giochi", "sport", "studio", "lavoro", "tempo libero",
-        "film", "libro", "cibo", "viaggio", "camminata", "passeggiata", "progetto"
+        "film", "libro", "cibo", "viaggio", "camminata", "passeggiata", "progetto", "ciao", "buongiorno", "sera"
     ]
 
     user_input_lower = user_input.lower()
-
-    # Determina se l'input è emotivo o neutro
     is_emotive = any(kw in user_input_lower for kw in emotive_keywords)
     is_neutral = any(kw in user_input_lower for kw in neutral_keywords) and not is_emotive
 
+    # 2. SE NEUTRO O FALLBACK (Risparmio API)
+    if not is_emotive and not is_neutral:
+        # Fallback statico gratutito
+        fallback_response = "Ciao! Come posso aiutarti oggi?"
+        today_ts = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        entry = pd.DataFrame([[today_ts, username, user_input, fallback_response, "neutro"]],
+                             columns=["timestamp", "username", "input", "risposta", "umore_inferito"])
+        try:
+             header_exists = os.path.exists(mind_path)
+             entry.to_csv(mind_path, mode="a", header=not header_exists, index=False)
+        except Exception:
+            pass
+        return f"🧠 {fallback_response}"
+
+    if is_neutral:
+        # Chiamata semplice (Economy)
+        if not gemini_initialized:
+             return "🧠 Ciao! Purtroppo sono offline."
+        try:
+            model = genai.GenerativeModel("gemini-2.5-flash")
+            response = model.generate_content(f"Rispondi brevemente a: {user_input}")
+            return f"🧠 {response.text.strip()}"
+        except Exception:
+            return "🧠 Ciao! Tutto bene?"
+
+    # 3. SE EMOTIVO -> CHIAMATA COMPLETA (Single Pass)
+    
     # Carica dati recenti dal diario utente (ultimi 3 giorni)
     diario_path = os.path.join(user_dir, "diario_utente.csv")
     diario_recent = ""
@@ -100,111 +126,113 @@ def handle_mind_state(user_input: str, username: str = "anonimo"):
         except Exception as e:
             print(f"[WARN] Impossibile leggere profilo utente: {e}")
 
-    # Recupera conoscenze pertinenti dai documenti
-    relevant_docs = query_knowledge(user_input)
-    knowledge_text = "\n".join(relevant_docs) if relevant_docs else "Nessuna conoscenza aggiuntiva trovata."
+    # Recupera conoscenze pertinenti dai documenti (se initialized)
+    knowledge_text = "Nessuna conoscenza aggiuntiva trovata."
+    try:
+        relevant_docs = query_knowledge(user_input)
+        if relevant_docs:
+            knowledge_text = "\n".join(relevant_docs)
+    except Exception:
+        pass
 
-    if is_emotive:
-        # Costruisci contesto dettagliato per il prompt
-        contesto = f"""Diario degli ultimi 3 giorni:
-{diario_recent if diario_recent else 'Nessuna voce recente nel diario.'}
+    if not gemini_initialized:
+        return "🧠 [FALLBACK] Mi dispiace, sono offline al momento. Riprova più tardi."
 
-Allenamenti degli ultimi 3 giorni:
-{allenamenti_recent if allenamenti_recent else 'Nessun allenamento recente registrato.'}
+    # --- COSTUZIONE PROMPT UNIFICATO ---
+    contesto = f"""DATI UTENTE:
+Diario (ultimi 3gg): {diario_recent if diario_recent else 'Nessuno'}
+Allenamenti (ultimi 3gg): {allenamenti_recent if allenamenti_recent else 'Nessuno'}
+Profilo: {json.dumps(profilo_utente, ensure_ascii=False) if profilo_utente else 'N/A'}
 
-Profilo utente:
-{json.dumps(profilo_utente, ensure_ascii=False, indent=2) if profilo_utente else 'Profilo utente non disponibile.'}
-
-Conoscenze utili dai documenti:
+CONOSCENZE UTILI:
 {knowledge_text}
 """
 
-        # Prompt unificato e potenziato
-        prompt = f"""{BASE_PROMPT}
-{MIND_PROMPT}
+    unified_prompt = f"""{BASE_PROMPT}
 
-Usa il seguente contesto per rispondere con empatia, realismo e conoscenze psicologiche profonde:
-
+CONTESTO AGGIUNTIVO:
 {contesto}
 
-Utente: {user_input}
-Coach:"""
+MESSAGGIO UTENTE: "{user_input}"
 
-        if not gemini_initialized:
-            fallback_response = "Mi dispiace, al momento non posso fornire una risposta dettagliata. Riprova più tardi."
-            print("[WARN] Gemini non inizializzato, risposta di fallback fornita.")
-            return f"🧠 {fallback_response}"
+COMPITI (Esegui in ordine):
+1. ANALISI SEMANTICA:
+   - Identifica il tono (es. sad, happy, neutral, angry, hopeless, anxious).
+   - Valuta il RISCHIO (none, low, medium, high, critical) per suicidio, autolesionismo, o pericolo grave.
+   
+2. GENERAZIONE RISPOSTA:
+   - Se Rischio > low OPPURE Tono emotivo: Usa empatia profonda, accogli il sentimento.
+   - Se Rischio = none E Tono neutro/positivo: Rispondi in modo conversazionale, breve e amichevole.
+   - REGOLA SICUREZZA: Se rilevi alto rischio (suicidio/autolesionismo), devi suggerire aiuto professionale o numeri emergenza.
+   - NON dare consigli non richiesti (tranne nel caso di sicurezza).
 
+OUTPUT RICHIESTO (JSON ESCLUSIVAMENTE):
+{{
+  "analysis": {{
+    "tone": "valore",
+    "risk_level": "valore (none/low/medium/high/critical)",
+    "risk_type": "valore (nessuno/suicidio/depressione_grave/etc)",
+    "description": "breve analisi"
+  }},
+  "response_text": "Il testo della risposta per l'utente"
+}}
+"""
+
+    max_retries = 5
+    base_delay = 4
+
+    for attempt in range(max_retries):
         try:
-            # Genera risposta con Gemini
             model = genai.GenerativeModel("gemini-2.5-flash")
-            response = model.generate_content(prompt)
-            risposta_testo = response.text.strip()
+            # Generazione unica
+            response = model.generate_content(unified_prompt, generation_config={"response_mime_type": "application/json"})
+            
+            result = json.loads(response.text)
+            
+            analysis = result.get("analysis", {})
+            risposta_testo = result.get("response_text", "Mi dispiace, non ho capito.")
+            
+            tone = analysis.get("tone", "neutral").lower()
+            risk_level = analysis.get("risk_level", "none").lower()
+            risk_type = analysis.get("risk_type", "nessuno").lower()
+            risk_desc = analysis.get("description", "")
+            
+            # --- LOGICA DI SALVATAGGIO ---
+            
+            # 1. Salva log generale in mind_state.csv
+            today_ts = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            entry = pd.DataFrame([[today_ts, username, user_input, risposta_testo, tone]],
+                                 columns=["timestamp", "username", "input", "risposta", "umore_inferito"])
+            
+            try:
+                 header_exists = os.path.exists(mind_path)
+                 entry.to_csv(mind_path, mode="a", header=not header_exists, index=False)
+            except Exception as e:
+                print(f"[WARN] Errore salvataggio mind_state: {e}")
 
-            # Stima umore basata su input e risposta
-            mood_prompt = f"""Determina l'umore complessivo (positivo, neutro, negativo) basandoti sul testo dell'utente e sulla risposta del coach.
+            # 2. Salva log PERICOLO se necessario
+            if risk_level in ["medium", "high", "critical", "suicidal_intent", "severe_depression", "danger", "self_harm"]:
+                danger_path = os.path.join(user_dir, "dangerous_behaviors.csv")
+                danger_entry = pd.DataFrame([[today_ts, username, user_input, risk_level, risk_type, risk_desc]],
+                                          columns=["timestamp", "username", "input", "risk_level", "risk_type", "description"])
+                danger_entry.to_csv(danger_path, mode="a", header=not os.path.exists(danger_path), index=False)
+                print(f"[ALERT] ⚠️ COMPORTAMENTO PERICOLOSO RILEVATO: {risk_level} ({risk_type})")
 
-Testo utente: {user_input}
-Risposta coach: {risposta_testo}
-
-Rispondi solo con una parola: positivo, neutro o negativo."""
-            mood_response = model.generate_content(mood_prompt)
-            umore_inferito = mood_response.text.strip().lower()
-            if umore_inferito not in {"positivo", "neutro", "negativo"}:
-                umore_inferito = "neutro"
-
-            # Salva lo stato mentale in CSV personale
-            today = datetime.date.today().strftime("%Y-%m-%d")
-            entry = pd.DataFrame([[today, username, user_input, risposta_testo, umore_inferito]],
-                                 columns=["data", "username", "input", "risposta", "umore_inferito"])
-            entry.to_csv(mind_path, mode="a", header=not os.path.exists(mind_path), index=False)
-
-            print(f"[LOG] 💾 Stato mentale salvato in {mind_path} con umore inferito: {umore_inferito}")
+            print(f"[LOG] 💾 Transazione completata. Tono: {tone}, Rischio: {risk_level}")
+            
+            # DEBUG: Aggiungi info di debug alla risposta visibile
+            # debug_info = f"\n\n[DEBUG: Tono={tone}, Rischio={risk_level}, Tipo={risk_type}]"
             return f"🧠 {risposta_testo}"
 
         except Exception as e:
-            print(f"[ERROR] Errore durante la generazione della risposta con Gemini: {e}")
-            fallback_response = "Mi dispiace, si è verificato un problema tecnico. Riprova più tardi."
-            return f"🧠 {fallback_response}"
+            error_msg = str(e)
+            if "429" in error_msg or "ResourceExhausted" in error_msg or "Quota exceeded" in error_msg:
+                # Calcola delay con backoff esponenziale + jitter
+                delay = (base_delay * (2 ** attempt)) + random.uniform(0, 1)
+                print(f"[WARN] Quota Gemini superata. Riprovo tra {delay:.2f}s (Tentativo {attempt+1}/{max_retries})...")
+                time.sleep(delay)
+            else:
+                print(f"[ERROR] Errore API/JSON non recuperabile: {e}")
+                return "🧠 Mi dispiace, si è verificato un errore tecnico momentaneo. Riprova tra poco."
 
-    elif is_neutral:
-        # Risposta semplice e conversazionale per input neutri
-        if not gemini_initialized:
-            fallback_response = "Mi dispiace, al momento non posso fornire una risposta. Riprova più tardi."
-            print("[WARN] Gemini non inizializzato, risposta di fallback fornita.")
-            return f"🧠 {fallback_response}"
-
-        try:
-            # Prompt semplice per risposta conversazionale
-            simple_prompt = f"""Sei un assistente amichevole e conversazionale. Rispondi in modo naturale e breve al seguente messaggio:
-
-Utente: {user_input}
-Assistente:"""
-
-            model = genai.GenerativeModel("gemini-2.5-flash")
-            response = model.generate_content(simple_prompt)
-            risposta_testo = response.text.strip()
-
-            # Salva lo stato mentale in CSV personale senza analisi umore (imposto neutro)
-            today = datetime.date.today().strftime("%Y-%m-%d")
-            entry = pd.DataFrame([[today, username, user_input, risposta_testo, "neutro"]],
-                                 columns=["data", "username", "input", "risposta", "umore_inferito"])
-            entry.to_csv(mind_path, mode="a", header=not os.path.exists(mind_path), index=False)
-
-            print(f"[LOG] 💾 Stato mentale salvato in {mind_path} con umore inferito: neutro (conversazionale)")
-            return f"🧠 {risposta_testo}"
-
-        except Exception as e:
-            print(f"[ERROR] Errore durante la generazione della risposta conversazionale con Gemini: {e}")
-            fallback_response = "Mi dispiace, si è verificato un problema tecnico. Riprova più tardi."
-            return f"🧠 {fallback_response}"
-
-    else:
-        # Caso generico: nessuna keyword emotiva o neutra trovata, risposta semplice
-        fallback_response = "Ciao! Come posso aiutarti oggi?"
-        today = datetime.date.today().strftime("%Y-%m-%d")
-        entry = pd.DataFrame([[today, username, user_input, fallback_response, "neutro"]],
-                             columns=["data", "username", "input", "risposta", "umore_inferito"])
-        entry.to_csv(mind_path, mode="a", header=not os.path.exists(mind_path), index=False)
-        print(f"[LOG] 💾 Stato mentale salvato in {mind_path} con umore inferito: neutro (default)")
-        return f"🧠 {fallback_response}"
+    return "🧠 Il servizio è momentaneamente molto occupato. Per favore attendi 30 secondi e riprova."

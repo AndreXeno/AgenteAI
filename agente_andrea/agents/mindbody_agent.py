@@ -7,6 +7,7 @@
 # ======================================
 from agents.data_manager import log_workout, log_mind_state, get_recent_logs
 from agents.module_training import handle_training
+from agents.module_mind import handle_mind_state
 from agents.module_analysis import handle_weekly_analysis
 from agents.mindbody_reflection import handle_training_reflection
 from agents.knowledge_loader import load_all_knowledge
@@ -73,15 +74,22 @@ def load_user_data(username):
 # ⚙️ CONFIGURAZIONE E LOG AVVIO
 # ======================================
 
-config_path = os.path.join("config", "personality.json")
+# ======================================
+# ⚙️ CONFIGURAZIONE E LOG AVVIO
+# ======================================
+
+# Ottieni il percorso assoluto della directory base del progetto (agente_andrea)
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+config_path = os.path.join(BASE_DIR, "config", "personality.json")
 
 if not os.path.exists(config_path):
-    print("⚠️ [ATTENZIONE] personality.json non trovato in /config")
+    print(f"⚠️ [ATTENZIONE] personality.json non trovato in: {config_path}")
+    # Fallback per evitare il crash se il file non c'è
+    COACH_PROFILE = {}
 else:
     print(f"🧩 Carico profilo coach da: {config_path}")
-
-with open(config_path, "r", encoding="utf-8") as f:
-    COACH_PROFILE = json.load(f)
+    with open(config_path, "r", encoding="utf-8") as f:
+        COACH_PROFILE = json.load(f)
 
 print(f"✅ Profilo Coach caricato: {COACH_PROFILE.get('name', 'Coach')}")
 
@@ -191,7 +199,9 @@ class MindBodyAgent:
 
         {logs_text}
 
-        Identifica pattern ricorrenti, possibili cause di stress o benessere, e fornisci un breve insight empatico e un consiglio pratico immediato (massimo 3 frasi).
+        Identifica pattern ricorrenti e possibili cause di stress o benessere.
+        Fornisci un breve insight empatico che aiuti l'utente a riflettere sulla sua settimana.
+        NON dare consigli o soluzioni pratiche, ma poni una domanda stimolante che porti l'utente a trovare le sue risposte.
         Rivolgiti direttamente all'utente.
         """
         

@@ -1,0 +1,42 @@
+[
+  {
+    "role": "utente",
+    "content": "ciao"
+  },
+  {
+    "role": "coach",
+    "content": "Mi dispiace, ho avuto un piccolo problema tecnico."
+  },
+  {
+    "role": "utente",
+    "content": "ciao"
+  },
+  {
+    "role": "coach",
+    "content": "Mi dispiace, ho avuto un piccolo problema tecnico."
+  },
+  {
+    "role": "utente",
+    "content": "ciao"
+  },
+  {
+    "role": "coach",
+    "content": "Ciao! Che bello sentirti. Sono qui come Mind&Body, pronto ad accompagnarti nel tuo percorso verso un maggiore equilibrio. Come posso esserti utile oggi?"
+  },
+  {
+    "role": "utente",
+    "content": "sono triste"
+  },
+  {
+    "role": "coach",
+    "content": "🧠 Mi dispiace molto sentirti così, guest. È normale provare tristezza a volte e non c'è nulla di sbagliato in questo. Sono qui per ascoltarti, se ti va di condividere cosa ti preoccupa."
+  },
+  {
+    "role": "utente",
+    "content": "ciao, sono un po triste"
+  },
+  {
+    "role": "coach",
+    "content": "🧠 Ciao di nuovo, guest. Comprendo che oggi ti senti un po' triste. Ricorda che è del tutto normale provare queste emozioni. Sono qui per te, pronto ad ascoltarti e a riflettere insieme se ne hai voglia."
+  }
+]
