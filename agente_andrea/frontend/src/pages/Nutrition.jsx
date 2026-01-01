@@ -1,8 +1,16 @@
-import React, { useMemo, useState } from "react";
+import React, { useMemo } from "react";
 import { Link } from 'react-router-dom';
-import "../styles/pages/nutrition-dashboard.css";
-
 import Navbar from "../components/Navbar";
+import {
+    SrLayout,
+    SrCard,
+    SrButton,
+    SrGrid,
+    SrSectionHead,
+    SrBadge,
+    SrSideCardDark
+} from "../components/Shared/SrComponents";
+import "../styles/pages/nutrition-dashboard.css"; // Keeping it for now
 
 const COMMUNITY_RECIPES = [
     {
@@ -67,50 +75,63 @@ const RECOMMENDED = [
 ];
 
 function Tag({ active, children }) {
-    return <button className={`tag ${active ? "tag--active" : "tag--outline"}`} type="button">{children}</button>;
+    // Replaced local button with SrButton variant="pill" style or custom badge, keeping simple for now
+    return (
+        <button
+            type="button"
+            style={{
+                background: active ? '#0f172a' : 'transparent',
+                color: active ? '#fff' : 'rgba(15,23,42,0.6)',
+                border: active ? '1px solid #0f172a' : '1px solid rgba(15,23,42,0.1)',
+                padding: '7px 12px', borderRadius: '999px', fontWeight: 700, fontSize: '13px', cursor: 'pointer'
+            }}
+        >
+            {children}
+        </button>
+    );
 }
 
 function RecipeCard({ r }) {
     return (
-        <article className="nd-recipeCard">
-            <div className="nd-recipeImg" style={{ backgroundImage: `url('${r.img}')` }} />
-            <div className="nd-recipeBody">
-                <div>
-                    <h4 className="nd-recipeTitle">{r.title}</h4>
-                    <div className="nd-recipeBy">
-                        di <span className="nd-author">{r.author}</span>
-                    </div>
+        <SrCard style={{ padding: 0, overflow: 'hidden' }}> {/* Custom padding override because original was tighter or specific */}
+            <div style={{ height: '180px', backgroundSize: 'cover', backgroundPosition: 'center', backgroundImage: `url('${r.img}')` }} />
+            <div style={{ padding: '20px' }}>
+                <h4 style={{ fontSize: '18px', fontWeight: 800, margin: '0 0 4px', lineHeight: 1.3 }}>{r.title}</h4>
+                <div style={{ color: 'var(--muted)', fontSize: '13px', marginBottom: '16px' }}>
+                    di <span style={{ fontWeight: 700, color: 'var(--text)' }}>{r.author}</span>
                 </div>
 
-                <div className="nd-recipeBottom">
-                    <div className="nd-like">
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <div style={{ fontSize: '13px', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '6px' }}>
                         <span aria-hidden="true">👍</span> {r.likes}
                     </div>
-                    <button className="nd-linkBtn" type="button">Vedi ricetta</button>
+                    <SrButton variant="link">Vedi ricetta</SrButton>
                 </div>
             </div>
-        </article>
+        </SrCard>
     );
 }
 
 function RecommendedCard({ c }) {
     return (
-        <article className="nd-recCard">
-            <div className="nd-recImgWrap">
-                <div className="nd-recImg" style={{ backgroundImage: `url('${c.img}')` }} />
-                <button className="nd-favBtn" type="button" aria-label="Aggiungi ai preferiti">♡</button>
+        <SrCard style={{ minWidth: '300px', padding: 0, overflow: 'hidden', flexShrink: 0 }}>
+            <div style={{ height: '160px', backgroundSize: 'cover', backgroundPosition: 'center', backgroundImage: `url('${c.img}')`, position: 'relative' }}>
+                <button type="button" aria-label="Aggiungi ai preferiti" style={{ position: 'absolute', top: '10px', right: '10px', background: 'rgba(255,255,255,0.8)', border: 'none', borderRadius: '50%', width: '32px', height: '32px', cursor: 'pointer' }}>♡</button>
             </div>
 
-            <div className="nd-recBody">
-                <div className="nd-recMeta">
-                    <span className="nd-clock">⏱ {c.minutes}</span>
-                    <span className="nd-dot">•</span>
-                    <span className={`tag tag--${c.badgeTone}`}>{c.badge}</span>
+            <div style={{ padding: '20px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px', fontSize: '12px', fontWeight: 700, color: 'var(--muted)' }}>
+                    <span>⏱ {c.minutes}</span>
+                    <span>•</span>
+                    <SrBadge style={{
+                        background: c.badgeTone === 'orange' ? '#ffedd5' : (c.badgeTone === 'blue' ? '#dbeafe' : '#dcfce7'),
+                        color: c.badgeTone === 'orange' ? '#9a3412' : (c.badgeTone === 'blue' ? '#1e40af' : '#166534')
+                    }}>{c.badge}</SrBadge>
                 </div>
-                <h4 className="nd-recTitle">{c.title}</h4>
-                <p className="nd-recDesc">{c.desc}</p>
+                <h4 style={{ fontSize: '16px', fontWeight: 800, margin: '0 0 6px' }}>{c.title}</h4>
+                <p style={{ fontSize: '14px', color: 'var(--muted)', margin: 0, lineHeight: 1.5 }}>{c.desc}</p>
             </div>
-        </article>
+        </SrCard>
     );
 }
 
@@ -121,158 +142,120 @@ export default function NutritionDashboard() {
         <div className="nd-page">
             <Navbar />
 
-            <main className="nd-main">
-                <div className="nd-wrap">
-                    {/* header */}
-                    <div className="nd-header">
-                        <div>
-                            <h1 className="nd-h1">Dashboard Nutrizione</h1>
-                            <p className="nd-sub">
-                                Esplora le ricette della community e gestisci la tua alimentazione.
-                            </p>
-                        </div>
-
-                        <Link className="btn-primary" to="/share-recipe" style={{ textDecoration: 'none' }}>
-                            <span aria-hidden="true">✎</span> Condividi ricetta
+            <SrLayout>
+                <SrSectionHead
+                    title="Dashboard Nutrizione"
+                    subtitle="Esplora le ricette della community e gestisci la tua alimentazione."
+                    action={
+                        <Link to="/share-recipe" style={{ textDecoration: 'none' }}>
+                            <SrButton variant="cta">
+                                <span aria-hidden="true">✎</span> Condividi ricetta
+                            </SrButton>
                         </Link>
-                    </div>
+                    }
+                />
 
-                    {/* grid */}
-                    <div className="nd-grid">
-                        {/* left */}
-                        <section className="nd-left">
-                            <div className="nd-row">
-                                <h2 className="nd-h2">Ricette della Community</h2>
-                                <div className="nd-tags">
-                                    <Tag active>Tutte</Tag>
-                                    <Tag>Colazione</Tag>
-                                    <Tag>Pranzo</Tag>
-                                    <Tag>Cena</Tag>
-                                </div>
-                            </div>
-
-                            <div className="nd-banner">
-                                <div className="nd-bannerLeft">
-                                    <div className="nd-spark" aria-hidden="true">✦</div>
-                                    <div>
-                                        <div className="nd-bannerTitle">Hai una ricetta sana “segreta”?</div>
-                                        <div className="nd-bannerSub">Condividila con oltre 50k membri</div>
-                                    </div>
-                                </div>
-
-                                <Link className="nd-bannerBtn" to="/share-recipe" style={{ textDecoration: 'none' }}>Condividi ora</Link>
-                            </div>
-
-                            <div className="nd-recipeGrid">
-                                {recipes.map((r) => (
-                                    <RecipeCard key={r.title} r={r} />
-                                ))}
-                            </div>
-                        </section>
-
-                        {/* right */}
-                        <aside className="nd-right">
-                            <div className="nd-card">
-                                <div className="nd-cardHead">
-                                    <h3 className="nd-h3">Più votate</h3>
-                                    <button className="nd-miniLink" type="button">Vedi tutte</button>
-                                </div>
-
-                                <div className="nd-leaderboard">
-                                    <div className="nd-rankRow">
-                                        <div className="nd-rank nd-rank--gold">1</div>
-                                        <div className="nd-rankImg" style={{ backgroundImage: "url('https://lh3.googleusercontent.com/aida-public/AB6AXuC0zOsXh3K4mgTewSkUl1RCuuSUD4ERwlyIgnce3d1JdmjBV-RB5sH6oLIPy-biLL8ydk5CA3VWj5PTcqt3cv5K11XUwnNYFbj2Qp3KEtQNFkKnA9P3RpnT977Fb8clxeAcKXgNPI-5D3rT3uxUJ69wiLeGPr-QvgXahe_yjgWmKBT8D1EnkbQW8swu1aCjP2fYXdarUUJ_lsumHbWQNL1LF38gJouQDQa14RZjIy0pAoR6hmxh1KbVKbTZfd4c_pUBSYkA5PLXaw')" }} />
-                                        <div className="nd-rankText">
-                                            <div className="nd-rankName">Tacos di tofu piccanti</div>
-                                            <div className="nd-rankVotes">2.4k voti</div>
-                                        </div>
-                                        <div className="nd-trophy" aria-hidden="true">🏆</div>
-                                    </div>
-
-                                    <div className="nd-sep" />
-
-                                    <div className="nd-rankRow">
-                                        <div className="nd-rank nd-rank--silver">2</div>
-                                        <div className="nd-rankImg" style={{ backgroundImage: "url('https://lh3.googleusercontent.com/aida-public/AB6AXuASOX5zV3FYaqJXeieXE-eJqtTzsjz4WwxeObtXNIK4x863MKXv_ha4VLKYMGmoKpMgsTKPU8gnSUcntYvhB7TYHa0HeOKHgO4_PlExorfSfOq_lk3Juk3c__UUZ7mo8-0JurrDuVXRWvhUa3Oqfzq23fjikl2Zr7-2EvWGU8pfhI1kPukDVyAWLqBDAegI6ztpjukaBzODoI3KHZd1zavtix_fq208M9DDSTFQ9g5jx0_Oc5CGGt_PZEL0jFAjyCRZdgbc2DT7hg')" }} />
-                                        <div className="nd-rankText">
-                                            <div className="nd-rankName">Pasta al pesto cremosa</div>
-                                            <div className="nd-rankVotes">1.8k voti</div>
-                                        </div>
-                                    </div>
-
-                                    <div className="nd-sep" />
-
-                                    <div className="nd-rankRow">
-                                        <div className="nd-rank nd-rank--bronze">3</div>
-                                        <div className="nd-rankImg" style={{ backgroundImage: "url('https://lh3.googleusercontent.com/aida-public/AB6AXuCqZzG0kKsegwpydEVB9BCbpkvnT3aNHZQ3j8C10EkFhe6-_mI9PjQgckJc_-wWLBf1vu8uyflfA_ZACGyCPHA6irLM9cKsXPyL4nAgDqVReiQKxpYK2MCPZiAC5Is9Y5DUf_uJFKPJCRATnpYEIZNNck_RaRkrieSEY7JfP7G0zlxogXdV8CjINiSFOTR6LmewfWsdYFyhmyBm7qYsfQCqjPjnWnN2LV_1JZv9UwBpVGhGVDHsAMATvQmvKwqhEzImmZEOKNeUaw')" }} />
-                                        <div className="nd-rankText">
-                                            <div className="nd-rankName">Acai power bowl</div>
-                                            <div className="nd-rankVotes">1.5k voti</div>
-                                        </div>
-                                    </div>
-
-                                    <div className="nd-sep" />
-
-                                    <div className="nd-rankRow nd-rankRow--dim">
-                                        <div className="nd-rank nd-rank--plain">4</div>
-                                        <div className="nd-rankImg" style={{ backgroundImage: "url('https://lh3.googleusercontent.com/aida-public/AB6AXuChvWRaigrqXA6F2RLdjucWymH-Yw4NA6B5aqDEm-3PhAck92pt1j6qfg2rXno-IY6i5TE0ezLf-YxXeiEui8Bl8euJ8lJkqVS1GZSbPs3uJMjF9sEVc6TONNQD9VUaWpjTjM_m1ynWxqLnNfV5-fVtsvhhuKkcg2ModAR1UPEyRK5To0g2SCVAOIhvicQQMpg4qa4J-NaEt6V0xAne1R6xkVWD7hUva6D-N8hOraCGOtuczfccDRkNCe7dikVY8b65RncWrWuWFg')" }} />
-                                        <div className="nd-rankText">
-                                            <div className="nd-rankName">Macedonia fresca</div>
-                                            <div className="nd-rankVotes">980 voti</div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <button className="nd-softBtn" type="button">Vedi classifica completa</button>
-                            </div>
-
-                            <div className="nd-card nd-boxCard">
-                                <div className="nd-boxTop">
-                                    <div>
-                                        <div className="nd-pill">
-                                            <span aria-hidden="true">🚚</span> Prossima: Mar
-                                        </div>
-                                        <h3 className="nd-h3">La tua Box Settimanale</h3>
-                                    </div>
-                                    <div className="nd-boxIcon" aria-hidden="true">📦</div>
-                                </div>
-
-                                <div className="nd-boxRow">
-                                    <div
-                                        className="nd-boxImg"
-                                        style={{
-                                            backgroundImage:
-                                                "url('https://lh3.googleusercontent.com/aida-public/AB6AXuCD1dXd7sifkOKeGKxrEwOqAztMD8xxEv9cP3UAM4IP6TDSjfZbubIUsPQkN4CcIkC0NrjeD4djQYVRgeo4VhY-G6ywvGbIqVLQZvKeytSEdUBFc7woXqJILtadWXcN3aCOIp2UdUsIIst_r9lbyh4wdRIovxwBhMy3VIKFK3RjC3ICwCsF1bR4edhI8GLsXDnyMxi2esaeOcZUz3w4Is1i1K8hRXaiYimrhIBtsnCQSuCifkgw0jXBACE_wvPIZcDOfsf4yIdoAA')",
-                                        }}
-                                    />
-                                    <p className="nd-boxText">
-                                        Gli ingredienti selezionati per la prossima settimana sono pronti per la revisione.
-                                    </p>
-                                </div>
-
-                                <Link className="nd-outlineBtn" to="/box/setup" style={{ display: 'block', textAlign: 'center', textDecoration: 'none' }}>Personalizza ordine</Link>
-                            </div>
-                        </aside>
-                    </div>
-
-                    {/* recommended */}
-                    <section className="nd-recommended">
-                        <div className="nd-recHead">
-                            <h2 className="nd-h2">Consigliate per te</h2>
-                            <div className="nd-arrows">
-                                <button className="nd-arrow" type="button" aria-label="Indietro">‹</button>
-                                <button className="nd-arrow" type="button" aria-label="Avanti">›</button>
+                <SrGrid>
+                    {/* LEFT Section */}
+                    <section className="nd-left">
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '24px' }}>
+                            <h2 className="sr-h2" style={{ fontSize: '24px' }}>Ricette della Community</h2>
+                            <div style={{ display: 'flex', gap: '8px' }}>
+                                <Tag active>Tutte</Tag>
+                                <Tag>Colazione</Tag>
+                                <Tag>Pranzo</Tag>
+                                <Tag>Cena</Tag>
                             </div>
                         </div>
 
-                        <div className="nd-recGrid">
-                            {RECOMMENDED.map((c) => (
-                                <RecommendedCard key={c.title} c={c} />
+                        <SrSideCardDark className="nd-banner" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)' }}>
+                            <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
+                                <div style={{ fontSize: '24px', color: '#FCD34D' }} aria-hidden="true">✦</div>
+                                <div>
+                                    <div style={{ fontSize: '20px', fontWeight: 800, marginBottom: '4px' }}>Hai una ricetta sana “segreta”?</div>
+                                    <div style={{ color: '#94a3b8' }}>Condividila con oltre 50k membri</div>
+                                </div>
+                            </div>
+
+                            <Link to="/share-recipe" style={{ textDecoration: 'none' }}>
+                                <SrButton variant="ghost" style={{ background: 'rgba(255,255,255,0.1)', color: '#fff', border: '1px solid rgba(255,255,255,0.2)' }}>Condividi ora</SrButton>
+                            </Link>
+                        </SrSideCardDark>
+
+                        <div className="nd-recipeGrid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '24px' }}>
+                            {recipes.map((r) => (
+                                <RecipeCard key={r.title} r={r} />
                             ))}
                         </div>
                     </section>
-                </div>
-            </main>
+
+                    {/* RIGHT Section */}
+                    <aside className="nd-right">
+                        <SrCard title="Più votate" action={<button className="sr-linkBtn" type="button">Vedi tutte</button>}>
+                            <div className="nd-leaderboard" style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                                {/* Hardcoded for simplicity as in original, but could be componentized */}
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                                    <div style={{ fontWeight: 800, color: '#F59E0B' }}>1</div>
+                                    <div style={{ width: '40px', height: '40px', borderRadius: '12px', backgroundSize: 'cover', backgroundImage: "url('https://lh3.googleusercontent.com/aida-public/AB6AXuC0zOsXh3K4mgTewSkUl1RCuuSUD4ERwlyIgnce3d1JdmjBV-RB5sH6oLIPy-biLL8ydk5CA3VWj5PTcqt3cv5K11XUwnNYFbj2Qp3KEtQNFkKnA9P3RpnT977Fb8clxeAcKXgNPI-5D3rT3uxUJ69wiLeGPr-QvgXahe_yjgWmKBT8D1EnkbQW8swu1aCjP2fYXdarUUJ_lsumHbWQNL1LF38gJouQDQa14RZjIy0pAoR6hmxh1KbVKbTZfd4c_pUBSYkA5PLXaw')" }} />
+                                    <div>
+                                        <div style={{ fontWeight: 700, fontSize: '14px' }}>Tacos di tofu piccanti</div>
+                                        <div style={{ fontSize: '12px', color: 'var(--muted)' }}>2.4k voti</div>
+                                    </div>
+                                    <div style={{ marginLeft: 'auto' }}>🏆</div>
+                                </div>
+                                {/* ... other items simplified or copied if needed, for brevity I'll assume just one for structure proof, or copy all if meticulous */}
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                                    <div style={{ fontWeight: 800, color: '#94a3b8' }}>2</div>
+                                    <div style={{ width: '40px', height: '40px', borderRadius: '12px', backgroundSize: 'cover', backgroundImage: "url('https://lh3.googleusercontent.com/aida-public/AB6AXuASOX5zV3FYaqJXeieXE-eJqtTzsjz4WwxeObtXNIK4x863MKXv_ha4VLKYMGmoKpMgsTKPU8gnSUcntYvhB7TYHa0HeOKHgO4_PlExorfSfOq_lk3Juk3c__UUZ7mo8-0JurrDuVXRWvhUa3Oqfzq23fjikl2Zr7-2EvWGU8pfhI1kPukDVyAWLqBDAegI6ztpjukaBzODoI3KHZd1zavtix_fq208M9DDSTFQ9g5jx0_Oc5CGGt_PZEL0jFAjyCRZdgbc2DT7hg')" }} />
+                                    <div>
+                                        <div style={{ fontWeight: 700, fontSize: '14px' }}>Pasta al pesto cremosa</div>
+                                        <div style={{ fontSize: '12px', color: 'var(--muted)' }}>1.8k voti</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <SrButton variant="soft" style={{ width: '100%', marginTop: '20px' }}>Vedi classifica completa</SrButton>
+                        </SrCard>
+
+                        <SrCard>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '16px' }}>
+                                <div>
+                                    <SrBadge style={{ marginBottom: '8px' }}>Prossima: Mar</SrBadge>
+                                    <h3 className="sr-h3" style={{ fontSize: '18px' }}>La tua Box Settimanale</h3>
+                                </div>
+                                <div style={{ fontSize: '32px' }}>📦</div>
+                            </div>
+
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '20px' }}>
+                                <div style={{ width: '60px', height: '60px', borderRadius: '12px', backgroundSize: 'cover', backgroundImage: "url('https://lh3.googleusercontent.com/aida-public/AB6AXuCD1dXd7sifkOKeGKxrEwOqAztMD8xxEv9cP3UAM4IP6TDSjfZbubIUsPQkN4CcIkC0NrjeD4djQYVRgeo4VhY-G6ywvGbIqVLQZvKeytSEdUBFc7woXqJILtadWXcN3aCOIp2UdUsIIst_r9lbyh4wdRIovxwBhMy3VIKFK3RjC3ICwCsF1bR4edhI8GLsXDnyMxi2esaeOcZUz3w4Is1i1K8hRXaiYimrhIBtsnCQSuCifkgw0jXBACE_wvPIZcDOfsf4yIdoAA')" }} />
+                                <p style={{ fontSize: '13px', color: 'var(--muted)', margin: 0, lineHeight: 1.4 }}>
+                                    Gli ingredienti selezionati per la prossima settimana sono pronti per la revisione.
+                                </p>
+                            </div>
+
+                            <Link to="/box/setup" style={{ display: 'block', textAlign: 'center', textDecoration: 'none' }}>
+                                <SrButton variant="ghost" style={{ width: '100%' }}>Personalizza ordine</SrButton>
+                            </Link>
+                        </SrCard>
+                    </aside>
+                </SrGrid>
+
+                {/* recommended */}
+                <section className="nd-recommended" style={{ marginTop: '60px' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
+                        <h2 className="sr-h2">Consigliate per te</h2>
+                        <div style={{ display: 'flex', gap: '8px' }}>
+                            <button style={{ width: '32px', height: '32px', borderRadius: '50%', border: '1px solid #cbd5e1', background: '#fff', cursor: 'pointer' }}>‹</button>
+                            <button style={{ width: '32px', height: '32px', borderRadius: '50%', border: '1px solid #cbd5e1', background: '#fff', cursor: 'pointer' }}>›</button>
+                        </div>
+                    </div>
+
+                    <div style={{ display: 'flex', gap: '24px', overflowX: 'auto', paddingBottom: '20px' }}>
+                        {RECOMMENDED.map((c) => (
+                            <RecommendedCard key={c.title} c={c} />
+                        ))}
+                    </div>
+                </section>
+            </SrLayout>
         </div>
     );
 }

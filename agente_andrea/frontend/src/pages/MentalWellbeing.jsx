@@ -1,7 +1,15 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import Navbar from "../components/Navbar";
-import "../styles/pages/mental-wellbeing.css";
+import {
+    SrLayout,
+    SrCard,
+    SrButton,
+    SrSectionHead,
+    SrGrid,
+    SrBadge
+} from "../components/Shared/SrComponents";
+import "../styles/pages/mental-wellbeing.css"; // Keeping it for now, but will likely be empty or minimal
 
 const MentalWellbeing = () => {
     const [messages, setMessages] = useState([
@@ -50,102 +58,134 @@ const MentalWellbeing = () => {
         <div className="mbw-page">
             <Navbar />
 
-            <main className="mbw-main">
-                <div className="mbw-hero">
-                    <h1 className="mbw-title">Il tuo spazio sicuro</h1>
-                    <p className="mbw-subtitle">Monitora il tuo benessere e connettiti con esperti.</p>
+            <SrLayout>
+                <div style={{ marginBottom: '40px' }}>
+                    <h1 className="sr-h1">Il tuo spazio sicuro</h1>
+                    <p className="sr-sub">Monitora il tuo benessere e connettiti con esperti.</p>
                 </div>
 
-                <div className="mbw-moodCard">
-                    <div>
-                        <h2 className="mbw-moodTitle">Come ti senti oggi?</h2>
-                        <p className="mbw-moodSub">L'autoconsapevolezza è il primo passo.</p>
-                    </div>
-                    <Link to="/diary">
-                        <button className="mbw-primaryBtn">
-                            <span className="mbw-primaryIcon">+</span> Registra Umore
-                        </button>
-                    </Link>
+                <div style={{ marginBottom: '40px' }}>
+                    <SrCard
+                        className="mbw-moodCard"
+                        title="Come ti senti oggi?"
+                        subtitle="L'autoconsapevolezza è il primo passo."
+                        action={
+                            <Link to="/diary">
+                                <SrButton variant="cta" style={{ boxShadow: '0 4px 14px 0 rgba(16, 185, 129, 0.39)' }}>
+                                    <span style={{ marginRight: '8px', fontSize: '20px' }}>+</span> Registra Umore
+                                </SrButton>
+                            </Link>
+                        }
+                    />
                 </div>
 
-                <section className="mbw-section">
-                    <div className="mbw-sectionHeader">
-                        <div>
-                            <h2 className="mbw-sectionTitle">I nostri specialisti</h2>
-                            <p className="mbw-sectionSub">Prenota o chatta con psicologi certificati</p>
-                        </div>
-                        <a href="#" className="mbw-seeAll">Vedi tutti</a>
-                    </div>
+                <SrSectionHead
+                    title="I nostri specialisti"
+                    subtitle="Prenota o chatta con psicologi certificati"
+                    action={<a href="#" className="sr-linkBtn">Vedi tutti</a>}
+                    className="mbw-section"
+                />
 
-                    <div className="mbw-grid">
-                        <div className="mb-therapistCard">
-                            <div className="mb-therapistTop">
-                                <div className="mb-avatar">
-                                    <span className="mb-avatarIcon">👩‍⚕️</span>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(350px, 1fr))', gap: '32px', marginBottom: '48px' }}>
+                    {/* Therapists */}
+                    <SrCard>
+                        <div style={{ display: 'flex', gap: '16px', marginBottom: '16px' }}>
+                            <div style={{ fontSize: '32px', background: '#f1f5f9', width: '60px', height: '60px', display: 'grid', placeItems: 'center', borderRadius: '50%' }}>
+                                👩‍⚕️
+                            </div>
+                            <div>
+                                <h3 style={{ margin: '0 0 4px', fontSize: '18px' }}>Dr. Anika Sharma</h3>
+                                <p style={{ margin: 0, color: 'var(--muted)', fontSize: '14px' }}>Psicologa Sportiva</p>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '4px', marginTop: '8px', fontSize: '14px', fontWeight: 600 }}>
+                                    <span style={{ color: '#F59E0B' }}>★</span> 4.9 <span style={{ color: 'var(--muted)', fontWeight: 400 }}>(120 recensioni)</span>
                                 </div>
-                                <div>
-                                    <h3 className="mb-therapistName">Dr. Anika Sharma</h3>
-                                    <p className="mb-therapistRole">Psicologa Sportiva</p>
-                                    <div className="mb-rating">
-                                        <span className="mb-star">★</span> 4.9 <span className="mb-ratingMeta">(120 recensioni)</span>
+                            </div>
+                        </div>
+                        <div style={{ display: 'flex', gap: '8px', marginBottom: '24px' }}>
+                            <SrBadge style={{ background: '#DBEAFE', color: '#1E40AF' }}>Ansia</SrBadge>
+                            <SrBadge style={{ background: '#F3E8FF', color: '#6B21A8' }}>Performance</SrBadge>
+                        </div>
+                        <Link to="/psychologist/anika-sharma">
+                            <SrButton variant="ghost" style={{ width: '100%' }}>Contatta</SrButton>
+                        </Link>
+                    </SrCard>
+
+                    <SrCard>
+                        <div style={{ display: 'flex', gap: '16px', marginBottom: '16px' }}>
+                            <div style={{ fontSize: '32px', background: '#fffbeb', width: '60px', height: '60px', display: 'grid', placeItems: 'center', borderRadius: '50%' }}>
+                                👨‍⚕️
+                            </div>
+                            <div>
+                                <h3 style={{ margin: '0 0 4px', fontSize: '18px' }}>Dr. Marco Rossi</h3>
+                                <p style={{ margin: 0, color: 'var(--muted)', fontSize: '14px' }}>Psicoterapeuta Cognitivo</p>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '4px', marginTop: '8px', fontSize: '14px', fontWeight: 600 }}>
+                                    <span style={{ color: '#F59E0B' }}>★</span> 4.8 <span style={{ color: 'var(--muted)', fontWeight: 400 }}>(98 recensioni)</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div style={{ display: 'flex', gap: '8px', marginBottom: '24px' }}>
+                            <SrBadge style={{ background: '#dcfce7', color: '#166534' }}>Stress</SrBadge>
+                            <SrBadge style={{ background: '#ffedd5', color: '#9a3412' }}>Burnout</SrBadge>
+                        </div>
+                        <SrButton variant="ghost" style={{ width: '100%' }}>Contatta</SrButton>
+                    </SrCard>
+                </div>
+
+                {/* Chat AI Section - Moved to bottom and full width */}
+                <h2 className="sr-h1" style={{ fontSize: '32px', marginBottom: '24px' }}>AI Assistant</h2>
+                <SrCard className="sr-card" style={{ padding: 0, overflow: 'hidden' }}>
+                    <div style={{ padding: '24px 24px 0' }}>
+                        <div className="sr-cardHead">
+                            <div>
+                                <h3 className="sr-h3">Chat Integrata ✨</h3>
+                                <p className="sr-sub" style={{ fontSize: '14px', marginTop: '4px' }}>Parla liberamente, sono qui per ascoltarti.</p>
+                            </div>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '12px', fontWeight: 700, color: '#10B981', background: 'rgba(16, 185, 129, 0.1)', padding: '4px 10px', borderRadius: '999px' }}>
+                                <span style={{ width: '6px', height: '6px', background: '#10B981', borderRadius: '50%' }}></span> Online
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style={{ padding: '0 24px 24px' }}>
+                        <div className="sr-chatContainer" style={{ height: '500px' }}> {/* Increased height for full page feel */}
+                            {messages.map((msg) => (
+                                <div key={msg.id} className={`sr-chatBubbleRow ${msg.sender === 'user' ? 'sr-user' : ''}`}>
+                                    {msg.sender === 'bot' && (
+                                        <div className="sr-chatAvatar">🤖</div>
+                                    )}
+                                    <div className={`sr-chatBubble ${msg.sender === 'user' ? 'sr-user' : 'sr-bot'}`}>
+                                        {msg.text}
                                     </div>
                                 </div>
-                            </div>
-                            <div className="mb-chips">
-                                <span className="mb-chip mb-chip--blue">Ansia</span>
-                                <span className="mb-chip mb-chip--purple">Performance</span>
-                            </div>
-                            <Link to="/psychologist/anika-sharma">
-                                <button className="mb-outlineBtn">Contatta</button>
-                            </Link>
+                            ))}
+                            {isLoading && (
+                                <div className="sr-chatBubbleRow">
+                                    <div className="sr-chatAvatar">🤖</div>
+                                    <div className="sr-chatBubble sr-bot">
+                                        <span className="animate-pulse">...</span>
+                                    </div>
+                                </div>
+                            )}
+                            <div ref={messagesEndRef} />
                         </div>
-                    </div>
-                </section>
 
-                <section className="mb-chatCard">
-                    <div className="mb-chatHeader">
-                        <div>
-                            <Link to="/chat" style={{ textDecoration: 'none', color: 'inherit' }}>
-                                <div className="mb-chatTitle" style={{ cursor: 'pointer' }}>AI Assistant ↗</div>
-                            </Link>
-                            <div className="mb-chatSubtitle">Sempre disponibile per ascoltarti</div>
-                        </div>
-                        <div className="mb-online">
-                            <span className="mb-dot"></span> Online
-                        </div>
+                        <form className="sr-chatInputBar" onSubmit={handleSendMessage} style={{ padding: '12px' }}>
+                            <input
+                                type="text"
+                                className="sr-chatInput"
+                                placeholder="Scrivi qui il tuo pensiero..."
+                                value={inputValue}
+                                onChange={(e) => setInputValue(e.target.value)}
+                                style={{ fontSize: '18px' }}
+                            />
+                            <SrButton type="submit" variant="dark" style={{ padding: '14px 32px', borderRadius: '14px', fontSize: '16px' }}>
+                                Invia messaggio
+                            </SrButton>
+                        </form>
                     </div>
-                    <div className="mb-chatBody">
-                        {messages.map((msg) => (
-                            <div key={msg.id} className={`mb-bubbleRow ${msg.sender === 'user' ? 'mb-user' : ''}`}>
-                                {msg.sender === 'bot' && (
-                                    <div className="mb-botAvatar">🤖</div>
-                                )}
-                                <div className={`mb-bubble ${msg.sender === 'user' ? 'mb-bubble-user' : 'mb-bubble-bot'}`}>
-                                    {msg.text}
-                                </div>
-                            </div>
-                        ))}
-                        {isLoading && (
-                            <div className="mb-bubbleRow">
-                                <div className="mb-botAvatar">🤖</div>
-                                <div className="mb-bubble mb-bubble-bot">
-                                    Sta scrivendo...
-                                </div>
-                            </div>
-                        )}
-                        <div ref={messagesEndRef} />
-                    </div>
-                    <form className="mb-chatInputBar" onSubmit={handleSendMessage}>
-                        <input
-                            type="text"
-                            className="mb-chatInput"
-                            placeholder="Scrivi qui..."
-                            value={inputValue}
-                            onChange={(e) => setInputValue(e.target.value)}
-                        />
-                    </form>
-                </section>
-            </main>
+                </SrCard>
+
+            </SrLayout>
         </div>
     );
 };
