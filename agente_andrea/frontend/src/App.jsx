@@ -5,7 +5,6 @@ import DiaryPage from './pages/DiaryPage';
 import PsychologistProfile from './pages/PsychologistProfile';
 import ContactPsychologist from './pages/ContactPsychologist';
 import Account from './pages/Account';
-import AIChat from './pages/AIChat';
 import Nutrition from './pages/Nutrition';
 import BoxSetup from './pages/BoxSetup';
 import PaymentDetails from './pages/PaymentDetails';
@@ -28,7 +27,6 @@ function App() {
         <Route path="/psychologist/:id" element={<PsychologistProfile />} />
         <Route path="/psychologist/:id/contact" element={<ContactPsychologist />} />
         <Route path="/account" element={<Account />} />
-        <Route path="/chat" element={<AIChat />} />
         <Route path="/nutrition" element={<Nutrition />} />
         <Route path="/box/setup" element={<BoxSetup />} />
         <Route path="/box/pagamento" element={<PaymentDetails />} />

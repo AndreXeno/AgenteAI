@@ -10,7 +10,7 @@ import {
     SrBadge,
     SrSideCardDark
 } from "../components/Shared/SrComponents";
-import "../styles/pages/nutrition-dashboard.css"; // Keeping it for now
+
 
 const COMMUNITY_RECIPES = [
     {

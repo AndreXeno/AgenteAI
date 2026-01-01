@@ -9,7 +9,7 @@ import {
     SrGrid,
     SrBadge
 } from "../components/Shared/SrComponents";
-import "../styles/pages/mental-wellbeing.css"; // Keeping it for now, but will likely be empty or minimal
+
 
 const MentalWellbeing = () => {
     const [messages, setMessages] = useState([
