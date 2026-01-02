@@ -1,16 +1,10 @@
-/* Shared SR Components Styles */
-/* Extracted from share-recipe.css to be reusable */
+/* =========================================================
+   2) sr-components.css  (REUSABLE SR COMPONENTS) ✅ NO DUPLICATI
+   - qui ci stanno SOLO componenti SR riutilizzabili
+   - niente header specifico pagina share-recipe
+   ========================================================= */
 
-/* Layout & Grid */
-.sr-main {
-    flex: 1;
-    padding: 40px 32px;
-    max-width: 1400px;
-    margin: 0 auto;
-    width: 100%;
-    animation: fadeIn 0.6s ease-out;
-}
-
+/* Anim */
 @keyframes fadeIn {
     from {
         opacity: 0;
@@ -21,6 +15,16 @@
         opacity: 1;
         transform: translateY(0);
     }
+}
+
+/* Layout & Grid */
+.sr-main {
+    flex: 1;
+    padding: 40px 32px;
+    max-width: 1400px;
+    margin: 0 auto;
+    width: 100%;
+    animation: fadeIn .6s ease-out;
 }
 
 .sr-wrap {
@@ -59,7 +63,7 @@
     font-weight: 800;
     color: var(--text);
     margin: 0;
-    letter-spacing: -0.5px;
+    letter-spacing: -.5px;
 }
 
 /* Cards */
@@ -67,21 +71,18 @@
     background: #fff;
     border-radius: 24px;
     padding: 32px;
-    box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.05);
-    /* Softer initial shadow */
-    border: 1px solid rgba(15, 23, 42, 0.06);
+    box-shadow: 0 4px 20px -2px rgba(0, 0, 0, .05);
+    border: 1px solid rgba(15, 23, 42, .06);
     margin-bottom: 32px;
-    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    /* Bouncy subtle effect */
+    transition: all .4s cubic-bezier(.175, .885, .32, 1.275);
     position: relative;
     overflow: hidden;
 }
 
 .sr-card:hover {
-    box-shadow: 0 20px 40px -12px rgba(0, 0, 0, 0.12);
+    box-shadow: 0 20px 40px -12px rgba(0, 0, 0, .12);
     transform: translateY(-4px);
-    border-color: rgba(13, 148, 136, 0.2);
-    /* Teal hint on hover */
+    border-color: rgba(13, 148, 136, .2);
 }
 
 .sr-sideCardDark {
@@ -90,8 +91,8 @@
     border-radius: 28px;
     padding: 32px;
     margin-bottom: 24px;
-    box-shadow: 0 20px 40px -10px rgba(15, 23, 42, 0.3);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 20px 40px -10px rgba(15, 23, 42, .3);
+    border: 1px solid rgba(255, 255, 255, .1);
 }
 
 /* Buttons */
@@ -104,7 +105,7 @@
     font-weight: 800;
     font-size: 15px;
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: all .2s ease;
 }
 
 .sr-btnGhost:hover {
@@ -121,8 +122,8 @@
     font-size: 18px;
     font-weight: 800;
     cursor: pointer;
-    box-shadow: 0 10px 20px -5px rgba(19, 236, 91, 0.4);
-    transition: all 0.2s ease;
+    box-shadow: 0 10px 20px -5px rgba(19, 236, 91, .4);
+    transition: all .2s ease;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -131,7 +132,7 @@
 
 .sr-cta:hover {
     transform: translateY(-2px) scale(1.02);
-    box-shadow: 0 15px 30px -8px rgba(19, 236, 91, 0.5);
+    box-shadow: 0 15px 30px -8px rgba(19, 236, 91, .5);
 }
 
 .sr-linkBtn {
@@ -143,11 +144,11 @@
     cursor: pointer;
     padding: 8px 12px;
     border-radius: 8px;
-    transition: background 0.2s;
+    transition: background .2s;
 }
 
 .sr-linkBtn:hover {
-    background: rgba(13, 148, 136, 0.1);
+    background: rgba(13, 148, 136, .1);
 }
 
 .sr-btnDark {
@@ -156,10 +157,9 @@
     border: none;
     border-radius: 14px;
     padding: 12px 18px;
-    /* Adjusted padding as it was fixed width in share-recipe */
     font-weight: 700;
     cursor: pointer;
-    transition: all 0.2s;
+    transition: all .2s;
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -178,7 +178,7 @@
     padding: 12px 24px;
     font-weight: 700;
     cursor: pointer;
-    transition: all 0.2s;
+    transition: all .2s;
 }
 
 .sr-btnSoft:hover {
@@ -186,14 +186,13 @@
     color: var(--text);
 }
 
-
 /* Form Elements */
 .sr-label {
     display: block;
     font-size: 13px;
     font-weight: 800;
     text-transform: uppercase;
-    letter-spacing: 0.5px;
+    letter-spacing: .5px;
     color: var(--muted);
     margin-bottom: 10px;
 }
@@ -209,7 +208,7 @@
     font-size: 16px;
     font-weight: 600;
     color: var(--text);
-    transition: all 0.2s ease;
+    transition: all .2s ease;
     outline: none;
     font-family: inherit;
 }
@@ -224,7 +223,7 @@
 .sr-textarea:focus,
 .sr-select:focus {
     border-color: var(--teal);
-    box-shadow: 0 0 0 4px rgba(13, 148, 136, 0.1);
+    box-shadow: 0 0 0 4px rgba(13, 148, 136, .1);
 }
 
 /* Badges & Pills */
@@ -236,7 +235,7 @@
     font-weight: 800;
     padding: 4px 8px;
     border-radius: 6px;
-    letter-spacing: 0.5px;
+    letter-spacing: .5px;
     display: inline-block;
 }
 
@@ -244,13 +243,13 @@
     display: inline-flex;
     align-items: center;
     gap: 8px;
-    background: rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, .1);
     padding: 6px 12px;
     border-radius: 8px;
     font-size: 12px;
     font-weight: 700;
     color: #94a3b8;
-    border: 1px solid rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, .05);
 }
 
 /* Sections & Headers */
@@ -270,7 +269,7 @@
     margin-bottom: 24px;
 }
 
-/* Chat UI Styles */
+/* Chat UI */
 .sr-chatContainer {
     height: 400px;
     overflow-y: auto;
@@ -281,7 +280,7 @@
     display: flex;
     flex-direction: column;
     gap: 16px;
-    border: 1px solid rgba(15, 23, 42, 0.04);
+    border: 1px solid rgba(15, 23, 42, .04);
 }
 
 .sr-chatBubbleRow {
@@ -304,7 +303,7 @@
     place-items: center;
     font-size: 20px;
     flex-shrink: 0;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, .05);
 }
 
 .sr-chatBubble {
@@ -315,19 +314,17 @@
     line-height: 1.5;
     font-weight: 500;
     position: relative;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, .02);
 }
 
 .sr-chatBubble.sr-bot {
     background: #fff;
     color: var(--text);
     border-bottom-left-radius: 4px;
-    border: 1px solid rgba(15, 23, 42, 0.05);
+    border: 1px solid rgba(15, 23, 42, .05);
 }
 
 .sr-chatBubble.sr-user {
-    background: var(--text);
-    /* Safe dark color */
     color: #fff;
     border-bottom-right-radius: 4px;
     background: linear-gradient(135deg, #0f172a 0%, #334155 100%);
@@ -339,8 +336,8 @@
     background: #fff;
     padding: 8px;
     border-radius: 18px;
-    border: 1px solid rgba(15, 23, 42, 0.06);
-    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
+    border: 1px solid rgba(15, 23, 42, .06);
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, .05);
 }
 
 .sr-chatInput {
@@ -354,7 +351,7 @@
     font-weight: 500;
 }
 
-/* Hero Styles */
+/* Hero */
 .sr-hero {
     position: relative;
     width: 100%;
@@ -362,7 +359,7 @@
     border-radius: 32px;
     overflow: hidden;
     margin-bottom: 48px;
-    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, .25);
 }
 
 .sr-heroImg {
@@ -371,7 +368,7 @@
     width: 100%;
     height: 100%;
     object-fit: cover;
-    transition: transform 0.8s ease;
+    transition: transform .8s ease;
 }
 
 .sr-hero:hover .sr-heroImg {
@@ -381,7 +378,7 @@
 .sr-overlay {
     position: absolute;
     inset: 0;
-    background: linear-gradient(to top, rgba(15, 23, 42, 0.8), rgba(15, 23, 42, 0.2));
+    background: linear-gradient(to top, rgba(15, 23, 42, .8), rgba(15, 23, 42, .2));
     display: flex;
     flex-direction: column;
     justify-content: flex-end;
@@ -393,12 +390,12 @@
     font-weight: 900;
     color: #fff;
     margin-bottom: 16px;
-    text-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    text-shadow: 0 4px 12px rgba(0, 0, 0, .3);
 }
 
 .sr-heroSub {
     font-size: 20px;
-    color: rgba(255, 255, 255, 0.9);
+    color: rgba(255, 255, 255, .9);
     max-width: 600px;
     line-height: 1.6;
     font-weight: 500;
