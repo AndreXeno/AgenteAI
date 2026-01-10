@@ -24,7 +24,7 @@
 
 .trk-order {
     font-weight: 700;
-    color: #0f172a;
+    color: var(--text);
     background: #e2e8f0;
     padding: 4px 8px;
     border-radius: 6px;
@@ -37,7 +37,7 @@
 
 .trk-etaLabel {
     font-size: 13px;
-    color: rgba(15, 23, 42, .6);
+    color: var(--muted);
     font-weight: 700;
     margin-bottom: 4px;
 }
@@ -45,7 +45,7 @@
 .trk-etaValue {
     font-size: 20px;
     font-weight: 900;
-    color: rgb(13, 148, 136);
+    color: var(--teal);
 }
 
 .trk-grid {
@@ -82,7 +82,7 @@
     top: 20px;
     left: 0;
     height: 4px;
-    background: rgb(13, 148, 136);
+    background: var(--teal);
     border-radius: 99px;
     z-index: 1;
 }
@@ -119,25 +119,25 @@
 }
 
 .trk-stepDot.is-done {
-    background: rgb(13, 148, 136);
-    border-color: rgb(13, 148, 136);
+    background: var(--teal);
+    border-color: var(--teal);
 }
 
 .trk-stepDot.is-current {
-    border-color: rgb(13, 148, 136);
-    color: rgb(13, 148, 136);
+    border-color: var(--teal);
+    color: var(--teal);
     transform: scale(1.1);
-    box-shadow: 0 0 0 4px rgba(13, 148, 136, 0.15);
+    box-shadow: 0 0 0 4px var(--teal-soft);
 }
 
 .trk-stepLabel {
     font-size: 13px;
     font-weight: 600;
-    color: rgba(15, 23, 42, .6);
+    color: var(--muted);
 }
 
 .trk-stepLabel.is-current {
-    color: #0f172a;
+    color: var(--text);
     font-weight: 800;
 }
 
@@ -146,7 +146,7 @@
     top: -20px;
     left: 50%;
     transform: translateX(-50%);
-    background: #ef4444;
+    background: var(--error);
     color: #fff;
     font-size: 10px;
     font-weight: 800;
@@ -193,7 +193,7 @@
 .trk-pinIcon {
     width: 48px;
     height: 48px;
-    background: #0f172a;
+    background: var(--text);
     color: #fff;
     border-radius: 50%;
     display: grid;
@@ -241,7 +241,7 @@
     text-transform: uppercase;
     font-size: 11px;
     font-weight: 800;
-    color: rgba(15, 23, 42, .5);
+    color: var(--muted);
     letter-spacing: 1px;
     margin-bottom: 12px;
 }
@@ -270,7 +270,7 @@
     width: 40px;
     height: 40px;
     border-radius: 50%;
-    border: 1px solid rgba(15, 23, 42, .1);
+    border: 1px solid var(--border-color);
     background: transparent;
     display: grid;
     place-items: center;
@@ -331,11 +331,11 @@
 
 .trk-supportBtn {
     background: #fff;
-    border: 1px solid rgba(15, 23, 42, .1);
+    border: 1px solid var(--border-color);
     padding: 10px 16px;
     border-radius: 99px;
     font-weight: 700;
     margin-top: 16px;
     cursor: pointer;
-    color: #0f172a;
+    color: var(--text);
 }

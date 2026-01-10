@@ -11,12 +11,22 @@
     --line: rgba(15, 23, 42, .10);
     --card: #fff;
     --shadow: 0 18px 50px rgba(0, 0, 0, .06);
+
+    /* Brand Colors */
     --teal: rgb(13, 148, 136);
+    --teal-soft: rgba(13, 148, 136, .12);
     --primary-green: #13ec5b;
     --dark-green: #102216;
 
+    /* Utility Colors */
     --soft-green: #f0fdf4;
     --soft-gray: #f0f4f2;
+    --border-color: rgba(15, 23, 42, .08);
+    --border-light: rgba(15, 23, 42, .06);
+
+    /* Semantic Colors */
+    --success: #22c55e;
+    --error: #ef4444;
 }
 
 * {
@@ -47,8 +57,8 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    background: #fff;
-    border-bottom: 1px solid rgba(15, 23, 42, .06);
+    background: var(--card);
+    border-bottom: 1px solid var(--border-light);
 }
 
 /* Common Brand / Logo (standard pages) */
@@ -84,7 +94,7 @@
     width: 12px;
     height: 12px;
     border-radius: 999px;
-    background: rgb(13, 148, 136);
+    background: var(--teal);
 }
 
 .mb-brandText,
@@ -166,8 +176,8 @@
 .d-card,
 .tc-card,
 .trk-card {
-    background: #fff;
-    border: 1px solid rgba(15, 23, 42, .08);
+    background: var(--card);
+    border: 1px solid var(--border-color);
     border-radius: 20px;
     box-shadow: 0 10px 30px rgba(0, 0, 0, .03);
 }
@@ -197,7 +207,7 @@
 .btn-primary {
     border: none;
     cursor: pointer;
-    background: #0f172a;
+    background: var(--text);
     color: #fff;
     font-weight: 900;
     padding: 12px 18px;
@@ -215,7 +225,7 @@
     padding: 12px;
     font-weight: 800;
     cursor: pointer;
-    color: #0f172a;
+    color: var(--text);
 }
 
 .btn-cta {
@@ -262,7 +272,7 @@
     outline: none;
     transition: border-color .2s;
     font-weight: 600;
-    background: #fff;
+    background: var(--card);
 }
 
 .form-input:focus {
@@ -290,20 +300,20 @@
 }
 
 .tag--outline {
-    background: #fff;
-    border-color: rgba(15, 23, 42, .10);
+    background: var(--card);
+    border-color: var(--line);
     color: rgba(15, 23, 42, .60);
 }
 
 .tag--active {
-    background: #0f172a;
+    background: var(--text);
     color: #fff;
-    border-color: #0f172a;
+    border-color: var(--text);
 }
 
 .tag--teal {
-    background: rgba(13, 148, 136, .12);
-    color: rgb(13, 148, 136);
+    background: var(--teal-soft);
+    color: var(--teal);
 }
 
 .tag--blue {

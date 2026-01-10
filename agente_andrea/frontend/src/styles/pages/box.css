@@ -1,16 +1,13 @@
 /* Box Setup Page Styles */
 /* Shared CSS loaded globally */
 
-/* Box Setup Page Styles */
-/* Shared CSS loaded globally */
-
 /* Specific overrides for box page */
 .mb-breadcrumbs {
     display: flex;
     align-items: center;
     gap: 8px;
     font-size: 14px;
-    color: rgba(15, 23, 42, .55);
+    color: var(--muted);
     margin-bottom: 24px;
 }
 
@@ -22,7 +19,7 @@
 
 .mb-crumbActive {
     font-weight: 700;
-    color: #0f172a;
+    color: var(--text);
 }
 
 .mb-sep {
@@ -49,12 +46,12 @@
 }
 
 .mb-grad {
-    color: rgb(13, 148, 136);
+    color: var(--teal);
 }
 
 .mb-sub {
     font-size: 18px;
-    color: rgba(15, 23, 42, .6);
+    color: var(--muted);
     margin-top: 12px;
     line-height: 1.5;
 }
@@ -93,7 +90,7 @@
     border: none;
     font-weight: 700;
     cursor: pointer;
-    color: rgb(13, 148, 136);
+    color: var(--teal);
 }
 
 .mb-pillRow {
@@ -107,16 +104,16 @@
     display: flex;
     align-items: center;
     gap: 8px;
-    background: rgba(13, 148, 136, 0.1);
+    background: var(--teal-soft);
     padding: 8px 14px;
     border-radius: 99px;
     font-weight: 700;
     font-size: 14px;
-    color: rgb(13, 148, 136);
+    color: var(--teal);
 }
 
 .mb-pill--strong {
-    background: rgb(13, 148, 136);
+    background: var(--teal);
     color: #fff;
 }
 
@@ -197,7 +194,7 @@
 /* Sidebar Box List */
 .mb-boxHead {
     margin-bottom: 20px;
-    border-bottom: 1px solid rgba(15, 23, 42, .06);
+    border-bottom: 1px solid var(--border-light);
     padding-bottom: 16px;
 }
 
@@ -255,7 +252,7 @@
     align-items: center;
     margin-top: 24px;
     padding-top: 20px;
-    border-top: 1px solid rgba(15, 23, 42, .06);
+    border-top: 1px solid var(--border-light);
 }
 
 .mb-totalNum {
@@ -272,7 +269,7 @@
 .mb-footnote {
     text-align: center;
     font-size: 12px;
-    color: rgba(15, 23, 42, .5);
+    color: var(--muted);
     margin-top: 16px;
 }
 
@@ -282,7 +279,7 @@
     margin-top: 24px;
     font-size: 12px;
     font-weight: 600;
-    color: rgba(15, 23, 42, .6);
+    color: var(--muted);
 }
 
 .mb-trustItem {

@@ -22,7 +22,7 @@
 
 .tp-card {
     background: var(--card);
-    border: 1px solid rgba(15, 23, 42, .08);
+    border: 1px solid var(--border-color);
     border-radius: 24px;
     box-shadow: var(--shadow);
 }
@@ -81,7 +81,7 @@
 }
 
 .tp-role {
-    color: rgba(15, 23, 42, .55);
+    color: var(--muted);
     font-weight: 700;
     font-size: 18px;
 }
@@ -103,7 +103,7 @@
 
 .tp-par {
     margin: 0;
-    color: rgba(15, 23, 42, .55);
+    color: var(--muted);
     font-weight: 650;
     font-size: 18px;
     line-height: 1.65;
@@ -142,7 +142,7 @@
 
 .tp-calDow {
     font-weight: 900;
-    color: rgba(15, 23, 42, .55);
+    color: var(--muted);
     text-align: center;
 }
 
@@ -171,7 +171,7 @@
 
 .tp-contactSub {
     margin-top: 6px;
-    color: rgba(15, 23, 42, .55);
+    color: var(--muted);
     font-weight: 700;
 }
 
@@ -204,7 +204,7 @@
 }
 
 .tp-checkText {
-    color: rgba(15, 23, 42, .55);
+    color: var(--muted);
     font-weight: 700;
     font-size: 18px;
     line-height: 1.35;
@@ -242,7 +242,7 @@
 
 .tp-reviewText {
     margin: 10px 0 0;
-    color: rgba(15, 23, 42, .55);
+    color: var(--muted);
     font-weight: 650;
     font-size: 16px;
     line-height: 1.5;
@@ -250,7 +250,7 @@
 
 .tp-divider {
     margin: 18px 0;
-    border-top: 1px solid rgba(15, 23, 42, .10);
+    border-top: 1px solid var(--border-color);
 }
 
 @media (max-width: 1080px) {

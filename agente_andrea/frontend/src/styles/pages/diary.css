@@ -30,7 +30,7 @@
 .d-card {
     width: min(720px, 92vw);
     background: var(--card);
-    border: 1px solid rgba(15, 23, 42, .08);
+    border: 1px solid var(--border-color);
     border-radius: 18px;
     padding: 28px 30px 26px;
     box-shadow: var(--shadow);
@@ -81,7 +81,7 @@
 }
 
 .d-chip {
-    border: 1px solid rgba(15, 23, 42, .10);
+    border: 1px solid var(--border-color);
     background: #fff;
     border-radius: 999px;
     padding: 10px 14px;
@@ -102,7 +102,7 @@
     resize: vertical;
     padding: 14px 14px;
     border-radius: 12px;
-    border: 1px solid rgba(15, 23, 42, .10);
+    border: 1px solid var(--border-color);
     outline: none;
     font-size: 16px;
     font-weight: 650;
